@@ -24,6 +24,7 @@ backend/.coverage
 backend/htmlcov/
 backend/*.sqlite3
 *.db
+backend/generated_quotes/
 
 # =========================
 # NODE / FRONTEND / ELECTRON
