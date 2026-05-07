@@ -52,7 +52,7 @@ function createWindow() {
       e.preventDefault();
     }
   });
-
+  mainWindow.webContents.openDevTools();
   mainWindow.loadURL('http://localhost:5173');
 }
 

@@ -1,21 +1,20 @@
 {
   "name": "electron-wrapper",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Kiosk Wrapper",
+  "main": "main.js", 
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "electron ."
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
   "devDependencies": {
-    "electron": "^42.0.0"
+    "electron": "^latest"
   },
   "dependencies": {
-    "concurrently": "^9.2.1",
-    "cross-env": "^10.1.0",
-    "wait-on": "^9.0.5"
+    "concurrently": "^latest",
+    "cross-env": "^latest",
+    "wait-on": "^latest"
   }
 }
