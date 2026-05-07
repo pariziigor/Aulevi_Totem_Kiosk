@@ -23,7 +23,7 @@ backend/.mypy_cache/
 backend/.coverage
 backend/htmlcov/
 backend/*.sqlite3
-backend/*.db
+*.db
 
 # =========================
 # NODE / FRONTEND / ELECTRON
