@@ -1,6 +1,9 @@
 import React, { useState, useRef } from 'react';
-import Keyboard from 'react-simple-keyboard';
+import KeyboardModule from 'react-simple-keyboard';
 import 'react-simple-keyboard/build/css/index.css';
+
+// Interoperabilidade: Garante a extração correta do componente no Vite
+const KeyboardComponent = typeof KeyboardModule === 'function' ? KeyboardModule : (KeyboardModule as any).default;
 
 interface LeadCaptureModalProps {
   onConfirm: (name: string, phone: string) => void;
@@ -12,7 +15,7 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({ onConfirm, o
   const [inputPhone, setInputPhone] = useState<string>('');
   const [layoutName, setLayoutName] = useState<string>('default');
   const [activeInput, setActiveInput] = useState<'name' | 'phone'>('name');
-  const [lgpdConsent, setLgpdConsent] = useState<boolean>(false); // Tipagem booleana estrita
+  const [lgpdConsent, setLgpdConsent] = useState<boolean>(false);
   
   const keyboardRef = useRef<any>(null);
 
@@ -89,11 +92,11 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({ onConfirm, o
       </div>
 
       <div className="w-full mt-auto mb-8">
-        <Keyboard
-          keyboardRef={r => (keyboardRef.current = r)}
+        <KeyboardComponent
+          keyboardRef={(r: any) => (keyboardRef.current = r)}
           layoutName={layoutName}
           onChange={handleKeyboardInput}
-          onKeyPress={(button) => button === "{shift}" || button === "{lock}" ? handleShift() : null}
+          onKeyPress={(button: string) => button === "{shift}" || button === "{lock}" ? handleShift() : null}
           theme={"hg-theme-default my-custom-keyboard-theme"}
           layout={{
             default: [
