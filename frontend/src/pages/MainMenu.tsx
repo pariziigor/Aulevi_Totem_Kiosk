@@ -10,7 +10,7 @@ const MainMenu: React.FC = () => {
     { id: 'LSF', label: 'LIGHT STEEL FRAME', icon: <Home size={90} strokeWidth={1.5} />, path: '/fluxo/LSF' },
     { id: 'MM', label: 'MADEIRAMENTO METÁLICO', icon: <Trees size={90} strokeWidth={1.5} />, path: '/fluxo/MM' },
     { id: 'CHALE', label: 'CHALÉS', icon: <Warehouse size={90} strokeWidth={1.5} />, path: '/fluxo/CHALE' },
-    { id: 'BARRACAO', label: 'BARRACÃO', icon: <Factory size={90} strokeWidth={1.5} />, path: '/fluxo/BARRACAO' },
+    { id: 'BARRACAO', label: 'GALPÃO', icon: <Factory size={90} strokeWidth={1.5} />, path: '/fluxo/BARRACAO' },
   ];
 
   const containerVariants = {
@@ -34,7 +34,7 @@ const MainMenu: React.FC = () => {
       {/* Cabeçalho Proporcional */}
       <header className="border-b-8 border-black pb-4 mb-6 flex justify-between items-end flex-none">
         <h1 className="text-6xl font-black tracking-tighter uppercase">Sistema Aulevi</h1>
-        <p className="text-3xl font-bold uppercase">Selecione o Sistema</p>
+        <p className="text-3xl font-bold uppercase">Selecione a opção desejada</p>
       </header>
 
       {/* Grid com min-h-0 forçando o respeito às bordas da tela */}
