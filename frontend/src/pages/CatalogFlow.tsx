@@ -170,11 +170,64 @@ const CatalogFlow: React.FC = () => {
             </div>
 
             <div className="flex-1 flex flex-col gap-8">
-              <div className="flex-grow border-8 border-black p-8 text-2xl font-bold uppercase overflow-y-auto">
-                <h3 className="text-xl text-gray-500 mb-4 border-b-4 border-black pb-2">
-                  Especificações Técnicas
-                </h3>
-                <p>{selectedProduct.description}</p>
+              <div className="flex-grow border-8 border-black p-4 xl:p-8 font-bold uppercase overflow-hidden flex flex-col justify-between h-full">
+                {/* Agrupamento Superior: Cabeçalho e Descrição (flex-none para não esmagar) */}
+                <div className="flex flex-col gap-4 xl:gap-8 flex-none">
+                  {/* Cabeçalho Escalonável */}
+                  <div className="flex justify-between border-b-4 xl:border-b-8 border-black pb-3 xl:pb-6 text-xl xl:text-3xl 2xl:text-4xl font-black">
+                    <span>ÁREA: {selectedProduct.area}</span>
+                    <span>DIMENSÃO: {selectedProduct.dimensions}</span>
+                  </div>
+
+                  {/* Descrição Escalonável */}
+                  <p className="text-gray-800 leading-snug text-sm xl:text-lg 2xl:text-2xl">
+                    {selectedProduct.description}
+                  </p>
+                </div>
+
+                {/* Agrupamento Inferior: Grid Flexível que absorve o resto da tela */}
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 xl:gap-8 mt-6 xl:mt-10 flex-grow min-h-0">
+                  {/* Bloco: INCLUSO */}
+                  <div className="border-4 xl:border-8 border-black p-4 xl:p-6 flex flex-col h-full min-h-0">
+                    <h4 className="bg-black text-white p-3 xl:p-5 mb-4 xl:mb-6 font-black text-base xl:text-2xl 2xl:text-3xl text-center uppercase tracking-widest flex-none">
+                      [ O QUE ACOMPANHA ]
+                    </h4>
+                    {/* justify-evenly espalha as linhas verticalmente para ocupar 100% do espaço */}
+                    <ul className="flex flex-col flex-grow justify-evenly overflow-hidden">
+                      {selectedProduct.includedItems.map((item, i) => (
+                        <li
+                          key={i}
+                          className="flex gap-3 xl:gap-5 text-xs xl:text-base 2xl:text-xl leading-tight items-center"
+                        >
+                          <span className="font-black text-lg xl:text-3xl mt-[-2px] xl:mt-[-4px]">
+                            +
+                          </span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Bloco: NÃO INCLUSO */}
+                  <div className="border-4 xl:border-8 border-gray-400 p-4 xl:p-6 flex flex-col text-gray-500 h-full min-h-0">
+                    <h4 className="bg-gray-200 text-black p-3 xl:p-5 mb-4 xl:mb-6 font-black text-base xl:text-2xl 2xl:text-3xl text-center uppercase tracking-widest border-b-4 xl:border-b-8 border-gray-400 flex-none">
+                      [ NÃO ACOMPANHA ]
+                    </h4>
+                    <ul className="flex flex-col flex-grow justify-evenly overflow-hidden">
+                      {selectedProduct.excludedItems.map((item, i) => (
+                        <li
+                          key={i}
+                          className="flex gap-3 xl:gap-5 text-xs xl:text-base 2xl:text-xl leading-tight items-center"
+                        >
+                          <span className="font-black text-lg xl:text-3xl mt-[-2px] xl:mt-[-4px]">
+                            -
+                          </span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
               </div>
 
               <motion.button
