@@ -8,7 +8,8 @@ export const useInactivityTimeout = (timeoutSeconds: number = 60) => {
   const resetSession = useKioskStore((state) => state.resetSession);
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
+    // Correção: Substituição da tipagem de Node para a tipagem nativa do navegador
+    let timeoutId: ReturnType<typeof setTimeout>;
 
     const resetTimer = () => {
       clearTimeout(timeoutId);
@@ -21,7 +22,7 @@ export const useInactivityTimeout = (timeoutSeconds: number = 60) => {
       }
     };
 
-    // Escuta eventos de toque e clique do Electron
+    // Escuta eventos de toque e clique
     window.addEventListener('mousemove', resetTimer);
     window.addEventListener('mousedown', resetTimer);
     window.addEventListener('touchstart', resetTimer);
