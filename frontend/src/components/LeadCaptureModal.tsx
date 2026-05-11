@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
+import { Check, X } from "lucide-react";
 
 interface LeadCaptureModalProps {
   onConfirm: (name: string, phone: string) => void;
@@ -38,7 +39,6 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
     if (activeInput === "name") {
       if (inputName.length < 50) setInputName((prev) => prev + finalKey);
     } else {
-      // Trava de segurança extra (back-end do componente)
       if (/[0-9]/.test(finalKey) && inputPhone.length < 15) {
         setInputPhone((prev) => prev + finalKey);
       }
@@ -90,10 +90,10 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
       flexClass = "flex-[1.5]";
     }
 
-    // LÓGICA DA TRAVA: Se for telefone e a tecla não for número nem APAGAR, desabilita
     const isPhoneField = activeInput === "phone";
     const isAllowedInPhone = /^[0-9]$/.test(key) || key === "APAGAR";
     const isDisabled = isPhoneField && !isAllowedInPhone;
+    const isSpecialKey = key === "APAGAR" || key === "MAIÚSCULA";
 
     return (
       <motion.button
@@ -101,15 +101,17 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
         whileTap={
           isDisabled
             ? {}
-            : { scale: 0.95, backgroundColor: "#000", color: "#FFF" }
+            : { scale: 0.95, backgroundColor: "#f1f5f9" }
         }
         onClick={() => !isDisabled && handleKeyPress(key)}
         disabled={isDisabled}
-        className={`${flexClass} flex items-center justify-center border-4 border-black py-3 xl:py-5 text-sm xl:text-2xl font-black uppercase transition-colors
+        className={`${flexClass} flex items-center justify-center border border-slate-200 rounded-lg xl:rounded-xl h-10 xl:h-14 text-sm xl:text-lg font-bold uppercase transition-all shadow-sm
           ${
             isDisabled
-              ? "bg-gray-200 text-gray-400 opacity-40 cursor-not-allowed"
-              : "bg-white text-black hover:bg-gray-100"
+              ? "bg-slate-100 text-slate-400 opacity-50 cursor-not-allowed shadow-none"
+              : isSpecialKey
+              ? "bg-slate-200 text-slate-600 hover:bg-slate-300"
+              : "bg-white text-slate-700 hover:border-emerald-300 hover:shadow-md"
           }
         `}
       >
@@ -119,122 +121,141 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-white z-50 flex flex-col p-6 xl:p-12 select-none border-16 border-black overflow-hidden">
-      {/* Cabeçalho */}
-      <header className="mb-6 xl:mb-12 flex-none">
-        <h2 className="text-4xl xl:text-5xl font-black tracking-tighter uppercase border-b-8 border-black pb-4">
-          Identificação Necessária
-        </h2>
-        <p className="text-xl xl:text-2xl mt-4 font-bold">
-          Informe seus dados para gerar o orçamento detalhado.
-        </p>
-      </header>
+    <motion.div 
+      initial={{ opacity: 0, y: 50 }} 
+      animate={{ opacity: 1, y: 0 }} 
+      exit={{ opacity: 0, y: 50 }}
+      className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 xl:p-8 select-none"
+    >
+      <div className="bg-slate-50 w-full max-w-6xl h-full max-h-[1080px] rounded-[2rem] shadow-2xl border border-slate-200 flex flex-col overflow-hidden relative">
+        
+        {/* Cabeçalho Compacto */}
+        <header className="bg-white border-b border-slate-200 px-6 xl:px-10 py-4 xl:py-6 flex-none flex flex-col items-center text-center">
+          <h2 className="text-2xl xl:text-4xl font-bold tracking-tight text-slate-900 uppercase">
+            Identificação Necessária
+          </h2>
+          <p className="text-base xl:text-xl mt-1 xl:mt-2 text-slate-500 font-medium">
+            Informe seus dados para gerar o orçamento detalhado.
+          </p>
+        </header>
 
-      {/* Inputs Falsos (Kiosk Safe) e LGPD */}
-      <div className="flex flex-col gap-4 xl:gap-8 w-full max-w-5xl mx-auto flex-none">
-        <div
-          onClick={() => setActiveInput("name")}
-          className="flex flex-col gap-2 cursor-pointer"
-        >
-          <label className="text-xl xl:text-2xl font-black uppercase text-gray-500">
-            Nome Completo
-          </label>
+        {/* Inputs Compactos */}
+        <div className="flex flex-col gap-3 xl:gap-5 w-full max-w-5xl mx-auto flex-none px-6 xl:px-12 mt-4 xl:mt-6">
           <div
-            className={`border-8 p-4 xl:p-6 text-2xl xl:text-3xl font-black transition-colors min-h-[80px] flex items-center ${activeInput === "name" ? "border-black bg-gray-100" : "border-gray-300 bg-white"}`}
+            onClick={() => setActiveInput("name")}
+            className="flex flex-col gap-1.5 cursor-pointer group"
           >
-            {inputName || (
-              <span className="text-gray-300">TOQUE PARA DIGITAR</span>
-            )}
+            <label className="text-sm xl:text-lg font-bold uppercase text-slate-500 ml-2 group-hover:text-emerald-600 transition-colors">
+              Nome Completo
+            </label>
+            <div
+              className={`border-2 p-3 xl:p-5 rounded-xl text-xl xl:text-2xl font-bold transition-all min-h-[56px] xl:min-h-[72px] flex items-center shadow-sm ${
+                activeInput === "name" 
+                  ? "border-emerald-500 ring-4 ring-emerald-50 bg-white text-slate-900" 
+                  : "border-slate-200 bg-slate-100 text-slate-600 hover:border-emerald-300"
+              }`}
+            >
+              {inputName || (
+                <span className="text-slate-400 font-medium">TOQUE PARA DIGITAR</span>
+              )}
+            </div>
+          </div>
+
+          <div
+            onClick={() => setActiveInput("phone")}
+            className="flex flex-col gap-1.5 cursor-pointer group"
+          >
+            <label className="text-sm xl:text-lg font-bold uppercase text-slate-500 ml-2 group-hover:text-emerald-600 transition-colors">
+              WhatsApp (apenas números)
+            </label>
+            <div
+              className={`border-2 p-3 xl:p-5 rounded-xl text-xl xl:text-2xl font-bold transition-all min-h-[56px] xl:min-h-[72px] flex items-center shadow-sm ${
+                activeInput === "phone" 
+                  ? "border-emerald-500 ring-4 ring-emerald-50 bg-white text-slate-900" 
+                  : "border-slate-200 bg-slate-100 text-slate-600 hover:border-emerald-300"
+              }`}
+            >
+              {inputPhone || (
+                <span className="text-slate-400 font-medium">TOQUE PARA DIGITAR</span>
+              )}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 mt-1 ml-2">
+            <input
+              type="checkbox"
+              id="lgpd"
+              checked={lgpdConsent}
+              onChange={(e) => setLgpdConsent(e.target.checked)}
+              className="w-6 h-6 xl:w-8 xl:h-8 border-2 border-slate-300 rounded-lg accent-emerald-600 cursor-pointer transition-all"
+            />
+            <label
+              htmlFor="lgpd"
+              className="text-sm xl:text-lg font-medium text-slate-600 cursor-pointer select-none"
+            >
+              Autorizo o armazenamento dos meus dados (LGPD).
+            </label>
           </div>
         </div>
 
-        <div
-          onClick={() => setActiveInput("phone")}
-          className="flex flex-col gap-2 cursor-pointer"
-        >
-          <label className="text-xl xl:text-2xl font-black uppercase text-gray-500">
-            WhatsApp (apenas números)
-          </label>
-          <div
-            className={`border-8 p-4 xl:p-6 text-2xl xl:text-3xl font-black transition-colors min-h-[80px] flex items-center ${activeInput === "phone" ? "border-black bg-gray-100" : "border-gray-300 bg-white"}`}
-          >
-            {inputPhone || (
-              <span className="text-gray-300">TOQUE PARA DIGITAR</span>
-            )}
+        {/* Teclado Responsivo Flexível com Alinhamento Centralizado */}
+        <div className="flex-grow flex flex-col justify-center gap-1.5 xl:gap-2.5 overflow-hidden w-full max-w-5xl mx-auto px-4 xl:px-8 mt-2 mb-4 xl:mb-6">
+          {keyboardLayout.map((row, rowIndex) => (
+            <div
+              key={rowIndex}
+              className="flex justify-center gap-1.5 xl:gap-2.5 w-full"
+            >
+              {row.map((key) => renderKey(key))}
+            </div>
+          ))}
+          {/* Linha do Espaço */}
+          <div className="flex justify-center gap-1.5 xl:gap-2.5 w-full mt-1">
+            <motion.button
+              whileTap={
+                activeInput === "phone"
+                  ? {}
+                  : { scale: 0.98, backgroundColor: "#f1f5f9" }
+              }
+              onClick={() => activeInput !== "phone" && handleKeyPress("ESPAÇO")}
+              disabled={activeInput === "phone"}
+              className={`w-full flex items-center justify-center border border-slate-200 rounded-xl h-12 xl:h-16 text-lg xl:text-xl font-bold uppercase transition-all shadow-sm
+                  ${
+                    activeInput === "phone"
+                      ? "bg-slate-100 text-slate-400 opacity-50 cursor-not-allowed shadow-none"
+                      : "bg-white text-slate-700 hover:border-emerald-300 hover:shadow-md"
+                  }
+                `}
+            >
+              ESPAÇO
+            </motion.button>
           </div>
         </div>
 
-        <div className="flex items-center gap-4 mt-2 mb-2">
-          <input
-            type="checkbox"
-            id="lgpd"
-            checked={lgpdConsent}
-            onChange={(e) => setLgpdConsent(e.target.checked)}
-            className="w-10 h-10 border-4 border-black accent-black cursor-pointer"
-          />
-          <label
-            htmlFor="lgpd"
-            className="text-lg xl:text-xl font-bold uppercase cursor-pointer"
-          >
-            Autorizo o armazenamento dos meus dados para contato comercial
-            (LGPD).
-          </label>
-        </div>
-      </div>
-
-      {/* Teclado Responsivo Flexível */}
-      <div className="flex-grow flex flex-col justify-end gap-1 sm:gap-2 overflow-hidden w-full max-w-6xl mx-auto mt-4 min-h-0">
-        {keyboardLayout.map((row, rowIndex) => (
-          <div
-            key={rowIndex}
-            className="flex justify-center gap-1 sm:gap-2 w-full"
-          >
-            {row.map((key) => renderKey(key))}
-          </div>
-        ))}
-        {/* Linha do Espaço com Trava embutida */}
-        <div className="flex justify-center gap-1 sm:gap-2 w-full mt-1">
+        {/* Rodapé de Ações Compacto */}
+        <div className="bg-white border-t border-slate-200 px-6 xl:px-10 py-4 xl:py-6 flex justify-between items-center flex-none">
           <motion.button
-            whileTap={
-              activeInput === "phone"
-                ? {}
-                : { scale: 0.98, backgroundColor: "#000", color: "#FFF" }
-            }
-            onClick={() => activeInput !== "phone" && handleKeyPress("ESPAÇO")}
-            disabled={activeInput === "phone"}
-            className={`w-full flex items-center justify-center border-4 border-black py-4 xl:py-6 text-xl xl:text-3xl font-black uppercase transition-colors
-                ${
-                  activeInput === "phone"
-                    ? "bg-gray-200 text-gray-400 opacity-40 cursor-not-allowed"
-                    : "bg-white text-black"
-                }
-              `}
+            whileTap={{ scale: 0.95 }}
+            onClick={onCancel}
+            className="bg-white text-slate-600 border border-slate-200 rounded-full px-6 xl:px-10 py-3 xl:py-4 text-lg xl:text-xl font-bold uppercase hover:bg-slate-100 transition-colors shadow-sm flex items-center gap-2"
           >
-            ESPAÇO
+            <X size={24} /> Cancelar
+          </motion.button>
+          
+          <motion.button
+            whileTap={lgpdConsent ? { scale: 0.95 } : {}}
+            onClick={handleSubmit}
+            disabled={lgpdConsent === false}
+            className={`rounded-full px-6 xl:px-10 py-3 xl:py-4 text-lg xl:text-xl font-bold uppercase transition-all flex items-center gap-2 shadow-md ${
+              lgpdConsent === true
+                ? "bg-emerald-600 text-white hover:bg-emerald-700 shadow-emerald-200"
+                : "bg-slate-200 text-slate-400 cursor-not-allowed shadow-none"
+            }`}
+          >
+            <Check size={24} /> Confirmar e Gerar
           </motion.button>
         </div>
-      </div>
 
-      {/* Rodapé de Ações */}
-      <div className="flex justify-between mt-6 border-t-8 border-black pt-6 xl:pt-8 flex-none">
-        <button
-          onClick={onCancel}
-          className="bg-white text-black border-8 border-black px-8 xl:px-12 py-4 xl:py-6 text-2xl xl:text-3xl font-black uppercase hover:bg-gray-200 transition-colors"
-        >
-          Cancelar
-        </button>
-        <button
-          onClick={handleSubmit}
-          disabled={lgpdConsent === false}
-          className={`px-8 xl:px-12 py-4 xl:py-6 text-2xl xl:text-3xl font-black uppercase border-8 border-black transition-colors ${
-            lgpdConsent === true
-              ? "bg-black text-white hover:opacity-90"
-              : "bg-gray-300 text-gray-500 cursor-not-allowed border-gray-400"
-          }`}
-        >
-          Confirmar e Gerar
-        </button>
       </div>
-    </div>
+    </motion.div>
   );
 };
