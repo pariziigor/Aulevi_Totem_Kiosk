@@ -240,7 +240,7 @@ const CatalogFlow: React.FC = () => {
               <motion.button
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setShowLeadModal(true)}
-                className="flex-none bg-emerald-600 text-white rounded-[2rem] py-6 xl:py-8 text-3xl xl:text-4xl font-bold uppercase shadow-lg shadow-emerald-200 hover:bg-emerald-700 transition-all w-full"
+                className="flex-none bg-orange-500 text-white rounded-[2rem] py-6 xl:py-8 text-3xl xl:text-4xl font-bold uppercase shadow-lg shadow-orange-200 hover:bg-orange-700 transition-all w-full"
               >
                 Tenho Interesse
               </motion.button>
@@ -259,7 +259,7 @@ const CatalogFlow: React.FC = () => {
           <h1 className="text-3xl xl:text-4xl font-black tracking-tight text-slate-900 uppercase">
             Catálogo: {catalogType}
           </h1>
-          <div className="h-1 w-24 bg-blue-500 rounded-full"></div>
+          <div className="h-1 w-24 bg-orange-500 rounded-full"></div>
         </div>
         <button
           onClick={() => navigate("/")}

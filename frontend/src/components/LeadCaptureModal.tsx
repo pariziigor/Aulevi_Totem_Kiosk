@@ -111,7 +111,7 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
               ? "bg-slate-100 text-slate-400 opacity-50 cursor-not-allowed shadow-none"
               : isSpecialKey
               ? "bg-slate-200 text-slate-600 hover:bg-slate-300"
-              : "bg-white text-slate-700 hover:border-emerald-300 hover:shadow-md"
+              : "bg-white text-slate-700 hover:border-orange-300 hover:shadow-md"
           }
         `}
       >
@@ -145,14 +145,14 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
             onClick={() => setActiveInput("name")}
             className="flex flex-col gap-1.5 cursor-pointer group"
           >
-            <label className="text-sm xl:text-lg font-bold uppercase text-slate-500 ml-2 group-hover:text-emerald-600 transition-colors">
+            <label className="text-sm xl:text-lg font-bold uppercase text-slate-500 ml-2 group-hover:text-orange-600 transition-colors">
               Nome Completo
             </label>
             <div
               className={`border-2 p-3 xl:p-5 rounded-xl text-xl xl:text-2xl font-bold transition-all min-h-[56px] xl:min-h-[72px] flex items-center shadow-sm ${
                 activeInput === "name" 
-                  ? "border-emerald-500 ring-4 ring-emerald-50 bg-white text-slate-900" 
-                  : "border-slate-200 bg-slate-100 text-slate-600 hover:border-emerald-300"
+                  ? "border-orange-500 ring-4 ring-orange-50 bg-white text-slate-900" 
+                  : "border-slate-200 bg-slate-100 text-slate-600 hover:border-orange-300"
               }`}
             >
               {inputName || (
@@ -165,13 +165,13 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
             onClick={() => setActiveInput("phone")}
             className="flex flex-col gap-1.5 cursor-pointer group"
           >
-            <label className="text-sm xl:text-lg font-bold uppercase text-slate-500 ml-2 group-hover:text-emerald-600 transition-colors">
+            <label className="text-sm xl:text-lg font-bold uppercase text-slate-500 ml-2 group-hover:text-orange-600 transition-colors">
               WhatsApp (apenas números)
             </label>
             <div
               className={`border-2 p-3 xl:p-5 rounded-xl text-xl xl:text-2xl font-bold transition-all min-h-[56px] xl:min-h-[72px] flex items-center shadow-sm ${
                 activeInput === "phone" 
-                  ? "border-emerald-500 ring-4 ring-emerald-50 bg-white text-slate-900" 
+                  ? "border-orange-500 ring-4 ring-emerald-50 bg-white text-slate-900" 
                   : "border-slate-200 bg-slate-100 text-slate-600 hover:border-emerald-300"
               }`}
             >
@@ -187,7 +187,7 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
               id="lgpd"
               checked={lgpdConsent}
               onChange={(e) => setLgpdConsent(e.target.checked)}
-              className="w-6 h-6 xl:w-8 xl:h-8 border-2 border-slate-300 rounded-lg accent-emerald-600 cursor-pointer transition-all"
+              className="w-6 h-6 xl:w-8 xl:h-8 border-2 border-slate-300 rounded-lg accent-orange-600 cursor-pointer transition-all"
             />
             <label
               htmlFor="lgpd"
@@ -222,7 +222,7 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
                   ${
                     activeInput === "phone"
                       ? "bg-slate-100 text-slate-400 opacity-50 cursor-not-allowed shadow-none"
-                      : "bg-white text-slate-700 hover:border-emerald-300 hover:shadow-md"
+                      : "bg-white text-slate-700 hover:border-orange-300 hover:shadow-md"
                   }
                 `}
             >
@@ -247,7 +247,7 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
             disabled={lgpdConsent === false}
             className={`rounded-full px-6 xl:px-10 py-3 xl:py-4 text-lg xl:text-xl font-bold uppercase transition-all flex items-center gap-2 shadow-md ${
               lgpdConsent === true
-                ? "bg-emerald-600 text-white hover:bg-emerald-700 shadow-emerald-200"
+                ? "bg-orange-600 text-white hover:bg-orange-700 shadow-orange-200"
                 : "bg-slate-200 text-slate-400 cursor-not-allowed shadow-none"
             }`}
           >
