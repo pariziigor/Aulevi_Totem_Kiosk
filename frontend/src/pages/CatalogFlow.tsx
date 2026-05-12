@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, CheckCircle2, XCircle } from "lucide-react";
+import { ChevronLeft, ChevronRight, CheckCircle2, XCircle, ChevronDown } from "lucide-react";
 import { LeadCaptureModal } from "../components/LeadCaptureModal";
 import { CHALES_DATA, BARRACAO_DATA, type Product } from "../data/products";
 
@@ -65,11 +65,7 @@ const CatalogFlow: React.FC = () => {
   const renderStep = () => {
     const stepVariants = {
       initial: { opacity: 0, x: 50 },
-      animate: {
-        opacity: 1,
-        x: 0,
-        transition: { duration: 0.4, ease: "easeOut" as const },
-      },
+      animate: { opacity: 1, x: 0, transition: { duration: 0.4, ease: "easeOut" as const } },
       exit: { opacity: 0, x: -50, transition: { duration: 0.2 } },
     };
 
@@ -84,6 +80,7 @@ const CatalogFlow: React.FC = () => {
           className="flex flex-col w-full h-full min-h-0"
         >
           <div className="flex-grow relative flex items-center justify-center min-h-0 w-full max-w-[1800px] mx-auto">
+            
             <button
               onClick={() => handleScroll("left")}
               className="absolute left-2 xl:left-8 z-10 bg-white/80 backdrop-blur-md border border-slate-200 text-slate-600 rounded-full p-4 hover:bg-white hover:shadow-md transition-all hidden md:flex shadow-sm"
@@ -109,7 +106,7 @@ const CatalogFlow: React.FC = () => {
                     className="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-700 ease-out"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent"></div>
-
+                  
                   <div className="relative z-10 bg-white/95 backdrop-blur-sm border border-white/20 rounded-2xl p-4 xl:p-5 text-center shadow-lg transform group-hover:-translate-y-2 transition-transform duration-300">
                     <h2 className="text-xl xl:text-2xl 2xl:text-3xl font-bold tracking-tight text-slate-800 uppercase leading-none">
                       {prod.title}
@@ -126,7 +123,7 @@ const CatalogFlow: React.FC = () => {
               <ChevronRight size={48} strokeWidth={1.5} />
             </button>
           </div>
-
+          
           <div className="text-center mt-2 mb-4 flex-none">
             <span className="text-base xl:text-xl font-bold uppercase tracking-widest text-slate-400 animate-pulse">
               Arraste para os lados e toque no modelo desejado
@@ -151,6 +148,7 @@ const CatalogFlow: React.FC = () => {
           </h2>
 
           <div className="flex-grow flex flex-col md:flex-row gap-6 xl:gap-12 2xl:gap-16 min-h-0 w-full">
+            
             <div className="flex-[1.3] relative flex items-center justify-center bg-slate-100 rounded-[2rem] xl:rounded-[3rem] overflow-hidden shadow-inner border border-slate-200">
               <button
                 onClick={prevImage}
@@ -178,25 +176,19 @@ const CatalogFlow: React.FC = () => {
             </div>
 
             <div className="flex-1 flex flex-col gap-6 xl:gap-8 w-full min-h-0">
+              
               <div className="bg-white border border-slate-200 rounded-[2rem] xl:rounded-[3rem] p-8 xl:p-12 2xl:p-14 shadow-sm flex flex-col h-full min-h-0 relative overflow-hidden">
+                
                 <div className="flex flex-col gap-6 flex-none border-b border-slate-100 pb-6 mb-6">
                   <div className="flex justify-between items-center bg-slate-50 rounded-2xl p-6 xl:p-8 border border-slate-100">
                     <div className="flex flex-col">
-                      <span className="text-slate-400 text-base xl:text-lg font-bold uppercase">
-                        Área Total
-                      </span>
-                      <span className="text-2xl xl:text-4xl font-black text-slate-800 mt-1">
-                        {selectedProduct.area}
-                      </span>
+                      <span className="text-slate-400 text-base xl:text-lg font-bold uppercase">Área Total</span>
+                      <span className="text-2xl xl:text-4xl font-black text-slate-800 mt-1">{selectedProduct.area}</span>
                     </div>
                     <div className="h-16 w-px bg-slate-200"></div>
                     <div className="flex flex-col text-right">
-                      <span className="text-slate-400 text-base xl:text-lg font-bold uppercase">
-                        Dimensões
-                      </span>
-                      <span className="text-2xl xl:text-4xl font-black text-slate-800 mt-1">
-                        {selectedProduct.dimensions}
-                      </span>
+                      <span className="text-slate-400 text-base xl:text-lg font-bold uppercase">Dimensões</span>
+                      <span className="text-2xl xl:text-4xl font-black text-slate-800 mt-1">{selectedProduct.dimensions}</span>
                     </div>
                   </div>
                   <p className="text-slate-600 font-medium text-lg xl:text-xl 2xl:text-2xl leading-relaxed mt-2">
@@ -204,54 +196,64 @@ const CatalogFlow: React.FC = () => {
                   </p>
                 </div>
 
-                {/* AREA DE CONTEÚDO COM SCROLL HABILITADO */}
-                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 xl:gap-8 flex-grow min-h-0 overflow-y-auto pr-4 custom-scrollbar">
-                  {/* Bloco: INCLUSO */}
-                  <div className="bg-orange-50/50 border border-orange-100 rounded-3xl p-6 xl:p-8 flex flex-col h-fit">
-                    <h4 className="text-orange-800 font-bold text-lg xl:text-xl 2xl:text-2xl uppercase tracking-wider mb-6 flex items-center gap-3">
-                      <CheckCircle2 size={28} /> O que acompanha
-                    </h4>
-                    <ul className="flex flex-col gap-4">
-                      {selectedProduct.includedItems.map((item, i) => (
-                        <li
-                          key={i}
-                          className="flex gap-4 text-sm xl:text-lg 2xl:text-xl font-medium text-slate-700 items-start"
-                        >
-                          <span className="text-orange-500 font-black mt-1">
-                            •
-                          </span>
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
+                {/* NOVO: Wrapper com posição relativa para abrigar o indicador de scroll */}
+                <div className="relative flex-grow min-h-0 overflow-hidden rounded-3xl">
+                  
+                  {/* Grid de Conteúdo */}
+                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 xl:gap-8 h-full overflow-y-auto pr-4 pb-24 custom-scrollbar">
+                    
+                    {/* Bloco: INCLUSO */}
+                    <div className="bg-orange-50/50 border border-orange-100 rounded-3xl p-6 xl:p-8 flex flex-col h-fit">
+                      <h4 className="text-orange-800 font-bold text-lg xl:text-xl 2xl:text-2xl uppercase tracking-wider mb-6 flex items-center gap-3">
+                        <CheckCircle2 size={28} /> O que acompanha
+                      </h4>
+                      <ul className="flex flex-col gap-4">
+                        {selectedProduct.includedItems.map((item, i) => (
+                          <li key={i} className="flex gap-4 text-sm xl:text-lg 2xl:text-xl font-medium text-slate-700 items-start">
+                            <span className="text-orange-500 font-black mt-1">•</span>
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    {/* Bloco: NÃO INCLUSO */}
+                    <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 xl:p-8 flex flex-col h-fit">
+                      <h4 className="text-slate-500 font-bold text-lg xl:text-xl 2xl:text-2xl uppercase tracking-wider mb-6 flex items-center gap-3">
+                        <XCircle size={28} /> Não acompanha
+                      </h4>
+                      <ul className="flex flex-col gap-4">
+                        {selectedProduct.excludedItems.map((item, i) => (
+                          <li key={i} className="flex gap-4 text-sm xl:text-lg 2xl:text-xl font-medium text-slate-500 items-start">
+                            <span className="text-slate-300 font-black mt-1">•</span>
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
 
-                  {/* Bloco: NÃO INCLUSO */}
-                  <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 xl:p-8 flex flex-col h-fit">
-                    <h4 className="text-slate-500 font-bold text-lg xl:text-xl 2xl:text-2xl uppercase tracking-wider mb-6 flex items-center gap-3">
-                      <XCircle size={28} /> Não acompanha
-                    </h4>
-                    <ul className="flex flex-col gap-4">
-                      {selectedProduct.excludedItems.map((item, i) => (
-                        <li
-                          key={i}
-                          className="flex gap-4 text-sm xl:text-lg 2xl:text-xl font-medium text-slate-500 items-start"
-                        >
-                          <span className="text-slate-300 font-black mt-1">
-                            •
-                          </span>
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
+                  {/* NOVO: Indicador Visual Animado de Scroll */}
+                  <div className="absolute bottom-0 left-0 right-4 h-32 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none flex items-end justify-center pb-2">
+                    <motion.div
+                      animate={{ y: [0, 8, 0] }}
+                      transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+                      className="bg-slate-800 text-white rounded-full px-6 py-2.5 shadow-lg flex items-center gap-2 mb-2 pointer-events-auto"
+                    >
+                      <span className="text-sm xl:text-base font-bold uppercase tracking-widest">
+                        Role para ver mais
+                      </span>
+                      <ChevronDown size={20} strokeWidth={2.5} />
+                    </motion.div>
                   </div>
                 </div>
+
               </div>
 
               <motion.button
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setShowLeadModal(true)}
-                className="flex-none bg-orange-600 text-white rounded-[2rem] py-6 xl:py-8 text-3xl xl:text-4xl font-bold uppercase shadow-lg shadow-orange-200 hover:bg-orange-700 transition-all w-full"
+                className="flex-none bg-orange-600 text-white rounded-[2rem] py-6 xl:py-8 text-3xl xl:text-4xl font-bold uppercase shadow-lg shadow-orange-300 hover:bg-orange-700 transition-all w-full"
               >
                 Tenho Interesse
               </motion.button>
@@ -264,7 +266,7 @@ const CatalogFlow: React.FC = () => {
 
   return (
     <div className="h-screen w-screen bg-slate-50 text-slate-800 flex flex-col p-6 xl:p-12 select-none overflow-hidden font-sans">
-      {/* Estilo para a scrollbar customizada */}
+      
       <style>{`
         .custom-scrollbar::-webkit-scrollbar {
           width: 8px;
@@ -287,7 +289,7 @@ const CatalogFlow: React.FC = () => {
           <h1 className="text-3xl xl:text-4xl font-black tracking-tight text-slate-900 uppercase">
             Catálogo: {catalogType}
           </h1>
-          <div className="h-1 w-24 bg-blue-500 rounded-full"></div>
+          <div className="h-1 w-24 bg-orange-500 rounded-full"></div>
         </div>
         <button
           onClick={() => navigate("/")}
