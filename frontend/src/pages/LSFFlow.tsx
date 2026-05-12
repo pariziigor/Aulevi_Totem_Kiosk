@@ -26,7 +26,7 @@ const LSFFlow: React.FC = () => {
         tipo: quoteData.tipo,
         padrao: quoteData.padrao,
         has_facade: quoteData.has_facade,
-        has_project: quoteData.has_project,
+        has_project: false, // Mantido no payload para não quebrar a API, mas fixado como falso
         area: parseFloat(quoteData.area)
       };
 
@@ -35,14 +35,11 @@ const LSFFlow: React.FC = () => {
       resetSession();
       navigate('/');
     } catch (error) {
-      // CORREÇÃO 1: Utilizando a variável error para evitar o bloqueio do ESLint
       console.error("Falha na comunicação com a API:", error);
       alert("ERRO: Falha ao processar orçamento. Tente novamente.");
       setIsProcessing(false);
     }
   };
-
-  // --- SUB-COMPONENTES OTIMIZADOS PARA CLEAN CORPORATE ---
 
   const Numpad = () => {
     const keys = ['1','2','3','4','5','6','7','8','9','0','APAGAR'];
@@ -74,7 +71,6 @@ const LSFFlow: React.FC = () => {
   const renderStep = () => {
     const stepVariants = {
       initial: { opacity: 0, x: 20 },
-      // CORREÇÃO 2: Adicionado 'as const' para tipagem estrita da propriedade ease
       animate: { opacity: 1, x: 0, transition: { duration: 0.4, ease: "easeOut" as const } },
       exit: { opacity: 0, x: -20, transition: { duration: 0.2 } }
     };
@@ -95,7 +91,7 @@ const LSFFlow: React.FC = () => {
             <motion.button 
               whileTap={{ scale: 0.95 }}
               onClick={handleNext} disabled={!quoteData.area || parseFloat(quoteData.area) <= 0}
-              className="mt-10 bg-orange-500 text-white rounded-full px-12 py-4 xl:py-5 text-xl xl:text-2xl font-bold disabled:opacity-40 disabled:bg-slate-300 disabled:scale-100 shadow-md hover:bg-orange-700 transition-all flex items-center gap-2"
+              className="mt-10 bg-orange-600 text-white rounded-full px-12 py-4 xl:py-5 text-xl xl:text-2xl font-bold disabled:opacity-40 disabled:bg-slate-300 disabled:scale-100 shadow-md hover:bg-orange-700 transition-all flex items-center gap-2"
             >
               Avançar <Check size={24} />
             </motion.button>
@@ -138,28 +134,49 @@ const LSFFlow: React.FC = () => {
       case 3:
         return (
           <motion.div key="step3" variants={stepVariants} initial="initial" animate="animate" exit="exit" className="flex flex-col items-center w-full">
-            <h2 className="text-3xl xl:text-5xl font-bold text-slate-800 tracking-tight mb-8 xl:mb-12">Detalhes Adicionais</h2>
-            <div className="flex flex-col gap-6 w-full max-w-3xl">
-              
-              {/* Card Toggle 1 */}
-              <div className="bg-white border border-slate-200 rounded-3xl p-6 xl:p-8 flex justify-between items-center shadow-sm">
-                <span className="text-2xl xl:text-3xl font-bold text-slate-700">Possui Fachada?</span>
-                <motion.button whileTap={{ scale: 0.9 }} onClick={() => setQuoteData({ has_facade: !quoteData.has_facade })} 
-                  className={`rounded-full w-32 xl:w-40 py-3 xl:py-4 text-lg xl:text-xl font-bold transition-all shadow-sm ${quoteData.has_facade ? 'bg-orange-500 text-white shadow-orange-200' : 'bg-slate-100 text-slate-500 border border-slate-200'}`}>
-                  {quoteData.has_facade ? 'SIM' : 'NÃO'}
-                </motion.button>
-              </div>
+            <h2 className="text-3xl xl:text-5xl font-bold text-slate-800 tracking-tight mb-2">Detalhes Adicionais</h2>
+            
+            {/* Aviso de instrução solicitado */}
+            <p className="text-slate-500 text-lg xl:text-xl font-medium mb-10 xl:mb-14">
+              Arraste o interruptor ou toque para selecionar
+            </p>
 
-              {/* Card Toggle 2 */}
-              <div className="bg-white border border-slate-200 rounded-3xl p-6 xl:p-8 flex justify-between items-center shadow-sm">
-                <span className="text-2xl xl:text-3xl font-bold text-slate-700">Projeto Estrutural?</span>
-                <motion.button whileTap={{ scale: 0.9 }} onClick={() => setQuoteData({ has_project: !quoteData.has_project })} 
-                  className={`rounded-full w-32 xl:w-40 py-3 xl:py-4 text-lg xl:text-xl font-bold transition-all shadow-sm ${quoteData.has_project ? 'bg-orange-500 text-white shadow-orange  -200' : 'bg-slate-100 text-slate-500 border border-slate-200'}`}>
-                  {quoteData.has_project ? 'SIM' : 'NÃO'}
-                </motion.button>
+            <div className="flex flex-col gap-6 w-full max-w-2xl">
+              
+              {/* Card Estilo iOS Centralizado */}
+              <div className="bg-white border border-slate-200 rounded-[2rem] p-10 xl:p-12 flex flex-col items-center justify-center gap-10 shadow-sm">
+                <span className="text-3xl xl:text-4xl font-bold text-slate-700 text-center">
+                  O projeto possui fachada?
+                </span>
+                
+                <div className="flex items-center justify-center gap-6 xl:gap-8">
+                  {/* Label NÃO */}
+                  <span className={`text-2xl xl:text-3xl font-bold transition-colors duration-300 ${!quoteData.has_facade ? 'text-slate-800' : 'text-slate-300'}`}>
+                    NÃO
+                  </span>
+                  
+                  {/* iOS Switch - O layout flex é dinâmico (justify-end ou justify-start) */}
+                  <div 
+                    onClick={() => setQuoteData({ has_facade: !quoteData.has_facade })}
+                    className={`w-36 xl:w-48 h-20 xl:h-24 rounded-full p-2 flex items-center cursor-pointer transition-colors duration-300 shadow-inner ${quoteData.has_facade ? 'bg-orange-500 justify-end' : 'bg-slate-300 justify-start'}`}
+                  >
+                    {/* A bolinha branca (Knob) */}
+                    <motion.div 
+                      layout
+                      transition={{ type: "spring", stiffness: 700, damping: 30 }}
+                      className="w-16 h-16 xl:w-20 xl:h-20 bg-white rounded-full shadow-md"
+                    />
+                  </div>
+
+                  {/* Label SIM */}
+                  <span className={`text-2xl xl:text-3xl font-bold transition-colors duration-300 ${quoteData.has_facade ? 'text-orange-600' : 'text-slate-300'}`}>
+                    SIM
+                  </span>
+                </div>
               </div>
 
             </div>
+            
             <motion.button whileTap={{ scale: 0.95 }} onClick={handleNext} className="mt-12 bg-slate-800 text-white rounded-full px-12 py-4 xl:py-5 text-xl xl:text-2xl font-bold shadow-md hover:bg-slate-900 transition-all">
               Ver Resumo
             </motion.button>
@@ -183,18 +200,15 @@ const LSFFlow: React.FC = () => {
                 <span className="text-slate-400">Padrão de Acabamento</span>
                 <span className="font-bold text-slate-800">{quoteData.padrao}</span>
               </div>
-              <div className="flex justify-between border-b border-slate-100 pb-3">
+              <div className="flex justify-between pb-1">
                 <span className="text-slate-400">Possui Fachada</span>
                 <span className="font-bold text-slate-800">{quoteData.has_facade ? 'Sim' : 'Não'}</span>
               </div>
-              <div className="flex justify-between pb-1">
-                <span className="text-slate-400">Projeto Estrutural</span>
-                <span className="font-bold text-slate-800">{quoteData.has_project ? 'Sim' : 'Não'}</span>
-              </div>
+              {/* Opção Projeto Estrutural Removida do Resumo */}
             </div>
 
             <motion.button whileTap={{ scale: 0.98 }} onClick={() => setShowLeadModal(true)} 
-              className="bg-orange-500 text-white rounded-full px-10 py-5 xl:py-6 text-2xl xl:text-3xl font-bold w-full max-w-3xl shadow-lg shadow-orange-200 hover:bg-orange-700 transition-all flex justify-center items-center gap-3">
+              className="bg-orange-600 text-white rounded-full px-10 py-5 xl:py-6 text-2xl xl:text-3xl font-bold w-full max-w-3xl shadow-lg shadow-orange-200 hover:bg-orange-700 transition-all flex justify-center items-center gap-3">
               <Check size={32} /> Gerar Orçamento Oficial
             </motion.button>
           </motion.div>
@@ -212,7 +226,7 @@ const LSFFlow: React.FC = () => {
           <div className="h-1 w-24 bg-orange-500 rounded-full"></div>
         </div>
         <div className="bg-white border border-slate-200 px-6 py-2 rounded-full shadow-sm">
-          <span className="text-lg xl:text-xl font-bold text-slate-500">Etapa <span className="text-emerald-600">{step + 1}</span> de 5</span>
+          <span className="text-lg xl:text-xl font-bold text-slate-500">Etapa <span className="text-orange-600">{step + 1}</span> de 5</span>
         </div>
       </header>
 
@@ -244,7 +258,7 @@ const LSFFlow: React.FC = () => {
           initial={{ opacity: 0 }} animate={{ opacity: 1 }}
           className="absolute inset-0 bg-slate-50/90 backdrop-blur-sm z-50 flex items-center justify-center flex-col"
         >
-          <div className="w-20 h-20 border-4 border-slate-200 border-t-emerald-500 rounded-full animate-spin shadow-md"></div>
+          <div className="w-20 h-20 border-4 border-slate-200 border-t-orange-500 rounded-full animate-spin shadow-md"></div>
           <p className="text-2xl font-bold text-slate-800 mt-8 tracking-tight">Calculando Materiais...</p>
           <p className="text-slate-500 mt-2">Isso levará apenas alguns segundos</p>
         </motion.div>
