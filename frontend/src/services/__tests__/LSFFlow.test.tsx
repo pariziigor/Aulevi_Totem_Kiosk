@@ -1,13 +1,11 @@
 import '@testing-library/jest-dom';
-// CORREÇÃO: Importamos 'type Mock'
 import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import LSFFlow from '../../pages/LSFFlow';
+import LSFFlow from '../../pages/LSFFlow'; // Ajuste o caminho se necessário
 import { useKioskStore } from '../../store/useKioskStore';
 import { KioskService } from '../../services/api';
 
-// Mock do React Router
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
@@ -17,7 +15,6 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
-// Mock da API
 vi.mock('../../services/api', () => ({
   KioskService: {
     submitQuote: vi.fn(),
@@ -41,9 +38,7 @@ describe('Página de Integração: LSFFlow', () => {
 
   it('deve iniciar na Etapa 1 e o botão "Avançar" deve estar desabilitado se a área for zero', () => {
     renderFlow();
-
     expect(screen.getByText('Informe a Área (m²)')).toBeInTheDocument();
-    
     const avancaButton = screen.getByText('Avançar');
     expect(avancaButton).toBeDisabled();
   });
@@ -60,8 +55,9 @@ describe('Página de Integração: LSFFlow', () => {
 
     fireEvent.click(avancaButton);
 
-    expect(screen.getByText('Selecione o Tipo')).toBeInTheDocument();
-    expect(screen.getByText('Casa 1 pav')).toBeInTheDocument();
+    // CORREÇÃO: findByText aguarda a animação do Framer Motion concluir e renderizar o elemento
+    expect(await screen.findByText('Selecione o Tipo')).toBeInTheDocument();
+    expect(await screen.findByText('Casa 1 pav')).toBeInTheDocument();
   });
 
   it('deve voltar para a Home (/) se o usuário clicar em "Cancelar" na primeira etapa', () => {
@@ -74,7 +70,6 @@ describe('Página de Integração: LSFFlow', () => {
   it('deve acionar o alerta de Sucesso e redirecionar ao finalizar o fluxo (Mock da Etapa Final)', async () => {
     renderFlow();
     
-    // CORREÇÃO: Apenas interceptamos e silenciamos o alert, sem atribuir a uma variável 'const alertMock ='
     vi.spyOn(window, 'alert').mockImplementation(() => {});
 
     act(() => {
@@ -89,8 +84,6 @@ describe('Página de Integração: LSFFlow', () => {
       });
     });
 
-    // CORREÇÃO: Substituímos 'any' pelo tipo 'Mock'
     (KioskService.submitQuote as Mock).mockResolvedValueOnce({ total_value: 300000 });
-
   });
 });

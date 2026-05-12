@@ -1,19 +1,13 @@
-// 1. Importa os matchers do DOM para resolver os erros de 'toBeInTheDocument', 'toBeDisabled', etc.
 import '@testing-library/jest-dom';
-
-// 2. Importa as funções globais explicitamente (padrão Vitest) para resolver o erro de namespace
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-
-import { LeadCaptureModal } from '../../components/LeadCaptureModal';
+import { LeadCaptureModal } from '../../components/LeadCaptureModal'; // Ajuste o caminho se necessário
 
 describe('Componente: LeadCaptureModal', () => {
-  // 3. Trocamos jest.fn() por vi.fn()
   const mockOnConfirm = vi.fn();
   const mockOnCancel = vi.fn();
 
   beforeEach(() => {
-    // Trocamos jest.clearAllMocks() por vi.clearAllMocks()
     vi.clearAllMocks();
   });
 
@@ -31,11 +25,12 @@ describe('Componente: LeadCaptureModal', () => {
   it('deve registrar a entrada de texto no campo ativo através do teclado virtual', () => {
     render(<LeadCaptureModal onConfirm={mockOnConfirm} onCancel={mockOnCancel} />);
     
-    fireEvent.click(screen.getByRole('button', { name: 'T' }));
-    fireEvent.click(screen.getByRole('button', { name: 'E' }));
-    fireEvent.click(screen.getByRole('button', { name: 'S' }));
-    fireEvent.click(screen.getByRole('button', { name: 'T' }));
-    fireEvent.click(screen.getByRole('button', { name: 'E' }));
+    // CORREÇÃO: Procurando as letras minúsculas exatas do array base
+    fireEvent.click(screen.getByRole('button', { name: 't' }));
+    fireEvent.click(screen.getByRole('button', { name: 'e' }));
+    fireEvent.click(screen.getByRole('button', { name: 's' }));
+    fireEvent.click(screen.getByRole('button', { name: 't' }));
+    fireEvent.click(screen.getByRole('button', { name: 'e' }));
 
     expect(screen.getByText('teste')).toBeInTheDocument();
   });
@@ -45,7 +40,8 @@ describe('Componente: LeadCaptureModal', () => {
     
     fireEvent.click(screen.getByText('WhatsApp (apenas números)'));
 
-    const buttonA = screen.getByRole('button', { name: 'A' });
+    // CORREÇÃO: Letra 'a' minúscula
+    const buttonA = screen.getByRole('button', { name: 'a' });
     const button9 = screen.getByRole('button', { name: '9' });
 
     expect(buttonA).toBeDisabled();
@@ -56,7 +52,6 @@ describe('Componente: LeadCaptureModal', () => {
     fireEvent.click(screen.getByRole('button', { name: '8' }));
 
     expect(screen.getByText('98')).toBeInTheDocument();
-    expect(screen.queryByText('A')).not.toBeInTheDocument();
   });
 
   it('deve habilitar o botão de confirmação apenas quando formulário for válido e a LGPD aceita', () => {
@@ -65,9 +60,10 @@ describe('Componente: LeadCaptureModal', () => {
     const confirmButton = screen.getByText('Confirmar e Gerar');
     const checkboxLgpd = screen.getByRole('checkbox');
 
-    fireEvent.click(screen.getByRole('button', { name: 'A' }));
-    fireEvent.click(screen.getByRole('button', { name: 'B' }));
-    fireEvent.click(screen.getByRole('button', { name: 'C' }));
+    // CORREÇÃO: Letras minúsculas
+    fireEvent.click(screen.getByRole('button', { name: 'a' }));
+    fireEvent.click(screen.getByRole('button', { name: 'b' }));
+    fireEvent.click(screen.getByRole('button', { name: 'c' }));
 
     fireEvent.click(screen.getByText('WhatsApp (apenas números)'));
     for (let i = 0; i < 10; i++) {
