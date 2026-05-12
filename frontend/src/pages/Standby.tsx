@@ -6,9 +6,9 @@ const StandbyScreen: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    // O onClick no contêiner principal garante que qualquer toque na tela acorde o Totem
     <div 
-      onClick={() => navigate('/menu')} // Ajuste a rota '/menu' para a rota correta do seu MainMenu
+      // CORREÇÃO AQUI: Alterado de '/menu' para '/' (rota raiz onde fica o MainMenu)
+      onClick={() => navigate('/')} 
       className="h-screen w-screen relative overflow-hidden bg-slate-900 cursor-pointer select-none"
     >
       {/* Vídeo em Background */}
@@ -19,12 +19,11 @@ const StandbyScreen: React.FC = () => {
         playsInline
         className="absolute inset-0 w-full h-full object-cover opacity-60"
       >
-        {/* Aponte para o caminho correto do seu vídeo na pasta public */}
         <source src="/assets/standby-video.mp4" type="video/mp4" />
         Seu navegador não suporta a tag de vídeo.
       </video>
 
-      {/* Camada de Overlay Escura (para dar contraste ao texto) */}
+      {/* Camada de Overlay Escura */}
       <div className="absolute inset-0 bg-gradient-to-b from-slate-900/40 via-transparent to-slate-900/80"></div>
 
       {/* Conteúdo Centralizado */}
