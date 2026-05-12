@@ -56,7 +56,7 @@ const LSFFlow: React.FC = () => {
             whileTap={{ scale: 0.95 }}
             onClick={() => handleKey(k)} 
             className={`
-              bg-white border border-slate-200 shadow-sm rounded-2xl flex items-center justify-center h-16 xl:h-20 transition-all hover:shadow-md hover:border-emerald-300
+              bg-white border border-slate-200 shadow-sm rounded-2xl flex items-center justify-center h-16 xl:h-20 transition-all hover:shadow-md hover:border-orange-300
               ${k === '0' ? 'col-span-2' : ''}
               ${k === 'APAGAR' ? 'text-lg xl:text-xl font-bold text-rose-500 bg-rose-50/50 hover:bg-rose-100 border-rose-100' : 'text-3xl xl:text-4xl font-bold text-slate-700'}
             `}
@@ -82,7 +82,7 @@ const LSFFlow: React.FC = () => {
             <h2 className="text-3xl xl:text-5xl font-bold text-slate-800 tracking-tight mb-4">Informe a Área (m²)</h2>
             <p className="text-slate-500 text-lg xl:text-xl mb-8">Digite o tamanho estimado do projeto</p>
             
-            <div className="text-6xl xl:text-8xl font-black text-emerald-600 border-b-4 border-slate-200 w-64 text-center pb-2 tracking-tighter">
+            <div className="text-6xl xl:text-8xl font-black text-orange-600 border-b-4 border-slate-200 w-64 text-center pb-2 tracking-tighter">
               {quoteData.area || <span className="text-slate-200">0</span>}
             </div>
             
@@ -91,7 +91,7 @@ const LSFFlow: React.FC = () => {
             <motion.button 
               whileTap={{ scale: 0.95 }}
               onClick={handleNext} disabled={!quoteData.area || parseFloat(quoteData.area) <= 0}
-              className="mt-10 bg-emerald-600 text-white rounded-full px-12 py-4 xl:py-5 text-xl xl:text-2xl font-bold disabled:opacity-40 disabled:bg-slate-300 disabled:scale-100 shadow-md hover:bg-emerald-700 transition-all flex items-center gap-2"
+              className="mt-10 bg-orange-600 text-white rounded-full px-12 py-4 xl:py-5 text-xl xl:text-2xl font-bold disabled:opacity-40 disabled:bg-slate-300 disabled:scale-100 shadow-md hover:bg-orange-700 transition-all flex items-center gap-2"
             >
               Avançar <Check size={24} />
             </motion.button>
@@ -109,7 +109,7 @@ const LSFFlow: React.FC = () => {
                 <motion.button key={t.label} 
                   whileTap={{ scale: 0.98 }} 
                   onClick={() => { setQuoteData({ tipo: t.label }); handleNext(); }}
-                  className="bg-white border border-slate-200 rounded-[2.5rem] shadow-sm p-8 xl:p-12 flex flex-col items-center justify-center gap-6 xl:gap-8 h-80 xl:h-[450px] transition-all hover:shadow-xl hover:border-emerald-400 hover:text-emerald-700 group"
+                  className="bg-white border border-slate-200 rounded-[2.5rem] shadow-sm p-8 xl:p-12 flex flex-col items-center justify-center gap-6 xl:gap-8 h-80 xl:h-[450px] transition-all hover:shadow-xl hover:border-orange-400 hover:text-orange-700 group"
                 >
                   <div className="w-40 h-40 xl:w-56 xl:h-56 flex items-center justify-center">
                     <img 
@@ -133,7 +133,7 @@ const LSFFlow: React.FC = () => {
                 <motion.button key={p} 
                   whileTap={{ scale: 0.98 }} 
                   onClick={() => { setQuoteData({ padrao: p }); handleNext(); }}
-                  className="bg-white border border-slate-200 rounded-[2rem] shadow-sm text-2xl xl:text-3xl font-bold text-slate-700 p-8 xl:p-12 h-40 xl:h-48 flex items-center justify-center text-center transition-all hover:shadow-lg hover:border-emerald-400 hover:text-emerald-700"
+                  className="bg-white border border-slate-200 rounded-[2rem] shadow-sm text-2xl xl:text-3xl font-bold text-slate-700 p-8 xl:p-12 h-40 xl:h-48 flex items-center justify-center text-center transition-all hover:shadow-lg hover:border-orange-400 hover:text-orange-700"
                 >
                   {p}
                 </motion.button>
@@ -164,7 +164,7 @@ const LSFFlow: React.FC = () => {
                   
                   <div 
                     onClick={() => setQuoteData({ has_facade: !quoteData.has_facade })}
-                    className={`w-36 xl:w-48 h-20 xl:h-24 rounded-full p-2 flex items-center cursor-pointer transition-colors duration-300 shadow-inner ${quoteData.has_facade ? 'bg-emerald-500 justify-end' : 'bg-slate-300 justify-start'}`}
+                    className={`w-36 xl:w-48 h-20 xl:h-24 rounded-full p-2 flex items-center cursor-pointer transition-colors duration-300 shadow-inner ${quoteData.has_facade ? 'bg-orange-500 justify-end' : 'bg-slate-300 justify-start'}`}
                   >
                     <motion.div 
                       layout
@@ -173,7 +173,7 @@ const LSFFlow: React.FC = () => {
                     />
                   </div>
 
-                  <span className={`text-2xl xl:text-3xl font-bold transition-colors duration-300 ${quoteData.has_facade ? 'text-emerald-600' : 'text-slate-300'}`}>
+                  <span className={`text-2xl xl:text-3xl font-bold transition-colors duration-300 ${quoteData.has_facade ? 'text-orange-600' : 'text-slate-300'}`}>
                     SIM
                   </span>
                 </div>
@@ -211,7 +211,7 @@ const LSFFlow: React.FC = () => {
             </div>
 
             <motion.button whileTap={{ scale: 0.98 }} onClick={() => setShowLeadModal(true)} 
-              className="bg-emerald-600 text-white rounded-full px-10 py-5 xl:py-6 text-2xl xl:text-3xl font-bold w-full max-w-3xl shadow-lg shadow-emerald-200 hover:bg-emerald-700 transition-all flex justify-center items-center gap-3">
+              className="bg-orange-600 text-white rounded-full px-10 py-5 xl:py-6 text-2xl xl:text-3xl font-bold w-full max-w-3xl shadow-lg shadow-orange-200 hover:bg-orange-700 transition-all flex justify-center items-center gap-3">
               <Check size={32} /> Gerar Orçamento Oficial
             </motion.button>
           </motion.div>
@@ -225,7 +225,7 @@ const LSFFlow: React.FC = () => {
       <header className="flex justify-between items-center mb-8 flex-none w-full">
         <div className="flex flex-col gap-2">
           <h1 className="text-3xl xl:text-4xl font-black tracking-tight text-slate-900 uppercase">Light Steel Frame</h1>
-          <div className="h-1 w-24 bg-emerald-500 rounded-full"></div>
+          <div className="h-1 w-24 bg-orange-500 rounded-full"></div>
         </div>
         <div className="bg-white border border-slate-200 px-6 py-2 rounded-full shadow-sm">
           <span className="text-lg xl:text-xl font-bold text-slate-500">Etapa <span className="text-emerald-600">{step + 1}</span> de 5</span>
@@ -257,7 +257,7 @@ const LSFFlow: React.FC = () => {
           initial={{ opacity: 0 }} animate={{ opacity: 1 }}
           className="absolute inset-0 bg-slate-50/90 backdrop-blur-sm z-50 flex items-center justify-center flex-col"
         >
-          <div className="w-20 h-20 border-4 border-slate-200 border-t-emerald-500 rounded-full animate-spin shadow-md"></div>
+          <div className="w-20 h-20 border-4 border-slate-200 border-t-orange-500 rounded-full animate-spin shadow-md"></div>
           <p className="text-2xl font-bold text-slate-800 mt-8 tracking-tight">Calculando Materiais...</p>
           <p className="text-slate-500 mt-2">Isso levará apenas alguns segundos</p>
         </motion.div>
