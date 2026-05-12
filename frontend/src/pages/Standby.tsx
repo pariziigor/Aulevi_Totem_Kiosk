@@ -19,7 +19,7 @@ const StandbyScreen: React.FC = () => {
         playsInline
         className="absolute inset-0 w-full h-full object-cover opacity-60"
       >
-        <source src="/assets/standby-video.mp4" type="video/mp4" />
+        <source src="/assets/standby-video2.mp4" type="video/mp4" />
         Seu navegador não suporta a tag de vídeo.
       </video>
 
@@ -42,7 +42,7 @@ const StandbyScreen: React.FC = () => {
           <p className="text-2xl xl:text-4xl text-slate-200 font-medium tracking-wide drop-shadow-lg">
             Engenharia Civil e Estruturas Metálicas
           </p>
-          <div className="h-2 w-48 bg-emerald-500 rounded-full mt-4 shadow-lg shadow-emerald-500/50"></div>
+          <div className="h-2 w-48 bg-orange-500 rounded-full mt-4 shadow-lg shadow-emerald-500/50"></div>
         </motion.div>
 
         {/* Instrução de Ação (Call to Action Pulsante) */}
