@@ -1,37 +1,68 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { MousePointerClick } from 'lucide-react';
 
-const Standby: React.FC = () => {
+const StandbyScreen: React.FC = () => {
   const navigate = useNavigate();
 
   return (
+    // O onClick no contêiner principal garante que qualquer toque na tela acorde o Totem
     <div 
-      className="h-screen w-screen bg-black text-white flex flex-col items-center justify-center cursor-pointer select-none"
-      onClick={() => navigate('/')}
+      onClick={() => navigate('/menu')} // Ajuste a rota '/menu' para a rota correta do seu MainMenu
+      className="h-screen w-screen relative overflow-hidden bg-slate-900 cursor-pointer select-none"
     >
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="text-center"
+      {/* Vídeo em Background */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover opacity-60"
       >
-        <h1 className="text-8xl font-black tracking-tighter mb-8 uppercase border-8 border-white p-12">
-          Aulevi Steel Frame
-        </h1>
+        {/* Aponte para o caminho correto do seu vídeo na pasta public */}
+        <source src="/assets/standby-video.mp4" type="video/mp4" />
+        Seu navegador não suporta a tag de vídeo.
+      </video>
+
+      {/* Camada de Overlay Escura (para dar contraste ao texto) */}
+      <div className="absolute inset-0 bg-gradient-to-b from-slate-900/40 via-transparent to-slate-900/80"></div>
+
+      {/* Conteúdo Centralizado */}
+      <div className="absolute inset-0 flex flex-col items-center justify-between py-24 xl:py-32 z-10">
         
-        <motion.div
-          animate={{ scale: [1, 1.1, 1] }}
-          transition={{ repeat: Infinity, duration: 2 }}
-          className="flex flex-col items-center gap-6 mt-20"
+        {/* Cabeçalho / Logo */}
+        <motion.div 
+          initial={{ opacity: 0, y: -30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1 }}
+          className="flex flex-col items-center gap-4"
         >
-          <MousePointerClick size={80} />
-          <p className="text-5xl font-bold uppercase">Toque na tela para iniciar</p>
+          <h1 className="text-6xl xl:text-8xl font-black tracking-tight text-white uppercase drop-shadow-2xl">
+            Aulevi
+          </h1>
+          <p className="text-2xl xl:text-4xl text-slate-200 font-medium tracking-wide drop-shadow-lg">
+            Engenharia Civil e Estruturas Metálicas
+          </p>
+          <div className="h-2 w-48 bg-emerald-500 rounded-full mt-4 shadow-lg shadow-emerald-500/50"></div>
         </motion.div>
-      </motion.div>
+
+        {/* Instrução de Ação (Call to Action Pulsante) */}
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1, duration: 1 }}
+          className="flex flex-col items-center"
+        >
+          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-12 py-6 shadow-2xl animate-pulse">
+            <span className="text-3xl xl:text-5xl font-black text-white uppercase tracking-widest">
+              Toque na tela para iniciar
+            </span>
+          </div>
+        </motion.div>
+
+      </div>
     </div>
   );
 };
 
-export default Standby;
+export default StandbyScreen;
