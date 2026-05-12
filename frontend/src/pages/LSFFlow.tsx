@@ -103,8 +103,8 @@ const LSFFlow: React.FC = () => {
             <h2 className="text-3xl xl:text-5xl font-bold text-slate-800 tracking-tight mb-8 xl:mb-12">Selecione o Tipo</h2>
             <div className="grid grid-cols-2 gap-8 xl:gap-12 w-full max-w-5xl">
               {[
-                { label: 'Casa 1 pav', icon: '/assets/menu_lsf/casa_1_pav.png' },
-                { label: 'Casa 2 pav', icon: '/assets/menu_lsf/casa_2_pav.png' }
+                { label: 'Casa 1 Pavimento', icon: '/assets/menu_lsf/casa_1_pav.png' },
+                { label: 'Casa 2 Pavimentos', icon: '/assets/menu_lsf/casa_2_pav.png' }
               ].map(t => (
                 <motion.button key={t.label} 
                   whileTap={{ scale: 0.98 }} 

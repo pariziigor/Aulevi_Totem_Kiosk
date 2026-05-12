@@ -5,8 +5,8 @@ class PricingService:
     @staticmethod
     def calculate_quote(data: QuoteRequestSchema) -> dict:
         fatores_tipo = {
-            "Casa 1 pav": 26.5,
-            "Casa 2 pav": 34.5,
+            "Casa 1 Pavimento": 26.5,
+            "Casa 2 Pavimentos": 34.5,
             "Galpão": 18.0,
             "Galpão + escritório": 25.0
         }
@@ -26,15 +26,15 @@ class PricingService:
         }
         
         fatores_parabolt = {
-            "Casa 1 pav": 0.90,
-            "Casa 2 pav": 0.45,
+            "Casa 1 Pavimento": 0.90,
+            "Casa 2 Pavimentos": 0.45,
             "Galpão": 0.45,
             "Galpão + escritório": 0.60
         }
         
         fatores_manta = {
-            "Casa 1 pav": 0.70,
-            "Casa 2 pav": 0.35,
+            "Casa 1 Pavimento": 0.70,
+            "Casa 2 Pavimentos": 0.35,
             "Galpão": 0.35,
             "Galpão + escritório": 0.50
         }
