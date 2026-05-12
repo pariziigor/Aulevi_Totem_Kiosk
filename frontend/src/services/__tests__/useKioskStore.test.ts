@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { useKioskStore } from './useKioskStore';
+import { useKioskStore } from '../../store/useKioskStore';
 import { renderHook, act } from '@testing-library/react';
 
 describe('Store: useKioskStore', () => {

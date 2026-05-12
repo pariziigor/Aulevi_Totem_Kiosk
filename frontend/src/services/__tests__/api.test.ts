@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest';
-import { KioskService } from './api'; // Ajuste o caminho se necessário
+import { KioskService } from '../api'; // Ajuste o caminho se necessário
 
 // 1. Utilizamos globalThis ao invés de global (padrão ECMAScript moderno)
 globalThis.fetch = vi.fn();
