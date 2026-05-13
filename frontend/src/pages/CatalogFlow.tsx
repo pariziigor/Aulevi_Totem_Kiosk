@@ -196,13 +196,10 @@ const CatalogFlow: React.FC = () => {
                   </p>
                 </div>
 
-                {/* NOVO: Wrapper com posição relativa para abrigar o indicador de scroll */}
                 <div className="relative flex-grow min-h-0 overflow-hidden rounded-3xl">
                   
-                  {/* Grid de Conteúdo */}
                   <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 xl:gap-8 h-full overflow-y-auto pr-4 pb-24 custom-scrollbar">
                     
-                    {/* Bloco: INCLUSO */}
                     <div className="bg-orange-50/50 border border-orange-100 rounded-3xl p-6 xl:p-8 flex flex-col h-fit">
                       <h4 className="text-orange-800 font-bold text-lg xl:text-xl 2xl:text-2xl uppercase tracking-wider mb-6 flex items-center gap-3">
                         <CheckCircle2 size={28} /> O que acompanha
@@ -217,7 +214,6 @@ const CatalogFlow: React.FC = () => {
                       </ul>
                     </div>
 
-                    {/* Bloco: NÃO INCLUSO */}
                     <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 xl:p-8 flex flex-col h-fit">
                       <h4 className="text-slate-500 font-bold text-lg xl:text-xl 2xl:text-2xl uppercase tracking-wider mb-6 flex items-center gap-3">
                         <XCircle size={28} /> Não acompanha
@@ -233,7 +229,6 @@ const CatalogFlow: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* NOVO: Indicador Visual Animado de Scroll */}
                   <div className="absolute bottom-0 left-0 right-4 h-32 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none flex items-end justify-center pb-2">
                     <motion.div
                       animate={{ y: [0, 8, 0] }}
@@ -253,7 +248,7 @@ const CatalogFlow: React.FC = () => {
               <motion.button
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setShowLeadModal(true)}
-                className="flex-none bg-orange-600 text-white rounded-[2rem] py-6 xl:py-8 text-3xl xl:text-4xl font-bold uppercase shadow-lg shadow-orange-300 hover:bg-orange-700 transition-all w-full"
+                className="flex-none bg-orange-600 text-white rounded-[2rem] py-6 xl:py-8 text-3xl xl:text-4xl font-bold uppercase shadow-lg shadow-orange-200 hover:bg-orange-700 transition-all w-full"
               >
                 Tenho Interesse
               </motion.button>
@@ -291,12 +286,14 @@ const CatalogFlow: React.FC = () => {
           </h1>
           <div className="h-1 w-24 bg-orange-500 rounded-full"></div>
         </div>
-        <button
-          onClick={() => navigate("/")}
-          className="text-base xl:text-lg font-bold text-slate-500 bg-white border border-slate-200 rounded-full px-6 py-3 hover:bg-slate-100 hover:text-slate-800 transition-colors shadow-sm"
-        >
-          Cancelar Operação
-        </button>
+        {step === 0 && (
+          <button
+            onClick={() => navigate("/")}
+            className="text-base xl:text-lg font-bold text-slate-500 bg-white border border-slate-200 rounded-full px-6 py-3 hover:bg-slate-100 hover:text-slate-800 transition-colors shadow-sm"
+          >
+            Cancelar Operação
+          </button>
+        )}
       </header>
 
       <div className="flex-grow relative w-full h-full min-h-0">
@@ -304,13 +301,21 @@ const CatalogFlow: React.FC = () => {
       </div>
 
       {step === 1 && (
-        <footer className="mt-8 flex justify-start flex-none w-full relative">
+        <footer className="mt-8 flex justify-between items-center flex-none w-full relative">
           <motion.button
             whileTap={{ scale: 0.95 }}
             onClick={() => setStep(0)}
             className="bg-white text-slate-600 border border-slate-200 rounded-full px-8 py-4 xl:px-12 xl:py-5 text-xl xl:text-2xl font-bold shadow-sm hover:bg-slate-100 transition-colors flex items-center gap-3"
           >
             <ChevronLeft size={32} /> Voltar ao Catálogo
+          </motion.button>
+
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            onClick={() => navigate("/")}
+            className="bg-white text-slate-500 border border-slate-200 rounded-full px-8 py-4 xl:px-12 xl:py-5 text-xl xl:text-2xl font-bold shadow-sm hover:bg-slate-100 hover:text-slate-800 transition-colors flex items-center gap-3"
+          >
+            Voltar ao Menu
           </motion.button>
         </footer>
       )}
