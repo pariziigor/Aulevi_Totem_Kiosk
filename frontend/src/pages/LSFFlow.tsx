@@ -17,6 +17,11 @@ const LSFFlow: React.FC = () => {
   const handleNext = () => setStep((s) => s + 1);
   const handleBack = () => step > 0 ? setStep((s) => s - 1) : navigate('/');
 
+  const handleCancelOperation = () => {
+    resetSession();
+    navigate('/');
+  };
+
   const submitQuoteFlow = async (name: string, phone: string) => {
     setIsProcessing(true);
     try {
@@ -103,8 +108,8 @@ const LSFFlow: React.FC = () => {
             <h2 className="text-3xl xl:text-5xl font-bold text-slate-800 tracking-tight mb-8 xl:mb-12">Selecione o Tipo</h2>
             <div className="grid grid-cols-2 gap-8 xl:gap-12 w-full max-w-5xl">
               {[
-                { label: 'Casa 1 Pavimento', icon: '/assets/menu_lsf/casa_1_pav.png' },
-                { label: 'Casa 2 Pavimentos', icon: '/assets/menu_lsf/casa_2_pav.png' }
+                { label: 'Casa 1 pav', icon: '/assets/casa1.png' },
+                { label: 'Casa 2 pav', icon: '/assets/casa2.png' }
               ].map(t => (
                 <motion.button key={t.label} 
                   whileTap={{ scale: 0.98 }} 
@@ -228,7 +233,7 @@ const LSFFlow: React.FC = () => {
           <div className="h-1 w-24 bg-orange-500 rounded-full"></div>
         </div>
         <div className="bg-white border border-slate-200 px-6 py-2 rounded-full shadow-sm">
-          <span className="text-lg xl:text-xl font-bold text-slate-500">Etapa <span className="text-emerald-600">{step + 1}</span> de 5</span>
+          <span className="text-lg xl:text-xl font-bold text-slate-500">Etapa <span className="text-orange-600">{step + 1}</span> de 5</span>
         </div>
       </header>
 
@@ -238,7 +243,7 @@ const LSFFlow: React.FC = () => {
         </AnimatePresence>
       </div>
 
-      <footer className="mt-8 flex justify-start flex-none w-full relative">
+      <footer className="mt-8 flex justify-between items-center flex-none w-full relative">
         <motion.button 
           whileTap={{ scale: 0.95 }} 
           onClick={handleBack} 
@@ -246,6 +251,16 @@ const LSFFlow: React.FC = () => {
         >
           <ChevronLeft size={24} /> {step === 0 ? 'Cancelar' : 'Voltar'}
         </motion.button>
+
+        {step > 0 && (
+          <motion.button 
+            whileTap={{ scale: 0.95 }} 
+            onClick={handleCancelOperation} 
+            className="bg-white text-slate-500 border border-slate-200 rounded-full px-8 py-3 xl:px-10 xl:py-4 text-lg xl:text-xl font-bold shadow-sm hover:bg-slate-100 hover:text-slate-800 transition-colors flex items-center gap-2"
+          >
+            Cancelar e Voltar ao Menu
+          </motion.button>
+        )}
       </footer>
 
       {showLeadModal && (
