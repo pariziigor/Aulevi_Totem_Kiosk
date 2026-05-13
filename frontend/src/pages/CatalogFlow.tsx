@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, CheckCircle2, XCircle, ChevronDown } from "lucide-react";
+import { motion, AnimatePresence, type PanInfo } from "framer-motion";
+import { ChevronLeft, ChevronRight, CheckCircle2, XCircle, ChevronDown, X } from "lucide-react";
 import { LeadCaptureModal } from "../components/LeadCaptureModal";
 import { CHALES_DATA, BARRACAO_DATA, type Product } from "../data/products";
 
@@ -16,6 +16,8 @@ const CatalogFlow: React.FC = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
   const [showLeadModal, setShowLeadModal] = useState<boolean>(false);
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+  
   const carouselRef = useRef<HTMLDivElement>(null);
 
   const handleSelectProduct = (product: Product) => {
@@ -47,6 +49,17 @@ const CatalogFlow: React.FC = () => {
       setCurrentImageIndex((prev) =>
         prev === 0 ? selectedProduct.images.length - 1 : prev - 1,
       );
+    }
+  };
+
+  // Função para lidar com o gesto de arrastar (swipe)
+  // Função para lidar com o gesto de arrastar (swipe) com tipagem estrita
+  const handleDragEnd = (_event: MouseEvent | TouchEvent | PointerEvent, { offset }: PanInfo) => {
+    const swipeThreshold = 50;
+    if (offset.x < -swipeThreshold) {
+      nextImage();
+    } else if (offset.x > swipeThreshold) {
+      prevImage();
     }
   };
 
@@ -98,7 +111,7 @@ const CatalogFlow: React.FC = () => {
                   key={prod.id}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => handleSelectProduct(prod)}
-                  className="snap-center shrink-0 w-[80%] md:w-[45%] lg:w-[30%] xl:w-[25%] 2xl:w-[22%] max-w-[450px] h-[75%] xl:h-[80%] rounded-[2rem] xl:rounded-[2.5rem] shadow-md border border-slate-200 flex flex-col justify-end p-4 xl:p-6 cursor-pointer hover:shadow-xl hover:border-orange-300 transition-all bg-white relative overflow-hidden group"
+                  className="snap-center shrink-0 w-[80%] md:w-[45%] lg:w-[30%] xl:w-[25%] 2xl:w-[22%] max-w-[450px] h-[75%] xl:h-[80%] rounded-[2rem] xl:rounded-[2.5rem] shadow-md border border-slate-200 flex flex-col justify-end p-4 xl:p-6 cursor-pointer hover:shadow-xl hover:border-blue-300 transition-all bg-white relative overflow-hidden group"
                 >
                   <img
                     src={prod.images[0]}
@@ -149,29 +162,43 @@ const CatalogFlow: React.FC = () => {
 
           <div className="flex-grow flex flex-col md:flex-row gap-6 xl:gap-12 2xl:gap-16 min-h-0 w-full">
             
-            <div className="flex-[1.3] relative flex items-center justify-center bg-slate-100 rounded-[2rem] xl:rounded-[3rem] overflow-hidden shadow-inner border border-slate-200">
+            <div className="flex-[1.3] relative flex items-center justify-center bg-slate-900 rounded-[2rem] xl:rounded-[3rem] overflow-hidden shadow-inner border border-slate-200">
               <button
-                onClick={prevImage}
-                className="absolute left-6 bg-white/80 backdrop-blur border border-slate-200 rounded-full p-4 hover:bg-white transition-all z-10 shadow-md text-slate-600"
+                onClick={(e) => { e.stopPropagation(); prevImage(); }}
+                className="absolute left-6 bg-white/80 backdrop-blur border border-slate-200 rounded-full p-4 hover:bg-white transition-all z-10 shadow-md text-slate-600 pointer-events-auto"
               >
                 <ChevronLeft size={48} />
               </button>
 
-              <img
+              <motion.img
+                key={currentImageIndex}
                 src={selectedProduct.images[currentImageIndex]}
                 alt={`${selectedProduct.title} - Imagem ${currentImageIndex + 1}`}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover cursor-pointer touch-none"
+                drag="x"
+                dragConstraints={{ left: 0, right: 0 }}
+                dragElastic={0.2}
+                onDragEnd={handleDragEnd}
+                onClick={() => setIsFullscreen(true)}
+                whileTap={{ cursor: "grabbing" }}
+                initial={{ opacity: 0.5, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3 }}
               />
 
               <button
-                onClick={nextImage}
-                className="absolute right-6 bg-white/80 backdrop-blur border border-slate-200 rounded-full p-4 hover:bg-white transition-all z-10 shadow-md text-slate-600"
+                onClick={(e) => { e.stopPropagation(); nextImage(); }}
+                className="absolute right-6 bg-white/80 backdrop-blur border border-slate-200 rounded-full p-4 hover:bg-white transition-all z-10 shadow-md text-slate-600 pointer-events-auto"
               >
                 <ChevronRight size={48} />
               </button>
 
-              <div className="absolute bottom-8 bg-slate-900/80 backdrop-blur-md text-white rounded-full px-8 py-3 font-bold tracking-widest text-lg shadow-md">
+              <div className="absolute bottom-8 bg-slate-900/80 backdrop-blur-md text-white rounded-full px-8 py-3 font-bold tracking-widest text-lg shadow-md pointer-events-none">
                 {currentImageIndex + 1} / {selectedProduct.images.length}
+              </div>
+              
+              <div className="absolute top-6 bg-slate-900/60 backdrop-blur-md text-white/90 rounded-full px-6 py-2 text-sm font-medium pointer-events-none flex items-center gap-2">
+                Toque para ampliar ou arraste para os lados
               </div>
             </div>
 
@@ -200,7 +227,7 @@ const CatalogFlow: React.FC = () => {
                   
                   <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 xl:gap-8 h-full overflow-y-auto pr-4 pb-24 custom-scrollbar">
                     
-                    <div className="bg-orange-50/50 border border-orange-100 rounded-3xl p-6 xl:p-8 flex flex-col h-fit">
+                    <div className="bg-blue-50/50 border border-blue-100 rounded-3xl p-6 xl:p-8 flex flex-col h-fit">
                       <h4 className="text-orange-800 font-bold text-lg xl:text-xl 2xl:text-2xl uppercase tracking-wider mb-6 flex items-center gap-3">
                         <CheckCircle2 size={28} /> O que acompanha
                       </h4>
@@ -315,7 +342,7 @@ const CatalogFlow: React.FC = () => {
             onClick={() => navigate("/")}
             className="bg-white text-slate-500 border border-slate-200 rounded-full px-8 py-4 xl:px-12 xl:py-5 text-xl xl:text-2xl font-bold shadow-sm hover:bg-slate-100 hover:text-slate-800 transition-colors flex items-center gap-3"
           >
-            Voltar ao Menu
+            Cancelar Operação
           </motion.button>
         </footer>
       )}
@@ -326,6 +353,64 @@ const CatalogFlow: React.FC = () => {
           onCancel={() => setShowLeadModal(false)}
         />
       )}
+
+      {/* MODAL FULLSCREEN (LIGHTBOX) */}
+      <AnimatePresence>
+        {isFullscreen && selectedProduct && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-4 xl:p-12"
+          >
+            <button
+              onClick={() => setIsFullscreen(false)}
+              className="absolute top-8 right-8 xl:top-12 xl:right-12 bg-white/10 text-white rounded-full p-4 hover:bg-white/20 transition-all z-50 shadow-lg"
+            >
+              <X size={40} />
+            </button>
+
+            <button 
+              onClick={(e) => { e.stopPropagation(); prevImage(); }} 
+              className="absolute left-8 xl:left-12 bg-white/10 text-white rounded-full p-6 hover:bg-white/20 transition-all z-50 shadow-lg"
+            >
+              <ChevronLeft size={48} />
+            </button>
+
+            <div className="w-full h-full max-w-7xl flex items-center justify-center overflow-hidden">
+              <motion.img
+                key={`fullscreen-${currentImageIndex}`}
+                src={selectedProduct.images[currentImageIndex]}
+                alt={`${selectedProduct.title} - Zoom`}
+                className="max-w-full max-h-full object-contain cursor-grab active:cursor-grabbing touch-none"
+                drag="x"
+                dragConstraints={{ left: 0, right: 0 }}
+                dragElastic={0.2}
+                onDragEnd={handleDragEnd}
+                initial={{ opacity: 0.5, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3 }}
+              />
+            </div>
+
+            <button 
+              onClick={(e) => { e.stopPropagation(); nextImage(); }} 
+              className="absolute right-8 xl:right-12 bg-white/10 text-white rounded-full p-6 hover:bg-white/20 transition-all z-50 shadow-lg"
+            >
+              <ChevronRight size={48} />
+            </button>
+
+            <div className="absolute bottom-8 xl:bottom-12 bg-slate-800/80 text-white rounded-full px-8 py-3 font-bold tracking-widest text-lg shadow-md pointer-events-none">
+              {currentImageIndex + 1} / {selectedProduct.images.length}
+            </div>
+            
+            <div className="absolute top-8 xl:top-12 bg-white/10 backdrop-blur-sm text-white rounded-full px-6 py-2 text-sm font-medium tracking-wide pointer-events-none">
+              Arraste para os lados para navegar
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </div>
   );
 };
