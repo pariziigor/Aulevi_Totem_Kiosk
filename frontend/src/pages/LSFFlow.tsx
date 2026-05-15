@@ -108,8 +108,8 @@ const LSFFlow: React.FC = () => {
             <h2 className="text-3xl xl:text-5xl font-bold text-slate-800 tracking-tight mb-8 xl:mb-12">Selecione o Tipo</h2>
             <div className="grid grid-cols-2 gap-8 xl:gap-12 w-full max-w-5xl">
               {[
-                { label: 'Casa 1 pav', icon: '/assets/casa1.png' },
-                { label: 'Casa 2 pav', icon: '/assets/casa2.png' }
+                { label: 'Casa 1 Pavimento', icon: '/assets/menu_lsf/casa_1_pav.png' },
+                { label: 'Casa 2 Pavimentos', icon: '/assets/menu_lsf/casa_2_pav.png' }
               ].map(t => (
                 <motion.button key={t.label} 
                   whileTap={{ scale: 0.98 }} 
@@ -134,13 +134,25 @@ const LSFFlow: React.FC = () => {
           <motion.div key="step2" variants={stepVariants} initial="initial" animate="animate" exit="exit" className="flex flex-col items-center w-full">
             <h2 className="text-3xl xl:text-5xl font-bold text-slate-800 tracking-tight mb-8 xl:mb-12">Padrão de Acabamento</h2>
             <div className="grid grid-cols-2 gap-6 xl:gap-8 w-full max-w-5xl">
-              {['Popular', 'Médio', 'Alto', 'Não se aplica'].map(p => (
-                <motion.button key={p} 
+              {[
+                { label: 'Popular', icon: '/assets/menu_lsf/casa_popular.png' },
+                { label: 'Médio', icon: '/assets/menu_lsf/casa_medio.png' },
+                { label: 'Alto', icon: '/assets/menu_lsf/casa_alto.png' },
+                { label: 'Não se aplica', icon: '/assets/menu_lsf/nao_aplica.png' }
+              ].map(p => (
+                <motion.button key={p.label} 
                   whileTap={{ scale: 0.98 }} 
-                  onClick={() => { setQuoteData({ padrao: p }); handleNext(); }}
-                  className="bg-white border border-slate-200 rounded-[2rem] shadow-sm text-2xl xl:text-3xl font-bold text-slate-700 p-8 xl:p-12 h-40 xl:h-48 flex items-center justify-center text-center transition-all hover:shadow-lg hover:border-orange-400 hover:text-orange-700"
+                  onClick={() => { setQuoteData({ padrao: p.label }); handleNext(); }}
+                  className="bg-white border border-slate-200 rounded-[2.5rem] shadow-sm p-6 xl:p-8 flex flex-col items-center justify-center gap-4 xl:gap-6 h-64 xl:h-80 transition-all hover:shadow-xl hover:border-orange-400 hover:text-orange-700 group"
                 >
-                  {p}
+                  <div className="w-24 h-24 xl:w-36 xl:h-36 flex items-center justify-center">
+                    <img 
+                      src={p.icon} 
+                      alt={p.label} 
+                      className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300" 
+                    />
+                  </div>
+                  <span className="text-2xl xl:text-3xl font-bold text-slate-700">{p.label}</span>
                 </motion.button>
               ))}
             </div>
@@ -258,7 +270,7 @@ const LSFFlow: React.FC = () => {
             onClick={handleCancelOperation} 
             className="bg-white text-slate-500 border border-slate-200 rounded-full px-8 py-3 xl:px-10 xl:py-4 text-lg xl:text-xl font-bold shadow-sm hover:bg-slate-100 hover:text-slate-800 transition-colors flex items-center gap-2"
           >
-            Cancelar e Voltar ao Menu
+            Cancelar Operação
           </motion.button>
         )}
       </footer>
