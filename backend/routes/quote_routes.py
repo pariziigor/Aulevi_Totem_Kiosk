@@ -29,7 +29,7 @@ async def create_quote(payload: QuoteRequestSchema, db: Session = Depends(get_db
         
         # 3. Geração do Documento PDF
         # O model_dump() converte o schema Pydantic num dicionário para o Jinja2
-        pdf_path = PDFService.generate_quote_pdf(
+        pdf_path = await PDFService.generate_quote_pdf(
             quote_data=payload.model_dump(),
             items=calculation_result["items"],
             total_value=calculation_result["total_value"],
