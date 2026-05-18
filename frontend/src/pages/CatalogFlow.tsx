@@ -4,6 +4,7 @@ import { motion, AnimatePresence, type PanInfo } from "framer-motion";
 import { ChevronLeft, ChevronRight, CheckCircle2, XCircle, ChevronDown, X } from "lucide-react";
 import { LeadCaptureModal } from "../components/LeadCaptureModal";
 import { CHALES_DATA, BARRACAO_DATA, type Product } from "../data/products";
+import { KioskService } from "../services/api";
 
 const CatalogFlow: React.FC = () => {
   const navigate = useNavigate();
@@ -63,16 +64,36 @@ const CatalogFlow: React.FC = () => {
     }
   };
 
+  // Importe o serviço no topo do arquivo se ainda não estiver lá:
+  // import { KioskService } from '../services/api';
+
   const submitInterest = async (name: string, phone: string) => {
     setShowLeadModal(false);
-    console.log(
-      `[Lead Capturado] Nome: ${name}, WhatsApp: ${phone}, Interesse: ${selectedProduct?.title}`,
-    );
+    
+    try {
+      // Montagem do payload flexível
+      const payload = {
+        module: catalogType, // Vai enviar 'CHALE' ou 'BARRACAO'
+        lead_name: name,
+        lead_phone: phone,
+        // Mandamos o nome do modelo como dado extra que o Pydantic agora aceita
+        modelo_escolhido: selectedProduct?.title, 
+        // Tentamos extrair a área do texto (ex: "45m²" -> 45). Se falhar, vai nulo.
+        area: selectedProduct?.area ? parseFloat(selectedProduct.area.replace(/\D/g, '')) : null
+      };
 
-    alert(
-      `ATENDIMENTO REGISTRADO!\n\nObrigado, ${name}.\nEm breve você receberá o material completo do ${selectedProduct?.title} no WhatsApp: ${phone}.`,
-    );
-    navigate("/");
+      const result = await KioskService.submitQuote(payload);
+      
+      console.log(`[Lead Capturado] Pedido: ${result.quote_number}`);
+
+      alert(
+        `ATENDIMENTO REGISTRADO!\n\nOrçamento Nº: ${result.quote_number}\n\nObrigado, ${name}.\nEm breve você receberá o material completo do ${selectedProduct?.title} no WhatsApp: ${phone}.`,
+      );
+      navigate("/");
+    } catch (error) {
+      console.error("Falha na comunicação com a API:", error);
+      alert("ERRO: Falha ao registrar interesse. Tente novamente.");
+    }
   };
 
   const renderStep = () => {

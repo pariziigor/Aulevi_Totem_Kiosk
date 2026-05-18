@@ -26,6 +26,7 @@ const LSFFlow: React.FC = () => {
     setIsProcessing(true);
     try {
       const payload = {
+        module: 'LSF', // Identificador do módulo
         lead_name: name,
         lead_phone: phone,
         tipo: quoteData.tipo,
@@ -36,7 +37,10 @@ const LSFFlow: React.FC = () => {
       };
 
       const result = await KioskService.submitQuote(payload);
-      alert(`ORÇAMENTO GERADO COM SUCESSO!\nValor Total: R$ ${result.total_value.toFixed(2)}`);
+      
+      // Exibindo o Número do Orçamento na tela de sucesso!
+      alert(`ORÇAMENTO GERADO COM SUCESSO!\nNº do Pedido: ${result.quote_number}\nValor Total: R$ ${result.total_value.toFixed(2)}`);
+      
       resetSession();
       navigate('/');
     } catch (error) {
