@@ -141,7 +141,7 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
               }`}
             >
               {inputName || (
-                <span className="text-slate-400 font-medium">TOQUE PARA DIGITAR</span>
+                <span className="text-slate-400 font-medium">TOQUE PARA DIGITAR O NOME</span>
               )}
             </div>
           </div>
@@ -151,7 +151,7 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
             className="flex flex-col gap-1.5 cursor-pointer group"
           >
             <label className="text-sm xl:text-lg font-bold uppercase text-slate-500 ml-2 group-hover:text-orange-600 transition-colors">
-              WhatsApp (apenas números)
+              WhatsApp (DDD+Número)
             </label>
             <div
               className={`border-2 p-3 xl:p-5 rounded-xl text-xl xl:text-2xl font-bold transition-all min-h-[56px] xl:min-h-[72px] flex items-center shadow-sm ${
