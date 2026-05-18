@@ -6,6 +6,9 @@ interface QuoteData {
   padrao: string;
   has_facade: boolean;  // Tipagem estrita
   has_project: boolean; // Tipagem estrita
+  has_land?: boolean;
+  own_resources?: boolean;
+  city?: string;
 }
 
 interface KioskState {
