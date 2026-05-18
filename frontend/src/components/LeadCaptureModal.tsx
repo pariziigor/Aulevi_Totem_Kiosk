@@ -7,6 +7,11 @@ interface LeadCaptureModalProps {
   onCancel: () => void;
 }
 
+// Função auxiliar para capitalizar automaticamente as palavras (Title Case)
+const formatNameTitleCase = (text: string) => {
+  return text.replace(/(?:^|\s)\S/g, (match) => match.toUpperCase());
+};
+
 export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
   onConfirm,
   onCancel,
@@ -15,7 +20,6 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
   const [inputPhone, setInputPhone] = useState<string>("");
   const [activeInput, setActiveInput] = useState<"name" | "phone">("name");
   const [lgpdConsent, setLgpdConsent] = useState<boolean>(false);
-  const [isUpperCase, setIsUpperCase] = useState<boolean>(false);
 
   const handleKeyPress = (key: string) => {
     if (key === "APAGAR") {
@@ -29,15 +33,13 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
       return;
     }
 
-    if (key === "MAIÚSCULA") {
-      setIsUpperCase(!isUpperCase);
-      return;
-    }
-
-    const finalKey = isUpperCase ? key.toUpperCase() : key;
+    const finalKey = key.toLowerCase();
 
     if (activeInput === "name") {
-      if (inputName.length < 50) setInputName((prev) => prev + finalKey);
+      // Aplica a formatação automática sempre que uma nova letra é digitada
+      if (inputName.length < 50) {
+        setInputName((prev) => formatNameTitleCase(prev + finalKey));
+      }
     } else {
       if (/[0-9]/.test(finalKey) && inputPhone.length < 15) {
         setInputPhone((prev) => prev + finalKey);
@@ -59,41 +61,24 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
     }
   };
 
+  // Teclado limpo, sem as teclas MAIÚSCULA
   const keyboardLayout = [
     ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=", "APAGAR"],
     ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "[", "]", "\\"],
     ["a", "s", "d", "f", "g", "h", "j", "k", "l", ";", "'"],
-    [
-      "MAIÚSCULA",
-      "z",
-      "x",
-      "c",
-      "v",
-      "b",
-      "n",
-      "m",
-      ",",
-      ".",
-      "/",
-      "MAIÚSCULA",
-    ],
+    ["z", "x", "c", "v", "b", "n", "m", ",", ".", "/"],
   ];
 
   const renderKey = (key: string) => {
-    const displayKey =
-      isUpperCase && key.length === 1 && /[a-z]/.test(key)
-        ? key.toUpperCase()
-        : key;
-
     let flexClass = "flex-1";
-    if (key === "APAGAR" || key === "MAIÚSCULA") {
+    if (key === "APAGAR") {
       flexClass = "flex-[1.5]";
     }
 
     const isPhoneField = activeInput === "phone";
     const isAllowedInPhone = /^[0-9]$/.test(key) || key === "APAGAR";
     const isDisabled = isPhoneField && !isAllowedInPhone;
-    const isSpecialKey = key === "APAGAR" || key === "MAIÚSCULA";
+    const isSpecialKey = key === "APAGAR";
 
     return (
       <motion.button
@@ -115,7 +100,7 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
           }
         `}
       >
-        {displayKey}
+        {key}
       </motion.button>
     );
   };
