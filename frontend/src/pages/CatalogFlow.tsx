@@ -53,8 +53,6 @@ const CatalogFlow: React.FC = () => {
     }
   };
 
-  // Função para lidar com o gesto de arrastar (swipe)
-  // Função para lidar com o gesto de arrastar (swipe) com tipagem estrita
   const handleDragEnd = (_event: MouseEvent | TouchEvent | PointerEvent, { offset }: PanInfo) => {
     const swipeThreshold = 50;
     if (offset.x < -swipeThreshold) {
@@ -64,21 +62,15 @@ const CatalogFlow: React.FC = () => {
     }
   };
 
-  // Importe o serviço no topo do arquivo se ainda não estiver lá:
-  // import { KioskService } from '../services/api';
-
   const submitInterest = async (name: string, phone: string) => {
     setShowLeadModal(false);
     
     try {
-      // Montagem do payload flexível
       const payload = {
-        module: catalogType, // Vai enviar 'CHALE' ou 'BARRACAO'
+        module: catalogType, 
         lead_name: name,
         lead_phone: phone,
-        // Mandamos o nome do modelo como dado extra que o Pydantic agora aceita
         modelo_escolhido: selectedProduct?.title, 
-        // Tentamos extrair a área do texto (ex: "45m²" -> 45). Se falhar, vai nulo.
         area: selectedProduct?.area ? parseFloat(selectedProduct.area.replace(/\D/g, '')) : null
       };
 
@@ -132,7 +124,7 @@ const CatalogFlow: React.FC = () => {
                   key={prod.id}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => handleSelectProduct(prod)}
-                  className="snap-center shrink-0 w-[80%] md:w-[45%] lg:w-[30%] xl:w-[25%] 2xl:w-[22%] max-w-[450px] h-[75%] xl:h-[80%] rounded-[2rem] xl:rounded-[2.5rem] shadow-md border border-slate-200 flex flex-col justify-end p-4 xl:p-6 cursor-pointer hover:shadow-xl hover:border-blue-300 transition-all bg-white relative overflow-hidden group"
+                  className="snap-center shrink-0 w-[80%] md:w-[45%] lg:w-[30%] xl:w-[25%] 2xl:w-[22%] max-w-[450px] h-[75%] xl:h-[80%] rounded-[2rem] xl:rounded-[2.5rem] shadow-md border border-slate-200 flex flex-col justify-end p-4 xl:p-6 cursor-pointer hover:shadow-xl hover:border-orange-300 transition-all bg-white relative overflow-hidden group"
                 >
                   <img
                     src={prod.images[0]}
@@ -223,36 +215,44 @@ const CatalogFlow: React.FC = () => {
               </div>
             </div>
 
+            {/* PAINEL DIREITO CORRIGIDO */}
             <div className="flex-1 flex flex-col gap-6 xl:gap-8 w-full min-h-0">
               
-              <div className="bg-white border border-slate-200 rounded-[2rem] xl:rounded-[3rem] p-8 xl:p-12 2xl:p-14 shadow-sm flex flex-col h-full min-h-0 relative overflow-hidden">
+              <div className="bg-white border border-slate-200 rounded-[2rem] xl:rounded-[3rem] p-6 xl:p-10 shadow-sm flex flex-col h-full min-h-0 relative overflow-hidden">
                 
-                <div className="flex flex-col gap-6 flex-none border-b border-slate-100 pb-6 mb-6">
-                  <div className="flex justify-between items-center bg-slate-50 rounded-2xl p-6 xl:p-8 border border-slate-100">
+                {/* --- TOPO: ÁREA E DESCRIÇÃO --- */}
+                <div className="flex flex-col gap-4 xl:gap-6 flex-1 min-h-0 border-b border-slate-100 pb-4 xl:pb-6">
+                  
+                  <div className="flex justify-between items-center bg-slate-50 rounded-2xl p-5 xl:p-8 border border-slate-100 flex-none">
                     <div className="flex flex-col">
-                      <span className="text-slate-400 text-base xl:text-lg font-bold uppercase">Área Total</span>
+                      <span className="text-slate-400 text-sm xl:text-lg font-bold uppercase">Área Total</span>
                       <span className="text-2xl xl:text-4xl font-black text-slate-800 mt-1">{selectedProduct.area}</span>
                     </div>
-                    <div className="h-16 w-px bg-slate-200"></div>
+                    <div className="h-12 xl:h-16 w-px bg-slate-200"></div>
                     <div className="flex flex-col text-right">
-                      <span className="text-slate-400 text-base xl:text-lg font-bold uppercase">Dimensões</span>
+                      <span className="text-slate-400 text-sm xl:text-lg font-bold uppercase">Dimensões</span>
                       <span className="text-2xl xl:text-4xl font-black text-slate-800 mt-1">{selectedProduct.dimensions}</span>
                     </div>
                   </div>
-                  <p className="text-slate-600 font-medium text-lg xl:text-xl 2xl:text-2xl leading-relaxed mt-2">
-                    {selectedProduct.description}
-                  </p>
+
+                  <div className="overflow-y-auto custom-scrollbar pr-4 flex-1 min-h-0">
+                    <p className="text-slate-600 font-medium text-lg xl:text-xl 2xl:text-2xl leading-relaxed">
+                      {selectedProduct.description}
+                    </p>
+                  </div>
+
                 </div>
 
-                <div className="relative flex-grow min-h-0 overflow-hidden rounded-3xl">
+                {/* --- BASE: ITENS INCLUSOS E NÃO INCLUSOS --- */}
+                <div className="relative flex-[1.2] min-h-0 overflow-hidden pt-2 xl:pt-4">
                   
-                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 xl:gap-8 h-full overflow-y-auto pr-4 pb-24 custom-scrollbar">
+                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 xl:gap-8 h-full overflow-y-auto pr-4 pb-20 custom-scrollbar">
                     
                     <div className="bg-blue-50/50 border border-blue-100 rounded-3xl p-6 xl:p-8 flex flex-col h-fit">
-                      <h4 className="text-orange-800 font-bold text-lg xl:text-xl 2xl:text-2xl uppercase tracking-wider mb-6 flex items-center gap-3">
+                      <h4 className="text-orange-800 font-bold text-lg xl:text-xl 2xl:text-2xl uppercase tracking-wider mb-4 xl:mb-6 flex items-center gap-3">
                         <CheckCircle2 size={28} /> O que acompanha
                       </h4>
-                      <ul className="flex flex-col gap-4">
+                      <ul className="flex flex-col gap-3 xl:gap-4">
                         {selectedProduct.includedItems.map((item, i) => (
                           <li key={i} className="flex gap-4 text-sm xl:text-lg 2xl:text-xl font-medium text-slate-700 items-start">
                             <span className="text-orange-500 font-black mt-1">•</span>
@@ -263,10 +263,10 @@ const CatalogFlow: React.FC = () => {
                     </div>
 
                     <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 xl:p-8 flex flex-col h-fit">
-                      <h4 className="text-slate-500 font-bold text-lg xl:text-xl 2xl:text-2xl uppercase tracking-wider mb-6 flex items-center gap-3">
+                      <h4 className="text-slate-500 font-bold text-lg xl:text-xl 2xl:text-2xl uppercase tracking-wider mb-4 xl:mb-6 flex items-center gap-3">
                         <XCircle size={28} /> Não acompanha
                       </h4>
-                      <ul className="flex flex-col gap-4">
+                      <ul className="flex flex-col gap-3 xl:gap-4">
                         {selectedProduct.excludedItems.map((item, i) => (
                           <li key={i} className="flex gap-4 text-sm xl:text-lg 2xl:text-xl font-medium text-slate-500 items-start">
                             <span className="text-slate-300 font-black mt-1">•</span>
@@ -277,7 +277,7 @@ const CatalogFlow: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="absolute bottom-0 left-0 right-4 h-32 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none flex items-end justify-center pb-2">
+                  <div className="absolute bottom-0 left-0 right-4 h-24 bg-gradient-to-t from-white via-white/90 to-transparent pointer-events-none flex items-end justify-center pb-2">
                     <motion.div
                       animate={{ y: [0, 8, 0] }}
                       transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
