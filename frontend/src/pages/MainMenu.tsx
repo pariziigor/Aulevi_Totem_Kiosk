@@ -1,71 +1,69 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Home, Factory, Trees, Warehouse, LogOut } from 'lucide-react';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { LogOut } from "lucide-react"; // Removemos os ícones antigos, mantivemos apenas o de Sair
 
 const MainMenu: React.FC = () => {
   const navigate = useNavigate();
 
+  // ATENÇÃO: Ajuste os nomes dos arquivos PNG no campo "image" para bater com os nomes exatos que você salvou na pasta assets!
   const options = [
-    { 
-      id: 'MM', 
-      label: 'Madeiramento Metálico', 
-      subtitle: 'Estruturas metálicas para telhados',
-      icon: <Trees className="w-16 h-16 xl:w-24 xl:h-24 text-white" strokeWidth={1.5} />, 
-      path: '/fluxo/MM',
-      iconBg: 'bg-blue-600',
-      hoverColorHex: '#eff6ff'
+    {
+      id: "MM",
+      label: "Madeiramento Metálico",
+      subtitle: "Estruturas metálicas para telhados",
+      image: "/assets/menu/mm.png",
+      path: "/fluxo/MM",
+      hoverColorHex: "#eff6ff",
     },
-    { 
-      id: 'LSF', 
-      label: 'Light Steel Frame', 
-      subtitle: 'Sistema construtivo em aço leve',
-      icon: <Home className="w-16 h-16 xl:w-24 xl:h-24 text-white" strokeWidth={1.5} />, 
-      path: '/fluxo/LSF',
-      iconBg: 'bg-emerald-600',
-      hoverColorHex: '#ecfdf5'
+    {
+      id: "LSF",
+      label: "Light Steel Frame",
+      subtitle: "Sistema construtivo em aço leve",
+      image: "/assets/menu/lsf.png",
+      path: "/fluxo/LSF",
+      hoverColorHex: "#ecfdf5",
     },
-    { 
-      id: 'BARRACAO', 
-      label: 'Galpão', 
-      subtitle: 'Galpões industriais e comerciais',
-      icon: <Factory className="w-16 h-16 xl:w-24 xl:h-24 text-white" strokeWidth={1.5} />, 
-      path: '/fluxo/BARRACAO',
-      iconBg: 'bg-orange-600',
-      hoverColorHex: '#fff7ed'
+    {
+      id: "BARRACAO",
+      label: "Galpão",
+      subtitle: "Galpões industriais e comerciais",
+      image: "/assets/menu/galpao.png",
+      path: "/fluxo/BARRACAO",
+      hoverColorHex: "#fff7ed",
     },
-    { 
-      id: 'CHALE', 
-      label: 'Chalés', 
-      subtitle: 'Construções residenciais em aço',
-      icon: <Warehouse className="w-16 h-16 xl:w-24 xl:h-24 text-white" strokeWidth={1.5} />, 
-      path: '/fluxo/CHALE',
-      iconBg: 'bg-purple-600',
-      hoverColorHex: '#faf5ff'
+    {
+      id: "CHALE",
+      label: "Chalés",
+      subtitle: "Construções residenciais em aço",
+      image: "/assets/menu/chale.png",
+      path: "/fluxo/CHALE",
+      hoverColorHex: "#faf5ff",
     },
   ];
 
   const cardVariants = {
     rest: { backgroundColor: "#ffffff" },
-    hover: (color: string) => ({ 
+    hover: (color: string) => ({
       backgroundColor: color,
-      // CORREÇÃO: 'as const' adicionado aqui para tipagem estrita do Framer Motion
-      transition: { duration: 0.3, ease: "easeOut" as const }
+      transition: { duration: 0.3, ease: "easeOut" as const },
     }),
-    tap: { scale: 0.98 }
+    tap: { scale: 0.98 },
   };
 
   const contentVariants = {
     rest: { scale: 1 },
-    hover: { 
+    hover: {
       scale: 1.05,
-      transition: { type: "spring" as const, stiffness: 300, damping: 20 }
-    }
+      transition: { type: "spring" as const, stiffness: 300, damping: 20 },
+    },
   };
 
   return (
-    <motion.div 
-      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
       className="h-screen w-screen bg-slate-50 text-slate-800 flex flex-col p-6 xl:p-12 select-none overflow-hidden"
     >
       {/* Cabeçalho */}
@@ -92,15 +90,24 @@ const MainMenu: React.FC = () => {
             variants={cardVariants}
             className="rounded-[2rem] xl:rounded-[3rem] shadow-sm border border-slate-200 flex flex-col items-center justify-center p-6 xl:p-10 transition-shadow hover:shadow-xl w-full h-full relative overflow-hidden"
           >
-            <motion.div 
+            <motion.div
               variants={contentVariants}
               className="flex flex-col items-center gap-4 xl:gap-8 w-full"
             >
-              {/* Ícone Escalonável */}
-              <div className={`w-24 h-24 xl:w-40 xl:h-40 rounded-2xl xl:rounded-3xl flex items-center justify-center shadow-md ${opt.iconBg}`}>
-                {opt.icon}
+              {/* Contêiner da Imagem Personalizada (PNG) */}
+              <div className="w-32 h-32 xl:w-48 xl:h-48 flex items-center justify-center drop-shadow-md">
+                <img
+                  src={opt.image}
+                  alt={`Ícone ${opt.label}`}
+                  className="w-full h-full object-contain"
+                  onError={(e) => {
+                    // Fallback visual caso você erre o nome do arquivo
+                    (e.target as HTMLImageElement).src =
+                      "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNjYmQ1ZTEiIHN0cm9rZS13aWR0aD0iMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHJlY3Qgd2lkdGg9IjE4IiBoZWlnaHQ9IjE4IiB4PSIzIiB5PSIzIiByeD0iMiIvPjxjaXJjbGUgY3g9IjkiIGN5PSI5IiByPSIyIi8+PHBhdGggZD0ibTIxIDE1LTMuMDgtMy4wOGExLjIgMS4yIDAgMDAtMS42Ni4xMWwtMi44OCAzLjU1YTEuMiAxLjIgMCAwMS0xLjY3LjExbC0xLjItMS4wOGExLjIgMS4yIDAgMDAtMS42Ni4xMUwzIDE2Ii8+PC9zdmc+";
+                  }}
+                />
               </div>
-              
+
               {/* Textos Escalonáveis */}
               <div className="flex flex-col items-center gap-1 xl:gap-2 px-4 text-center">
                 <h2 className="text-2xl xl:text-5xl font-bold text-slate-800 tracking-tight leading-none">
@@ -117,7 +124,6 @@ const MainMenu: React.FC = () => {
 
       {/* Rodapé com Instrução Centralizada e Botão à Direita */}
       <footer className="mt-6 xl:mt-8 flex items-center justify-center flex-none w-full relative h-16 xl:h-24">
-        
         {/* Texto de Instrução Pulsante */}
         <span className="text-slate-400 font-bold text-lg xl:text-2xl tracking-widest uppercase animate-pulse text-center">
           Toque em uma opção para continuar
@@ -125,16 +131,17 @@ const MainMenu: React.FC = () => {
 
         {/* Botão Encerrar Posicionado Absolutamente à Direita */}
         <div className="absolute right-0">
-          <motion.button 
+          <motion.button
             whileTap={{ scale: 0.95 }}
-            onClick={() => navigate('/standby')}
+            onClick={() => navigate("/standby")}
             className="bg-slate-800 text-white rounded-full px-6 py-3 xl:px-10 xl:py-5 hover:bg-slate-900 transition-colors shadow-md flex items-center justify-center gap-3 xl:gap-4"
           >
             <LogOut className="w-6 h-6 xl:w-8 xl:h-8" strokeWidth={2} />
-            <span className="text-lg xl:text-2xl font-bold uppercase tracking-wide">Encerrar</span>
+            <span className="text-lg xl:text-2xl font-bold uppercase tracking-wide">
+              Encerrar
+            </span>
           </motion.button>
         </div>
-        
       </footer>
     </motion.div>
   );
