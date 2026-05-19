@@ -144,19 +144,21 @@ class PDFService:
         
         logo_b64 = PDFService.get_logo_base64()
         
-        # Pega o ID bruto do jeito que vier do frontend (como a string "ch-02")
+        # Extrai o ID bruto enviado pelo frontend (ex: 'ch-01')
         raw_id = str(product_data.get('id', '1'))
         
-        # Passa o raw_id para a nossa função blindada tratar
-        main_img_b64 = PDFService.get_chale_image_base64(raw_id, 1)
-        sec_img_b64 = PDFService.get_chale_image_base64(raw_id, 2)
+        # Converte as três primeiras imagens sequenciais em Base64
+        img1_b64 = PDFService.get_chale_image_base64(raw_id, 1)
+        img2_b64 = PDFService.get_chale_image_base64(raw_id, 2)
+        img3_b64 = PDFService.get_chale_image_base64(raw_id, 3)
         
         html_content = template.render(
             product=product_data,
             date=datetime.now().strftime("%d/%m/%Y"),
             logo_url=logo_b64,
-            main_image=main_img_b64,
-            secondary_image=sec_img_b64
+            image_1=img1_b64,
+            image_2=img2_b64,
+            image_3=img3_b64
         )
         
         output_dir = os.path.join(os.path.dirname(__file__), '../generated_quotes')
