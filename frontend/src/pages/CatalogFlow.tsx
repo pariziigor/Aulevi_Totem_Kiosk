@@ -67,11 +67,11 @@ const CatalogFlow: React.FC = () => {
     
     try {
       const payload = {
-        module: catalogType, 
+        module: catalogType, // Vai enviar "CHALE" ou "BARRACAO"
         lead_name: name,
         lead_phone: phone,
-        modelo_escolhido: selectedProduct?.title, 
-        area: selectedProduct?.area ? parseFloat(selectedProduct.area.replace(/\D/g, '')) : null
+        // Envia o objeto INTEIRO do produto para o backend montar o PDF rico!
+        product: selectedProduct 
       };
 
       const result = await KioskService.submitQuote(payload);
@@ -79,7 +79,7 @@ const CatalogFlow: React.FC = () => {
       console.log(`[Lead Capturado] Pedido: ${result.quote_number}`);
 
       alert(
-        `ATENDIMENTO REGISTRADO!\n\nOrçamento Nº: ${result.quote_number}\n\nObrigado, ${name}.\nEm breve você receberá o material completo do ${selectedProduct?.title} no WhatsApp: ${phone}.`,
+        `ATENDIMENTO REGISTRADO!\n\nOrçamento Nº: ${result.quote_number}\n\nObrigado, ${name}.\nEm breve você receberá o material completo do ${selectedProduct?.title} no WhatsApp.`
       );
       navigate("/");
     } catch (error) {

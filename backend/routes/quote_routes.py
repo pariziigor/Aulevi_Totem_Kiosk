@@ -36,25 +36,21 @@ async def create_quote(payload: QuoteRequestSchema, db: Session = Depends(get_db
             # Se for LSF, roda o motor de precificação pesado
             calculation_result = PricingService.calculate_quote(payload)
         else:
-            # Se for Chalé ou Barracão, gera um escopo padrão para o PDF
+            # Se for Chalé ou Barracão, não precisamos de cálculo de itens aqui,
+            # pois o PDF de Catálogo não usa tabela de preços, apenas a ficha técnica.
             calculation_result = {
                 "total_value": 0.0,
                 "value_per_m2": 0.0,
-                "items": [
-                    {
-                        "codigo": "COMERCIAL",
-                        "descricao": f"Modelo Selecionado: {payload_dict.get('modelo_escolhido', 'A definir')}",
-                        "qtd": 1,
-                        "un": "un",
-                        "formatted_price": "Sob Consulta"
-                    }
-                ]
+                "items": []
             }
         
         # 2. Extração dos dados fixos
         lead_name = payload_dict.pop("lead_name", "Não Informado")
         lead_phone = payload_dict.pop("lead_phone", "Não Informado")
         area = payload_dict.pop("area", None)
+        
+        # Extrai o objeto completo do Chalé enviado pelo frontend
+        product_data = payload_dict.get("product", {})
         
         selections = payload_dict
 
@@ -74,16 +70,22 @@ async def create_quote(payload: QuoteRequestSchema, db: Session = Depends(get_db
         db.commit()
         db.refresh(new_quote)
         
-        # 4. Geração do Documento PDF
+        # 4. GERAÇÃO DO DOCUMENTO PDF CONDICIONAL (A Mágica Acontece Aqui)
         pdf_data = payload.model_dump()
         pdf_data["quote_number"] = quote_number
         
-        pdf_path = await PDFService.generate_quote_pdf(
-            quote_data=pdf_data,
-            items=calculation_result.get("items", []),
-            total_value=calculation_result.get("total_value", 0.0),
-            value_per_m2=calculation_result.get("value_per_m2", 0.0)
-        )
+        if module == "LSF":
+            # Se for LSF, gera o Orçamento Paramétrico (Tabelas)
+            pdf_path = await PDFService.generate_quote_pdf(
+                quote_data=pdf_data,
+                items=calculation_result.get("items", []),
+                total_value=calculation_result.get("total_value", 0.0),
+                value_per_m2=calculation_result.get("value_per_m2", 0.0)
+            )
+        elif module in ["CHALE", "BARRACAO"]:
+            # Se for Chalé/Barracão, gera o Catálogo/Memorial Descritivo (Imagens)
+            # Passamos o product_data direto para a função nova que criamos!
+            pdf_path = await PDFService.generate_chalet_pdf(product_data)
         
         print(f"[PDF Generator]: Documento {quote_number} compilado com sucesso em -> {pdf_path}")
         

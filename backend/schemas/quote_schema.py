@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, ConfigDict
-from typing import Optional
+from typing import Optional, Dict, Any
 
 class QuoteRequestSchema(BaseModel):
     # DADOS FIXOS E OBRIGATÓRIOS
@@ -18,6 +18,8 @@ class QuoteRequestSchema(BaseModel):
     has_land: Optional[bool] = Field(default=None, description="Possui terreno? Tipo nativo True ou False")
     own_resources: Optional[bool] = Field(default=None, description="Recurso próprio? Tipo nativo True ou False")
     city: Optional[str] = Field(default=None, description="Local da obra (Cidade/Estado)")
+
+    product: Optional[Dict[str, Any]] = Field(default=None, description="Dados completos do produto (Chalé/Barracão)")
 
     # PERMISSÃO PARA CAMPOS EXTRAS
     model_config = ConfigDict(extra='allow')
