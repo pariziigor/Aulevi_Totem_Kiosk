@@ -18,6 +18,7 @@ const CatalogFlow: React.FC = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
   const [showLeadModal, setShowLeadModal] = useState<boolean>(false);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false); // Novo estado de carregamento
   
   const carouselRef = useRef<HTMLDivElement>(null);
 
@@ -64,6 +65,7 @@ const CatalogFlow: React.FC = () => {
 
   const submitInterest = async (name: string, phone: string) => {
     setShowLeadModal(false);
+    setIsProcessing(true); // Liga a tela de carregamento
     
     try {
       const payload = {
@@ -85,6 +87,8 @@ const CatalogFlow: React.FC = () => {
     } catch (error) {
       console.error("Falha na comunicação com a API:", error);
       alert("ERRO: Falha ao registrar interesse. Tente novamente.");
+    } finally {
+      setIsProcessing(false); // Desliga a tela de carregamento independentemente de sucesso ou erro
     }
   };
 
@@ -215,12 +219,10 @@ const CatalogFlow: React.FC = () => {
               </div>
             </div>
 
-            {/* PAINEL DIREITO CORRIGIDO */}
             <div className="flex-1 flex flex-col gap-6 xl:gap-8 w-full min-h-0">
               
               <div className="bg-white border border-slate-200 rounded-[2rem] xl:rounded-[3rem] p-6 xl:p-10 shadow-sm flex flex-col h-full min-h-0 relative overflow-hidden">
                 
-                {/* --- TOPO: ÁREA E DESCRIÇÃO --- */}
                 <div className="flex flex-col gap-4 xl:gap-6 flex-1 min-h-0 border-b border-slate-100 pb-4 xl:pb-6">
                   
                   <div className="flex justify-between items-center bg-slate-50 rounded-2xl p-5 xl:p-8 border border-slate-100 flex-none">
@@ -243,7 +245,6 @@ const CatalogFlow: React.FC = () => {
 
                 </div>
 
-                {/* --- BASE: ITENS INCLUSOS E NÃO INCLUSOS --- */}
                 <div className="relative flex-[1.2] min-h-0 overflow-hidden pt-2 xl:pt-4">
                   
                   <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 xl:gap-8 h-full overflow-y-auto pr-4 pb-20 custom-scrollbar">
@@ -375,7 +376,6 @@ const CatalogFlow: React.FC = () => {
         />
       )}
 
-      {/* MODAL FULLSCREEN (LIGHTBOX) */}
       <AnimatePresence>
         {isFullscreen && selectedProduct && (
           <motion.div
@@ -431,6 +431,19 @@ const CatalogFlow: React.FC = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Overlay de carregamento durante a geração do PDF */}
+      {isProcessing && (
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="absolute inset-0 bg-slate-50/90 backdrop-blur-sm z-[150] flex items-center justify-center flex-col"
+        >
+          <div className="w-20 h-20 border-4 border-slate-200 border-t-orange-500 rounded-full animate-spin shadow-md"></div>
+          <p className="text-2xl font-bold text-slate-800 mt-8 tracking-tight">Gerando Catálogo...</p>
+          <p className="text-slate-500 mt-2">Preparando imagens e especificações técnicas</p>
+        </motion.div>
+      )}
 
     </div>
   );
