@@ -1,7 +1,14 @@
 import React, { useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion, AnimatePresence, type PanInfo } from "framer-motion";
-import { ChevronLeft, ChevronRight, CheckCircle2, XCircle, ChevronDown, X } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  CheckCircle2,
+  XCircle,
+  ChevronDown,
+  X,
+} from "lucide-react";
 import { LeadCaptureModal } from "../components/LeadCaptureModal";
 import { CHALES_DATA, BARRACAO_DATA, type Product } from "../data/products";
 import { KioskService } from "../services/api";
@@ -19,7 +26,7 @@ const CatalogFlow: React.FC = () => {
   const [showLeadModal, setShowLeadModal] = useState<boolean>(false);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const [isProcessing, setIsProcessing] = useState<boolean>(false); // Novo estado de carregamento
-  
+
   const carouselRef = useRef<HTMLDivElement>(null);
 
   const handleSelectProduct = (product: Product) => {
@@ -54,7 +61,10 @@ const CatalogFlow: React.FC = () => {
     }
   };
 
-  const handleDragEnd = (_event: MouseEvent | TouchEvent | PointerEvent, { offset }: PanInfo) => {
+  const handleDragEnd = (
+    _event: MouseEvent | TouchEvent | PointerEvent,
+    { offset }: PanInfo,
+  ) => {
     const swipeThreshold = 50;
     if (offset.x < -swipeThreshold) {
       nextImage();
@@ -66,22 +76,22 @@ const CatalogFlow: React.FC = () => {
   const submitInterest = async (name: string, phone: string) => {
     setShowLeadModal(false);
     setIsProcessing(true); // Liga a tela de carregamento
-    
+
     try {
       const payload = {
         module: catalogType, // Vai enviar "CHALE" ou "BARRACAO"
         lead_name: name,
         lead_phone: phone,
         // Envia o objeto INTEIRO do produto para o backend montar o PDF rico!
-        product: selectedProduct 
+        product: selectedProduct,
       };
 
       const result = await KioskService.submitQuote(payload);
-      
+
       console.log(`[Lead Capturado] Pedido: ${result.quote_number}`);
 
       alert(
-        `ATENDIMENTO REGISTRADO!\n\nOrçamento Nº: ${result.quote_number}\n\nObrigado, ${name}.\nEm breve você receberá o material completo do ${selectedProduct?.title} no WhatsApp.`
+        `ATENDIMENTO REGISTRADO!\n\nOrçamento Nº: ${result.quote_number}\n\nObrigado, ${name}.\nEm breve você receberá o material completo do ${selectedProduct?.title} no WhatsApp.`,
       );
       navigate("/");
     } catch (error) {
@@ -95,7 +105,11 @@ const CatalogFlow: React.FC = () => {
   const renderStep = () => {
     const stepVariants = {
       initial: { opacity: 0, x: 50 },
-      animate: { opacity: 1, x: 0, transition: { duration: 0.4, ease: "easeOut" as const } },
+      animate: {
+        opacity: 1,
+        x: 0,
+        transition: { duration: 0.4, ease: "easeOut" as const },
+      },
       exit: { opacity: 0, x: -50, transition: { duration: 0.2 } },
     };
 
@@ -110,7 +124,6 @@ const CatalogFlow: React.FC = () => {
           className="flex flex-col w-full h-full min-h-0"
         >
           <div className="flex-grow relative flex items-center justify-center min-h-0 w-full max-w-[1800px] mx-auto">
-            
             <button
               onClick={() => handleScroll("left")}
               className="absolute left-2 xl:left-8 z-10 bg-white/80 backdrop-blur-md border border-slate-200 text-slate-600 rounded-full p-4 hover:bg-white hover:shadow-md transition-all hidden md:flex shadow-sm"
@@ -136,7 +149,7 @@ const CatalogFlow: React.FC = () => {
                     className="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-700 ease-out"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent"></div>
-                  
+
                   <div className="relative z-10 bg-white/95 backdrop-blur-sm border border-white/20 rounded-2xl p-4 xl:p-5 text-center shadow-lg transform group-hover:-translate-y-2 transition-transform duration-300">
                     <h2 className="text-xl xl:text-2xl 2xl:text-3xl font-bold tracking-tight text-slate-800 uppercase leading-none">
                       {prod.title}
@@ -153,7 +166,7 @@ const CatalogFlow: React.FC = () => {
               <ChevronRight size={48} strokeWidth={1.5} />
             </button>
           </div>
-          
+
           <div className="text-center mt-2 mb-4 flex-none">
             <span className="text-base xl:text-xl font-bold uppercase tracking-widest text-slate-400 animate-pulse">
               Arraste para os lados e toque no modelo desejado
@@ -178,10 +191,12 @@ const CatalogFlow: React.FC = () => {
           </h2>
 
           <div className="flex-grow flex flex-col md:flex-row gap-6 xl:gap-12 2xl:gap-16 min-h-0 w-full">
-            
             <div className="flex-[1.3] relative flex items-center justify-center bg-slate-900 rounded-[2rem] xl:rounded-[3rem] overflow-hidden shadow-inner border border-slate-200">
               <button
-                onClick={(e) => { e.stopPropagation(); prevImage(); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  prevImage();
+                }}
                 className="absolute left-6 bg-white/80 backdrop-blur border border-slate-200 rounded-full p-4 hover:bg-white transition-all z-10 shadow-md text-slate-600 pointer-events-auto"
               >
                 <ChevronLeft size={48} />
@@ -204,7 +219,10 @@ const CatalogFlow: React.FC = () => {
               />
 
               <button
-                onClick={(e) => { e.stopPropagation(); nextImage(); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  nextImage();
+                }}
                 className="absolute right-6 bg-white/80 backdrop-blur border border-slate-200 rounded-full p-4 hover:bg-white transition-all z-10 shadow-md text-slate-600 pointer-events-auto"
               >
                 <ChevronRight size={48} />
@@ -213,27 +231,32 @@ const CatalogFlow: React.FC = () => {
               <div className="absolute bottom-8 bg-slate-900/80 backdrop-blur-md text-white rounded-full px-8 py-3 font-bold tracking-widest text-lg shadow-md pointer-events-none">
                 {currentImageIndex + 1} / {selectedProduct.images.length}
               </div>
-              
+
               <div className="absolute top-6 bg-slate-900/60 backdrop-blur-md text-white/90 rounded-full px-6 py-2 text-sm font-medium pointer-events-none flex items-center gap-2">
                 Toque para ampliar ou arraste para os lados
               </div>
             </div>
 
             <div className="flex-1 flex flex-col gap-6 xl:gap-8 w-full min-h-0">
-              
               <div className="bg-white border border-slate-200 rounded-[2rem] xl:rounded-[3rem] p-6 xl:p-10 shadow-sm flex flex-col h-full min-h-0 relative overflow-hidden">
-                
                 <div className="flex flex-col gap-4 xl:gap-6 flex-1 min-h-0 border-b border-slate-100 pb-4 xl:pb-6">
-                  
                   <div className="flex justify-between items-center bg-slate-50 rounded-2xl p-5 xl:p-8 border border-slate-100 flex-none">
                     <div className="flex flex-col">
-                      <span className="text-slate-400 text-sm xl:text-lg font-bold uppercase">Área Total</span>
-                      <span className="text-2xl xl:text-4xl font-black text-slate-800 mt-1">{selectedProduct.area}</span>
+                      <span className="text-slate-400 text-sm xl:text-lg font-bold uppercase">
+                        Área Total
+                      </span>
+                      <span className="text-2xl xl:text-4xl font-black text-slate-800 mt-1">
+                        {selectedProduct.area}
+                      </span>
                     </div>
                     <div className="h-12 xl:h-16 w-px bg-slate-200"></div>
                     <div className="flex flex-col text-right">
-                      <span className="text-slate-400 text-sm xl:text-lg font-bold uppercase">Dimensões</span>
-                      <span className="text-2xl xl:text-4xl font-black text-slate-800 mt-1">{selectedProduct.dimensions}</span>
+                      <span className="text-slate-400 text-sm xl:text-lg font-bold uppercase">
+                        Dimensões
+                      </span>
+                      <span className="text-2xl xl:text-4xl font-black text-slate-800 mt-1">
+                        {selectedProduct.dimensions}
+                      </span>
                     </div>
                   </div>
 
@@ -242,21 +265,23 @@ const CatalogFlow: React.FC = () => {
                       {selectedProduct.description}
                     </p>
                   </div>
-
                 </div>
 
                 <div className="relative flex-[1.2] min-h-0 overflow-hidden pt-2 xl:pt-4">
-                  
                   <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 xl:gap-8 h-full overflow-y-auto pr-4 pb-20 custom-scrollbar">
-                    
                     <div className="bg-blue-50/50 border border-blue-100 rounded-3xl p-6 xl:p-8 flex flex-col h-fit">
                       <h4 className="text-orange-800 font-bold text-lg xl:text-xl 2xl:text-2xl uppercase tracking-wider mb-4 xl:mb-6 flex items-center gap-3">
                         <CheckCircle2 size={28} /> O que acompanha
                       </h4>
                       <ul className="flex flex-col gap-3 xl:gap-4">
                         {selectedProduct.includedItems.map((item, i) => (
-                          <li key={i} className="flex gap-4 text-sm xl:text-lg 2xl:text-xl font-medium text-slate-700 items-start">
-                            <span className="text-orange-500 font-black mt-1">•</span>
+                          <li
+                            key={i}
+                            className="flex gap-4 text-sm xl:text-lg 2xl:text-xl font-medium text-slate-700 items-start"
+                          >
+                            <span className="text-orange-500 font-black mt-1">
+                              •
+                            </span>
                             <span>{item}</span>
                           </li>
                         ))}
@@ -269,8 +294,13 @@ const CatalogFlow: React.FC = () => {
                       </h4>
                       <ul className="flex flex-col gap-3 xl:gap-4">
                         {selectedProduct.excludedItems.map((item, i) => (
-                          <li key={i} className="flex gap-4 text-sm xl:text-lg 2xl:text-xl font-medium text-slate-500 items-start">
-                            <span className="text-slate-300 font-black mt-1">•</span>
+                          <li
+                            key={i}
+                            className="flex gap-4 text-sm xl:text-lg 2xl:text-xl font-medium text-slate-500 items-start"
+                          >
+                            <span className="text-slate-300 font-black mt-1">
+                              •
+                            </span>
                             <span>{item}</span>
                           </li>
                         ))}
@@ -281,7 +311,11 @@ const CatalogFlow: React.FC = () => {
                   <div className="absolute bottom-0 left-0 right-4 h-24 bg-gradient-to-t from-white via-white/90 to-transparent pointer-events-none flex items-end justify-center pb-2">
                     <motion.div
                       animate={{ y: [0, 8, 0] }}
-                      transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+                      transition={{
+                        repeat: Infinity,
+                        duration: 1.5,
+                        ease: "easeInOut",
+                      }}
                       className="bg-slate-800 text-white rounded-full px-6 py-2.5 shadow-lg flex items-center gap-2 mb-2 pointer-events-auto"
                     >
                       <span className="text-sm xl:text-base font-bold uppercase tracking-widest">
@@ -291,7 +325,6 @@ const CatalogFlow: React.FC = () => {
                     </motion.div>
                   </div>
                 </div>
-
               </div>
 
               <motion.button
@@ -310,7 +343,6 @@ const CatalogFlow: React.FC = () => {
 
   return (
     <div className="h-screen w-screen bg-slate-50 text-slate-800 flex flex-col p-6 xl:p-12 select-none overflow-hidden font-sans">
-      
       <style>{`
         .custom-scrollbar::-webkit-scrollbar {
           width: 8px;
@@ -391,8 +423,11 @@ const CatalogFlow: React.FC = () => {
               <X size={40} />
             </button>
 
-            <button 
-              onClick={(e) => { e.stopPropagation(); prevImage(); }} 
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                prevImage();
+              }}
               className="absolute left-8 xl:left-12 bg-white/10 text-white rounded-full p-6 hover:bg-white/20 transition-all z-50 shadow-lg"
             >
               <ChevronLeft size={48} />
@@ -414,8 +449,11 @@ const CatalogFlow: React.FC = () => {
               />
             </div>
 
-            <button 
-              onClick={(e) => { e.stopPropagation(); nextImage(); }} 
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                nextImage();
+              }}
               className="absolute right-8 xl:right-12 bg-white/10 text-white rounded-full p-6 hover:bg-white/20 transition-all z-50 shadow-lg"
             >
               <ChevronRight size={48} />
@@ -424,7 +462,7 @@ const CatalogFlow: React.FC = () => {
             <div className="absolute bottom-8 xl:bottom-12 bg-slate-800/80 text-white rounded-full px-8 py-3 font-bold tracking-widest text-lg shadow-md pointer-events-none">
               {currentImageIndex + 1} / {selectedProduct.images.length}
             </div>
-            
+
             <div className="absolute top-8 xl:top-12 bg-white/10 backdrop-blur-sm text-white rounded-full px-6 py-2 text-sm font-medium tracking-wide pointer-events-none">
               Arraste para os lados para navegar
             </div>
@@ -434,17 +472,20 @@ const CatalogFlow: React.FC = () => {
 
       {/* Overlay de carregamento durante a geração do PDF */}
       {isProcessing && (
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           className="absolute inset-0 bg-slate-50/90 backdrop-blur-sm z-[150] flex items-center justify-center flex-col"
         >
           <div className="w-20 h-20 border-4 border-slate-200 border-t-orange-500 rounded-full animate-spin shadow-md"></div>
-          <p className="text-2xl font-bold text-slate-800 mt-8 tracking-tight">Gerando Catálogo...</p>
-          <p className="text-slate-500 mt-2">Preparando imagens e especificações técnicas</p>
+          <p className="text-2xl font-bold text-slate-800 mt-8 tracking-tight">
+            Gerando Catálogo...
+          </p>
+          <p className="text-slate-500 mt-2">
+            Preparando imagens e especificações técnicas
+          </p>
         </motion.div>
       )}
-
     </div>
   );
 };
