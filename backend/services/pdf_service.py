@@ -185,3 +185,43 @@ class PDFService:
             await browser.close()
         
         return output_path
+
+    @staticmethod
+    async def generate_madeiramento_pdf(quote_data: dict) -> str:
+        import os
+        from datetime import datetime
+        from jinja2 import Environment, FileSystemLoader
+        from playwright.async_api import async_playwright
+
+        env = Environment(loader=FileSystemLoader(os.path.join(os.path.dirname(__file__), '../templates')))
+        template = env.get_template('madeiramento_template.html')
+        
+        # Puxa a logo (garanta que a função get_logo_base64() já exista na classe)
+        logo_b64 = PDFService.get_logo_base64()
+        
+        html_content = template.render(
+            quote=quote_data,
+            date=datetime.now().strftime("%d/%m/%Y"),
+            logo_url=logo_b64
+        )
+        
+        output_dir = os.path.join(os.path.dirname(__file__), '../generated_quotes')
+        os.makedirs(output_dir, exist_ok=True)
+        
+        filename = f"madeiramento_{quote_data.get('quote_number')}.pdf"
+        output_path = os.path.join(output_dir, filename)
+        
+        async with async_playwright() as p:
+            browser = await p.chromium.launch()
+            page = await browser.new_page()
+            await page.set_content(html_content)
+            await page.evaluate("document.fonts.ready")
+            await page.pdf(
+                path=output_path,
+                format="A4",
+                print_background=True,
+                margin={"top": "0", "right": "0", "bottom": "0", "left": "0"}
+            )
+            await browser.close()
+        
+        return output_path

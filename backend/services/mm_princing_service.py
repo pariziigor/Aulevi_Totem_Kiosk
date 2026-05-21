@@ -1,30 +1,26 @@
 """
-Serviço de quantificação de madeiramento para telhados 1/2 águas.
+Serviço de quantificação de madeiramento — telhados 1/2 águas.
 Baseado na planilha AULEVI - MADEIRAMENTO - QUANTIFICADOR 1-2 ÁGUAS.
 
-Lógica extraída integralmente das fórmulas da planilha:
+Regras automáticas (sem entrada do usuário):
+  - Vão máximo : Cerâmico/Concreto → 1,0 m | demais → 1,5 m
+  - Perfil viga SEM LAJE : calculado por critério de deflexão L/120
+  - Pontaletes COM LAJE  : ceil(b / 1,5)  — cada tramo ≤ 1,5 m
+  - Altura pontaletes    : estimada como inclinação_média × (b/2), mínimo 0,3 m
 
-  SEM LAJE
-  --------
-  - VIGA  : perfil informado pelo usuário (não calculado automaticamente)
-  - TERÇA : calculada por critério de deflexão L/120
-
-  COM LAJE
-  --------
-  - VIGA  : calculada por critério de deflexão L/120
-            com vão = b / (pontaletes_por_linha + 1)
-  - TERÇA : calculada por critério de deflexão L/120
-
-Uso rápido
-----------
-    from madeiramento_service import calcular_sem_laje, calcular_com_laje
+Interface pública
+-----------------
+    calcular_sem_laje(a, b, tipo_telha, tem_placa) -> ResultadoSemLaje
+    calcular_com_laje(a, b, tipo_telha, tem_placa) -> ResultadoComLaje
+    para_dict(resultado)  -> dict  (serializável em JSON)
+    tipos_de_telha()      -> list[str]
 """
 
 import math
 from dataclasses import dataclass, field, asdict
 
 # ---------------------------------------------------------------------------
-# Tabelas de referência (transcrição das abas *_PROCV)
+# Tabelas de referência
 # ---------------------------------------------------------------------------
 
 TELHAS: dict = {
@@ -35,6 +31,9 @@ TELHAS: dict = {
     "Termoacustico":   {"carga_kn_m2": 0.13, "inclinacao": 0.07, "esp_terca_m": 1.50, "parafusos_m2":  5},
     "Shingle":         {"carga_kn_m2": 0.64, "inclinacao": 0.17, "esp_terca_m": 0.30, "parafusos_m2": 12},
 }
+
+# Telhas que exigem vão = 1,0 m; demais usam 1,5 m
+_TELHAS_VAO_1M = {"Cerâmico", "Concreto"}
 
 # Perfis em ordem crescente de inércia (mm⁴)
 PERFIS: list = [
@@ -52,21 +51,45 @@ PERFIS: list = [
     ("Viga 1,50",         4_237_363.75),
 ]
 
-PERFIS_NOMES: list = [p[0] for p in PERFIS]
-
-# Módulo de elasticidade do aço (kN/m²)
 E_ACO_KN_M2 = 206_000_000.0
 
 
 # ---------------------------------------------------------------------------
-# Funções auxiliares
+# Automações: regras que eliminam inputs técnicos do usuário
+# ---------------------------------------------------------------------------
+
+def _vao_automatico(tipo_telha: str) -> float:
+    """Vão máximo entre apoios definido automaticamente pelo tipo de telha."""
+    return 1.0 if tipo_telha in _TELHAS_VAO_1M else 1.5
+
+
+def _pontaletes_automatico(b: float) -> int:
+    """
+    Quantidade de pontaletes por linha = ceil(b / 1,5).
+    Garante que nenhum tramo supere 1,5 m.
+    Mínimo de 1 pontalete (garante ao menos 2 tramos).
+    """
+    return max(1, math.ceil(b / 1.5))
+
+
+def _altura_pontaletes_automatica(b: float, inclinacao: float) -> float:
+    """
+    Estimativa da altura média dos pontaletes.
+    O telhado sobe com a inclinação ao longo de b; o ponto médio está a b/2.
+    altura = tan(inclinação) × (b / 2), mínimo de 0,30 m.
+    Arredondado para cima em múltiplos de 0,05 m.
+    """
+    altura_bruta = math.tan(math.atan(inclinacao)) * (b / 2)
+    altura = _ceiling(max(0.30, altura_bruta), 0.05)
+    return round(altura, 2)
+
+
+# ---------------------------------------------------------------------------
+# Funções auxiliares internas
 # ---------------------------------------------------------------------------
 
 def _inertia_minima_mm4(carga_kn_m: float, vao_m: float) -> float:
-    """
-    Inércia mínima (mm⁴) — viga biapoiada, carga distribuída, critério L/120.
-    I = (5 · q · L⁴) / (384 · E · δ_max) × 10¹²
-    """
+    """Inércia mínima (mm⁴) — viga biapoiada, critério deflexão L/120."""
     delta_max = vao_m / 120.0
     return ((5.0 * carga_kn_m * (vao_m ** 4)) / (384.0 * E_ACO_KN_M2 * delta_max)) * 1e12
 
@@ -88,41 +111,48 @@ def _contem(substring: str, texto: str) -> bool:
     return substring.lower() in texto.lower()
 
 
-# ---------------------------------------------------------------------------
-# Lógica de seleção de perfil da terça (igual nos dois cenários)
-# ---------------------------------------------------------------------------
-
 def _calcular_perfil_terca(
-    tipo_telha: str,
-    carga_telha: float,
-    esp_terca: float,
-    vao_maximo: float,
-    alertas: list,
+    tipo_telha: str, carga_telha: float, esp_terca: float,
+    vao_maximo: float, alertas: list
 ) -> str:
+    """Seleciona o perfil da terça por inércia, aplicando regras de negócio."""
     carga_terca = carga_telha * esp_terca
     inertia = _inertia_minima_mm4(carga_terca, vao_maximo)
     perfil_raw = _menor_perfil(inertia)
 
+    # Cerâmica com vão != 1 m (não deve ocorrer com automação, mas mantém como guarda)
     if tipo_telha == "Cerâmico" and vao_maximo != 1.0:
-        alertas.append("Para telha cerâmica o vão máximo entre apoios deve ser exatamente 1 m.")
+        alertas.append("Para telha cerâmica o vão máximo deve ser 1 m.")
         return "Vão máximo entre apoios deve ser 1 m"
 
+    # Cerâmica/Concreto com vão > 1,2 m → upgrade mínimo
     if tipo_telha in ("Cerâmico", "Concreto") and vao_maximo > 1.2:
         alertas.append("Vão > 1,2 m com cerâmica/concreto: perfil elevado para Caibro Aberto 0,80.")
-        if perfil_raw in ("Ripa 0,65", "Ripa 0,80"):
-            return "Caibro Aberto 0,80"
-        return perfil_raw
+        return "Caibro Aberto 0,80" if perfil_raw in ("Ripa 0,65", "Ripa 0,80") else perfil_raw
 
+    # Outros tipos com vão > 1 m → upgrade mínimo
     if vao_maximo > 1.0 and tipo_telha not in ("Cerâmico", "Concreto"):
-        if perfil_raw in ("Ripa 0,65", "Ripa 0,80"):
-            return "Caibro Aberto 0,80"
-        return perfil_raw
+        return "Caibro Aberto 0,80" if perfil_raw in ("Ripa 0,65", "Ripa 0,80") else perfil_raw
 
+    # Cerâmica com vão = 1 m deve usar apenas Ripa 0,65
     if tipo_telha == "Cerâmico" and perfil_raw != "Ripa 0,65":
-        alertas.append("Perfil calculado para a terça não atende para telha cerâmica (deve ser Ripa 0,65).")
+        alertas.append("Perfil da terça não atende para telha cerâmica (deve ser Ripa 0,65).")
         return "Não atendido"
 
     return perfil_raw
+
+
+def _calcular_perfil_viga_sem_laje(
+    a: float, carga_telha: float, vao_maximo: float
+) -> str:
+    """
+    Calcula o perfil da viga para o cenário SEM LAJE.
+    Vão livre da viga = a (percorre toda a largura).
+    Carga linear = carga_telha × vao_maximo.
+    """
+    carga_viga = carga_telha * vao_maximo
+    inertia = _inertia_minima_mm4(carga_viga, a)
+    return _menor_perfil(inertia)
 
 
 # ---------------------------------------------------------------------------
@@ -131,28 +161,34 @@ def _calcular_perfil_terca(
 
 @dataclass
 class ResultadoSemLaje:
+    # Inputs do usuário
     a: float
     b: float
     tipo_telha: str
     tem_placa: bool
-    vao_maximo: float
-    perfil_viga: str
 
+    # Derivados automáticos (não requerem input do usuário)
+    vao_maximo: float
     inclinacao: float
     angulo_rad: float
     carga_telha_kn_m2: float
     esp_terca_m: float
 
+    # Perfis calculados
+    perfil_viga: str
     perfil_terca: str
 
+    # Quantitativos — Viga
     qtd_vigas: int
     comp_viga_m: float
     total_viga_m: float
 
+    # Quantitativos — Terça
     qtd_tercas: int
     comp_terca_m: float
     total_terca_m: float
 
+    # Fixadores e conexões
     parafusos_48: int
     parafusos_42: int
     conexoes_p: int
@@ -164,35 +200,43 @@ class ResultadoSemLaje:
 
 @dataclass
 class ResultadoComLaje:
+    # Inputs do usuário
     a: float
     b: float
     tipo_telha: str
     tem_placa: bool
+
+    # Derivados automáticos
     vao_maximo: float
     pontaletes_por_linha: int
     altura_pontaletes_m: float
-
     inclinacao: float
     angulo_rad: float
     carga_telha_kn_m2: float
     esp_terca_m: float
 
+    # Perfis calculados
     perfil_viga: str
     perfil_terca: str
 
+    # Quantitativos — Viga
     qtd_vigas: int
     comp_viga_m: float
     total_viga_m: float
 
+    # Quantitativos — Terça
     qtd_tercas: int
     comp_terca_m: float
     total_terca_m: float
 
+    # Pontaletes
     perfil_pontalete: str
     total_pontalete_m: float
 
+    # Contraventamento
     total_contraventamento_m: float
 
+    # Fixadores e conexões
     parafusos_48: int
     parafusos_42: int
     conexoes_p: int
@@ -201,7 +245,7 @@ class ResultadoComLaje:
 
 
 # ---------------------------------------------------------------------------
-# Cálculo SEM LAJE
+# API pública
 # ---------------------------------------------------------------------------
 
 def calcular_sem_laje(
@@ -209,21 +253,19 @@ def calcular_sem_laje(
     b: float,
     tipo_telha: str,
     tem_placa: bool,
-    vao_maximo: float,
-    perfil_viga: str,
 ) -> ResultadoSemLaje:
     """
-    a           : largura total do telhado (m) — eixo das vigas
-    b           : profundidade do caimento (m) — eixo das terças
-    tipo_telha  : chave de TELHAS
-    tem_placa   : +0,25 kN/m² se True
-    vao_maximo  : vão máximo entre apoios (m)
-    perfil_viga : escolhido pelo usuário (não calculado)
+    Calcula o quantitativo SEM LAJE a partir apenas das dimensões e tipo de telha.
+
+    Parâmetros
+    ----------
+    a          : largura total do telhado (m) — eixo das vigas
+    b          : profundidade do caimento (m) — eixo das terças
+    tipo_telha : um de tipos_de_telha()
+    tem_placa  : True se há placa fotovoltaica (+0,25 kN/m²)
     """
     if tipo_telha not in TELHAS:
         raise ValueError(f"tipo_telha inválido: '{tipo_telha}'. Opções: {list(TELHAS)}")
-    if perfil_viga not in PERFIS_NOMES:
-        raise ValueError(f"perfil_viga inválido: '{perfil_viga}'. Opções: {PERFIS_NOMES}")
 
     alertas: list = []
     telha = TELHAS[tipo_telha]
@@ -233,14 +275,17 @@ def calcular_sem_laje(
     carga_telha = telha["carga_kn_m2"] + (0.25 if tem_placa else 0.0)
     esp_terca   = telha["esp_terca_m"]
 
+    # Automação: vão máximo fixo por tipo de telha
+    vao_maximo = _vao_automatico(tipo_telha)
+
+    # Automação: perfil da viga calculado (não mais escolhido pelo usuário)
+    perfil_viga  = _calcular_perfil_viga_sem_laje(a, carga_telha, vao_maximo)
     perfil_terca = _calcular_perfil_terca(tipo_telha, carga_telha, esp_terca, vao_maximo, alertas)
 
-    # Viga percorre eixo b; 1 viga a cada vao_maximo metros ao longo de a
     qtd_vigas  = int(_ceiling(a / vao_maximo, 1) + 1)
     comp_viga  = _ceiling((b / abs(math.cos(angulo_rad))) + 0.15, 0.05)
     total_viga = qtd_vigas * comp_viga
 
-    # Terça percorre eixo a; 1 terça a cada esp_terca metros ao longo de b
     qtd_tercas  = int(_ceiling(b / esp_terca, 1) + 1)
     comp_terca  = a
     total_terca = qtd_tercas * comp_terca
@@ -249,20 +294,20 @@ def calcular_sem_laje(
     parafusos_42 = (qtd_tercas * 2 + 2) if tipo_telha in ("Cerâmico", "Concreto") else 0
 
     conexoes_p = conexoes_m = conexoes_g = 0
-    for perfil, multiplicador in [(perfil_viga, qtd_vigas * 2), (perfil_terca, qtd_tercas * qtd_vigas)]:
+    for perfil, mult in [(perfil_viga, qtd_vigas * 2), (perfil_terca, qtd_tercas * qtd_vigas)]:
         if _contem("Caibro", perfil):
-            conexoes_p += multiplicador
+            conexoes_p += mult
         elif _contem("Terça", perfil):
-            conexoes_m += multiplicador
+            conexoes_m += mult
         elif _contem("Viga", perfil):
-            conexoes_g += multiplicador
+            conexoes_g += mult
 
     return ResultadoSemLaje(
         a=a, b=b, tipo_telha=tipo_telha, tem_placa=tem_placa,
-        vao_maximo=vao_maximo, perfil_viga=perfil_viga,
+        vao_maximo=vao_maximo,
         inclinacao=inclinacao, angulo_rad=angulo_rad,
         carga_telha_kn_m2=carga_telha, esp_terca_m=esp_terca,
-        perfil_terca=perfil_terca,
+        perfil_viga=perfil_viga, perfil_terca=perfil_terca,
         qtd_vigas=qtd_vigas, comp_viga_m=comp_viga, total_viga_m=total_viga,
         qtd_tercas=qtd_tercas, comp_terca_m=comp_terca, total_terca_m=total_terca,
         parafusos_48=parafusos_48, parafusos_42=parafusos_42,
@@ -271,27 +316,21 @@ def calcular_sem_laje(
     )
 
 
-# ---------------------------------------------------------------------------
-# Cálculo COM LAJE
-# ---------------------------------------------------------------------------
-
 def calcular_com_laje(
     a: float,
     b: float,
     tipo_telha: str,
     tem_placa: bool,
-    vao_maximo: float,
-    pontaletes_por_linha: int,
-    altura_pontaletes_m: float,
 ) -> ResultadoComLaje:
     """
-    a                    : largura total (m)
-    b                    : comprimento total (m)
-    tipo_telha           : chave de TELHAS
-    tem_placa            : +0,25 kN/m² se True
-    vao_maximo           : vão máximo entre apoios (m), recomendado 1–2 m
-    pontaletes_por_linha : pontaletes intermediários por linha de vigas
-    altura_pontaletes_m  : altura média dos pontaletes (m)
+    Calcula o quantitativo COM LAJE a partir apenas das dimensões e tipo de telha.
+
+    Parâmetros
+    ----------
+    a          : largura total do telhado (m)
+    b          : comprimento total do telhado (m)
+    tipo_telha : um de tipos_de_telha()
+    tem_placa  : True se há placa fotovoltaica (+0,25 kN/m²)
     """
     if tipo_telha not in TELHAS:
         raise ValueError(f"tipo_telha inválido: '{tipo_telha}'. Opções: {list(TELHAS)}")
@@ -303,6 +342,11 @@ def calcular_com_laje(
     angulo_rad  = math.atan(inclinacao)
     carga_telha = telha["carga_kn_m2"] + (0.25 if tem_placa else 0.0)
     esp_terca   = telha["esp_terca_m"]
+
+    # Automação: vão e pontaletes calculados
+    vao_maximo           = _vao_automatico(tipo_telha)
+    pontaletes_por_linha = _pontaletes_automatico(b)
+    altura_pontaletes_m  = _altura_pontaletes_automatica(b, inclinacao)
 
     vao_viga     = b / (pontaletes_por_linha + 1)
     carga_viga   = carga_telha * vao_maximo
@@ -366,10 +410,11 @@ def calcular_com_laje(
 
 
 # ---------------------------------------------------------------------------
-# Serialização para JSON / API REST
+# Utilitários
 # ---------------------------------------------------------------------------
 
 def para_dict(resultado) -> dict:
+    """Converte resultado em dict serializável (JSON)."""
     return asdict(resultado)
 
 
@@ -377,36 +422,41 @@ def tipos_de_telha() -> list:
     return list(TELHAS.keys())
 
 
-def perfis_disponiveis() -> list:
-    return PERFIS_NOMES
-
-
 # ---------------------------------------------------------------------------
-# Smoke test com os valores do template da planilha
+# Smoke test
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    print("=== SEM LAJE (a=15, b=2.6, Cerâmico, com placa, vão=1, viga=Terça 0,95) ===")
-    r1 = calcular_sem_laje(a=15, b=2.6, tipo_telha="Cerâmico", tem_placa=True,
-                           vao_maximo=1, perfil_viga="Terça 0,95")
-    print(f"  Perfil viga      : {r1.perfil_viga}")
+    print("=== SEM LAJE (a=15, b=2.6, Cerâmico, com placa) ===")
+    r1 = calcular_sem_laje(a=15, b=2.6, tipo_telha="Cerâmico", tem_placa=True)
+    print(f"  Vão automático   : {r1.vao_maximo} m")
+    print(f"  Perfil viga      : {r1.perfil_viga}  (calculado)")
     print(f"  Perfil terça     : {r1.perfil_terca}")
     print(f"  Vigas            : {r1.qtd_vigas} × {r1.comp_viga_m:.2f} m = {r1.total_viga_m:.2f} m")
     print(f"  Terças           : {r1.qtd_tercas} × {r1.comp_terca_m:.0f} m = {r1.total_terca_m:.0f} m")
     print(f"  Parafusos 4,8    : {r1.parafusos_48}  | 4,2: {r1.parafusos_42}")
-    print(f"  Conexões P/M/G   : {r1.conexoes_p} / {r1.conexoes_m} / {r1.conexoes_g}")
-    print(f"  Esperado         : vigas=16×2.95m=47.2m | terças=10×15m=150m | 4,8=390 | M=32")
+    print(f"  Conexões P/M/G   : {r1.conexoes_p}/{r1.conexoes_m}/{r1.conexoes_g}")
+    if r1.alertas:
+        print(f"  Alertas          : {r1.alertas}")
 
     print()
-    print("=== COM LAJE (a=17, b=5, Cerâmico, sem placa, vão=1, pont=4, h=1) ===")
-    r2 = calcular_com_laje(a=17, b=5, tipo_telha="Cerâmico", tem_placa=False,
-                           vao_maximo=1, pontaletes_por_linha=4, altura_pontaletes_m=1)
+    print("=== COM LAJE (a=17, b=5, Cerâmico, sem placa) ===")
+    r2 = calcular_com_laje(a=17, b=5, tipo_telha="Cerâmico", tem_placa=False)
+    print(f"  Vão automático   : {r2.vao_maximo} m")
+    print(f"  Pontaletes/linha : {r2.pontaletes_por_linha}  (auto: ceil(5/1.5)={math.ceil(5/1.5)})")
+    print(f"  Altura pont.     : {r2.altura_pontaletes_m} m  (auto: inclinação × b/2)")
     print(f"  Perfil viga      : {r2.perfil_viga}")
     print(f"  Perfil terça     : {r2.perfil_terca}")
     print(f"  Vigas            : {r2.qtd_vigas} × {r2.comp_viga_m:.2f} m = {r2.total_viga_m:.2f} m")
     print(f"  Terças           : {r2.qtd_tercas} × {r2.comp_terca_m:.0f} m = {r2.total_terca_m:.0f} m")
-    print(f"  Pontaletes       : {r2.perfil_pontalete} | {r2.total_pontalete_m:.0f} m")
+    print(f"  Pontaletes total : {r2.total_pontalete_m:.2f} m")
     print(f"  Contraventamento : {r2.total_contraventamento_m:.2f} m")
     print(f"  Parafusos 4,8    : {r2.parafusos_48}  | 4,2: {r2.parafusos_42}")
     print(f"  Conexões P       : {r2.conexoes_p}")
-    print(f"  Esperado         : vigas=18×5.45m=98.1m | terças=18×17m=306m | pont=72m | contra=248.9m | 4,8=1138 | 4,2=38 | P=180")
+
+    print()
+    print("=== SEM LAJE (a=20, b=8, Fibrocimento, sem placa) ===")
+    r3 = calcular_sem_laje(a=20, b=8, tipo_telha="Fibrocimento", tem_placa=False)
+    print(f"  Vão automático   : {r3.vao_maximo} m  (não-cerâmico → 1,5 m)")
+    print(f"  Perfil viga      : {r3.perfil_viga}  (calculado)")
+    print(f"  Perfil terça     : {r3.perfil_terca}")
