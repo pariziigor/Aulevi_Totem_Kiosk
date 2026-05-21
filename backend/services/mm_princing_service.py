@@ -63,25 +63,26 @@ def _vao_automatico(tipo_telha: str) -> float:
     return 1.0 if tipo_telha in _TELHAS_VAO_1M else 1.5
 
 
-def _pontaletes_automatico(b: float) -> int:
+def _pontaletes_automatico(b: float, vao_maximo: float) -> int:
     """
-    Quantidade de pontaletes por linha = ceil(b / 1,5).
-    Garante que nenhum tramo supere 1,5 m.
-    Mínimo de 1 pontalete (garante ao menos 2 tramos).
-    """
-    return max(1, math.ceil(b / 1.5))
+    Quantidade de pontaletes por linha.
 
+    Fórmula validada contra a planilha:
+        pont = ceil(b / (vao_maximo * 1,5))
+
+    Exemplos conferidos:
+        b=5,  vao=1,0 -> ceil(5 / 1,5)  = ceil(3,33) = 4  (template planilha)
+        b=9,  vao=1,5 -> ceil(9 / 2,25) = ceil(4,00) = 4  (caso real validado)
+    """
+    return max(1, math.ceil(b / (vao_maximo * 1.5)))
+
+
+# Altura padrão dos pontaletes — campo era input manual na planilha.
+# Calculada como: inclinação × (b/2), mínimo 0,3 m
+_ALTURA_PONTALETES_PADRAO = 1.0
 
 def _altura_pontaletes_automatica(b: float, inclinacao: float) -> float:
-    """
-    Estimativa da altura média dos pontaletes.
-    O telhado sobe com a inclinação ao longo de b; o ponto médio está a b/2.
-    altura = tan(inclinação) × (b / 2), mínimo de 0,30 m.
-    Arredondado para cima em múltiplos de 0,05 m.
-    """
-    altura_bruta = math.tan(math.atan(inclinacao)) * (b / 2)
-    altura = _ceiling(max(0.30, altura_bruta), 0.05)
-    return round(altura, 2)
+    return max(0.3, inclinacao * (b / 2))
 
 
 # ---------------------------------------------------------------------------
@@ -345,7 +346,7 @@ def calcular_com_laje(
 
     # Automação: vão e pontaletes calculados
     vao_maximo           = _vao_automatico(tipo_telha)
-    pontaletes_por_linha = _pontaletes_automatico(b)
+    pontaletes_por_linha = _pontaletes_automatico(b, vao_maximo)
     altura_pontaletes_m  = _altura_pontaletes_automatica(b, inclinacao)
 
     vao_viga     = b / (pontaletes_por_linha + 1)
