@@ -148,11 +148,11 @@ def _calcular_perfil_viga_sem_laje(
 ) -> str:
     """
     Calcula o perfil da viga para o cenário SEM LAJE.
-    Vão livre da viga = a (percorre toda a largura).
+    Vão livre da viga = vao_maximo (espaçamento entre vigas).
     Carga linear = carga_telha × vao_maximo.
     """
     carga_viga = carga_telha * vao_maximo
-    inertia = _inertia_minima_mm4(carga_viga, a)
+    inertia = _inertia_minima_mm4(carga_viga, vao_maximo)
     return _menor_perfil(inertia)
 
 
