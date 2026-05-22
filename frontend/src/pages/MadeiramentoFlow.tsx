@@ -26,40 +26,166 @@ const TIPOS_TELHA = [
   'Shingle',
 ] as const;
 
-// Mapeamento de tipos de telha para suas imagens
 const TELHA_ICONS: Record<typeof TIPOS_TELHA[number], string> = {
-  'Cerâmico': '/assets/telhas/ceramica.png',
-  'Concreto': '/assets/telhas/concreto.png',
-  'Fibrocimento': '/assets/telhas/fibrocimento.png',
+  'Cerâmico':        '/assets/telhas/ceramica.png',
+  'Concreto':        '/assets/telhas/concreto.png',
+  'Fibrocimento':    '/assets/telhas/fibrocimento.png',
   'Aço galvanizado': '/assets/telhas/acogalvo.png',
-  'Termoacustico': '/assets/telhas/termoacustico.png',
-  'Shingle': '/assets/telhas/shingle.png',
+  'Termoacustico':   '/assets/telhas/termoacustico.png',
+  'Shingle':         '/assets/telhas/shingle.png',
 };
 
-// Helpers
 const formatTitleCase = (text: string) =>
   text.replace(/(?:^|\s)\S/g, (m) => m.toUpperCase());
 
 // ---------------------------------------------------------------------------
-// Steps:
-//   0 — Tipo de laje (Sem / Com)
-//   1 — Dimensões A e B
-//   2 — Tipo de telha + placa fotovoltaica
-//   3 — Local da obra (cidade)
-//   4 — Resumo + confirmar
+// SVG isométrico do telhado com labels A e B dinâmicos
+// ---------------------------------------------------------------------------
+
+const TelhadoSVG: React.FC<{ dimA: string; dimB: string; activeDim: 'A' | 'B' }> = ({
+  dimA,
+  dimB,
+  activeDim,
+}) => {
+  const labelA = dimA ? `${dimA} m` : '? m';
+  const labelB = dimB ? `${dimB} m` : '? m';
+  const activeA = activeDim === 'A';
+  const activeB = activeDim === 'B';
+
+  return (
+    <svg
+      width="100%"
+      viewBox="0 0 520 340"
+      role="img"
+      aria-label="Diagrama isométrico do telhado com dimensões A e B"
+      className="w-full max-w-sm xl:max-w-md"
+    >
+      <defs>
+        <marker id="arrOrange" viewBox="0 0 10 10" refX="8" refY="5"
+          markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="#f97316"
+            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+        <marker id="arrOrangeActive" viewBox="0 0 10 10" refX="8" refY="5"
+          markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="#ea580c"
+            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+      </defs>
+
+      {/* ── Paredes ── */}
+      {/* Face esquerda */}
+      <polygon points="110,265 110,158 210,100 210,210"
+        fill="#6b7280" stroke="#4b5563" strokeWidth="0.8"/>
+      {/* Face frontal */}
+      <polygon points="210,210 210,100 390,100 390,210"
+        fill="#9ca3af" stroke="#6b7280" strokeWidth="0.8"/>
+      {/* Lateral direita (sombra) */}
+      <polygon points="390,210 390,100 398,95 398,207"
+        fill="#4b5563" stroke="#374151" strokeWidth="0.8"/>
+
+      {/* ── Telhado ── */}
+      {/* Sombra inferior */}
+      <polygon points="110,152 210,95 390,95 290,152"
+        fill="#d97706" stroke="#b45309" strokeWidth="0.8" opacity="0.4"/>
+      {/* Face principal */}
+      <polygon points="110,152 290,152 390,95 210,95"
+        fill="#f59e0b" stroke="#d97706" strokeWidth="1"/>
+      {/* Beiral frontal */}
+      <line x1="110" y1="152" x2="290" y2="152"
+        stroke="#b45309" strokeWidth="2"/>
+      {/* Cumeeira */}
+      <line x1="210" y1="95" x2="390" y2="95"
+        stroke="#b45309" strokeWidth="1.5"/>
+      {/* Linhas de terças (decorativas) */}
+      {[138, 124, 109].map((y, i) => (
+        <line key={i}
+          x1={110 + (152 - y) * 0.55} y1={y}
+          x2={290 + (152 - y) * 0.55} y2={y}
+          stroke="#d97706" strokeWidth="0.6" strokeDasharray="4,4" opacity="0.5"/>
+      ))}
+
+      {/* ── Seta A (largura — eixo horizontal frontal) ── */}
+      <line x1="110" y1="285" x2="110" y2="210"
+        stroke="#94a3b8" strokeWidth="0.8" strokeDasharray="3,3"/>
+      <line x1="290" y1="285" x2="290" y2="210"
+        stroke="#94a3b8" strokeWidth="0.8" strokeDasharray="3,3"/>
+      <line x1="118" y1="207" x2="282" y2="207"
+        stroke={activeA ? '#ea580c' : '#f97316'}
+        strokeWidth={activeA ? 2.8 : 2}
+        markerStart={activeA ? 'url(#arrOrangeActive)' : 'url(#arrOrange)'}
+        markerEnd={activeA ? 'url(#arrOrangeActive)' : 'url(#arrOrange)'}/>
+      {/* Label A */}
+      <rect x="175" y="192" width="50" height="24" rx="5"
+        fill={activeA ? '#fff7ed' : '#f8fafc'}
+        stroke={activeA ? '#ea580c' : '#f97316'}
+        strokeWidth={activeA ? 1.8 : 1.2}/>
+      <text x="200" y="209" textAnchor="middle"
+        fontFamily="sans-serif" fontSize="12"
+        fontWeight={activeA ? '700' : '600'}
+        fill={activeA ? '#ea580c' : '#f97316'}>
+        A
+      </text>
+
+      {/* Label valor A — abaixo da seta */}
+      <text x="200" y="240" textAnchor="middle"
+        fontFamily="sans-serif" fontSize="13"
+        fontWeight="600"
+        fill={activeA ? '#ea580c' : '#94a3b8'}>
+        {labelA}
+      </text>
+
+      {/* ── Seta B (profundidade — eixo diagonal esquerdo) ── */}
+      <line x1="60" y1="152" x2="110" y2="180"
+        stroke="#94a3b8" strokeWidth="0.8" strokeDasharray="3,3"/>
+      <line x1="82" y1="112" x2="110" y2="127"
+        stroke="#94a3b8" strokeWidth="0.8" strokeDasharray="3,3"/>
+      <line x1="68" y1="149" x2="89" y2="116"
+        stroke={activeB ? '#ea580c' : '#f97316'}
+        strokeWidth={activeB ? 2.8 : 2}
+        markerStart={activeB ? 'url(#arrOrangeActive)' : 'url(#arrOrange)'}
+        markerEnd={activeB ? 'url(#arrOrangeActive)' : 'url(#arrOrange)'}/>
+      {/* Label B */}
+      <rect x="50" y="120" width="32" height="24" rx="5"
+        fill={activeB ? '#fff7ed' : '#f8fafc'}
+        stroke={activeB ? '#ea580c' : '#f97316'}
+        strokeWidth={activeB ? 1.8 : 1.2}/>
+      <text x="66" y="137" textAnchor="middle"
+        fontFamily="sans-serif" fontSize="12"
+        fontWeight={activeB ? '700' : '600'}
+        fill={activeB ? '#ea580c' : '#f97316'}>
+        B
+      </text>
+
+      {/* Label valor B — à esquerda da seta */}
+      <text x="28" y="175" textAnchor="middle"
+        fontFamily="sans-serif" fontSize="13"
+        fontWeight="600"
+        fill={activeB ? '#ea580c' : '#94a3b8'}>
+        {labelB}
+      </text>
+    </svg>
+  );
+};
+
+// ---------------------------------------------------------------------------
+// Constantes
 // ---------------------------------------------------------------------------
 
 const TOTAL_STEPS = 5;
+
+// ---------------------------------------------------------------------------
+// Componente principal
+// ---------------------------------------------------------------------------
 
 const MadeiramentoFlow: React.FC = () => {
   const navigate = useNavigate();
   const { quoteData, setQuoteData, resetSession } = useKioskStore();
 
-  const [step, setStep]               = useState(0);
-  const [showLeadModal, setShowLeadModal] = useState(false);
-  const [isProcessing, setIsProcessing]   = useState(false);
+  const [step, setStep]                         = useState(0);
+  const [showLeadModal, setShowLeadModal]       = useState(false);
+  const [isProcessing, setIsProcessing]         = useState(false);
 
-  // Dados do orçamento
   const [tipoLaje, setTipoLaje]   = useState<TipoLaje>('SEM_LAJE');
   const [dimA, setDimA]           = useState('');
   const [dimB, setDimB]           = useState('');
@@ -67,11 +193,10 @@ const MadeiramentoFlow: React.FC = () => {
   const [tipoTelha, setTipoTelha] = useState('');
   const [temPlaca, setTemPlaca]   = useState(false);
 
-  // Modal cidade
-  const [showCityModal, setShowCityModal]   = useState(false);
-  const [citySearch, setCitySearch]         = useState('');
-  const [allCities, setAllCities]           = useState<string[]>([]);
-  const [isLoadingCities, setIsLoadingCities] = useState(false);
+  const [showCityModal, setShowCityModal]       = useState(false);
+  const [citySearch, setCitySearch]             = useState('');
+  const [allCities, setAllCities]               = useState<string[]>([]);
+  const [isLoadingCities, setIsLoadingCities]   = useState(false);
 
   useEffect(() => {
     const fetchCities = async () => {
@@ -115,7 +240,6 @@ const MadeiramentoFlow: React.FC = () => {
         dim_b: parseFloat(dimB.replace(',', '.')),
         city: quoteData.city || 'Não informado',
       };
-
       const result = await KioskService.submitQuote(payload);
       alert(
         `ORÇAMENTO GERADO COM SUCESSO!\nNº do Pedido: ${result.quote_number}\nValor Total: R$ ${result.total_value.toFixed(2)}`
@@ -129,7 +253,7 @@ const MadeiramentoFlow: React.FC = () => {
     }
   };
 
-  // ─── Sub-componentes internos ─────────────────────────────────────────────
+  // ─── NumpadMedida ─────────────────────────────────────────────────────────
 
   const NumpadMedida = ({
     value,
@@ -142,24 +266,24 @@ const MadeiramentoFlow: React.FC = () => {
   }) => {
     const keys = ['1','2','3','4','5','6','7','8','9',',','0','APAGAR'];
     const handle = (k: string) => {
-      if (k === 'APAGAR')              { onChange(value.slice(0, -1)); return; }
-      if (k === ',' && value.includes(',')) return;
-      if (value.length >= maxLen)      return;
+      if (k === 'APAGAR')                    { onChange(value.slice(0, -1)); return; }
+      if (k === ',' && value.includes(','))  return;
+      if (value.length >= maxLen)            return;
       onChange(value + k);
     };
     return (
-      <div className="grid grid-cols-3 gap-3 xl:gap-4 w-full max-w-sm mx-auto mt-4">
+      <div className="grid grid-cols-3 gap-2 xl:gap-3 w-full">
         {keys.map((k) => (
           <motion.button
             key={k}
             whileTap={{ scale: 0.95 }}
             onClick={() => handle(k)}
             className={`
-              border shadow-sm rounded-2xl flex items-center justify-center h-14 xl:h-16 transition-all
+              border shadow-sm rounded-2xl flex items-center justify-center h-12 xl:h-14 transition-all
               hover:shadow-md hover:border-orange-300
               ${k === 'APAGAR'
-                ? 'text-base font-bold text-rose-500 bg-rose-50 border-rose-100 hover:bg-rose-100'
-                : 'text-2xl xl:text-3xl font-bold text-slate-700 bg-white border-slate-200'}
+                ? 'text-sm font-bold text-rose-500 bg-rose-50 border-rose-100 hover:bg-rose-100'
+                : 'text-xl xl:text-2xl font-bold text-slate-700 bg-white border-slate-200'}
             `}
           >
             {k}
@@ -168,6 +292,8 @@ const MadeiramentoFlow: React.FC = () => {
       </div>
     );
   };
+
+  // ─── Toggle ───────────────────────────────────────────────────────────────
 
   const Toggle = ({
     label,
@@ -229,7 +355,6 @@ const MadeiramentoFlow: React.FC = () => {
               <X size={28} />
             </button>
           </header>
-
           <div className="p-6 bg-white border-b border-slate-100">
             <div className="w-full bg-slate-50 border-2 border-orange-500 ring-4 ring-orange-50 rounded-2xl h-16 xl:h-20 flex items-center px-6 shadow-inner">
               <span className="text-2xl xl:text-3xl font-bold text-slate-800">
@@ -238,7 +363,6 @@ const MadeiramentoFlow: React.FC = () => {
               <span className="ml-1 w-1 h-8 xl:h-10 bg-orange-500 animate-pulse" />
             </div>
           </div>
-
           <div className="h-48 xl:h-64 overflow-y-auto bg-slate-100 p-4 flex flex-col gap-2">
             {citySearch.length > 0 ? (
               filtered.length > 0 ? (
@@ -258,7 +382,6 @@ const MadeiramentoFlow: React.FC = () => {
               <div className="flex items-center justify-center h-full text-xl text-slate-400">Comece a digitar para ver os resultados</div>
             )}
           </div>
-
           <div className="flex-grow bg-white p-6 flex flex-col justify-center gap-2 xl:gap-3">
             {keyboard.map((row, ri) => (
               <div key={ri} className="flex justify-center gap-2 xl:gap-3 w-full">
@@ -322,21 +445,10 @@ const MadeiramentoFlow: React.FC = () => {
             <p className="text-slate-500 text-lg xl:text-xl mb-10">
               O telhado será apoiado sobre laje existente?
             </p>
-
             <div className="grid grid-cols-2 gap-8 xl:gap-12 w-full max-w-4xl">
               {[
-                {
-                  val: 'SEM_LAJE' as TipoLaje,
-                  label: 'Sem Laje',
-                  sub: 'Telhado com estrutura própria',
-                  color: 'text-orange-400',
-                },
-                {
-                  val: 'COM_LAJE' as TipoLaje,
-                  label: 'Com Laje',
-                  sub: 'Telhado apoiado sobre laje com pontaletes',
-                  color: 'text-blue-400',
-                },
+                { val: 'SEM_LAJE' as TipoLaje, label: 'Sem Laje',  sub: 'Telhado com estrutura própria',              color: 'text-orange-400' },
+                { val: 'COM_LAJE' as TipoLaje, label: 'Com Laje',  sub: 'Telhado apoiado sobre laje com pontaletes',  color: 'text-blue-400'   },
               ].map((opt) => (
                 <motion.button
                   key={opt.val}
@@ -357,57 +469,68 @@ const MadeiramentoFlow: React.FC = () => {
 
       // ── Step 1: Dimensões A e B ───────────────────────────────────────────
       case 1: {
-        const currentVal   = editingDim === 'A' ? dimA : dimB;
+        const currentVal    = editingDim === 'A' ? dimA : dimB;
         const setCurrentVal = (v: string) => editingDim === 'A' ? setDimA(v) : setDimB(v);
-        const canAdvance   = parseFloat(dimA.replace(',', '.')) > 0 && parseFloat(dimB.replace(',', '.')) > 0;
+        const canAdvance    = parseFloat(dimA.replace(',', '.')) > 0 && parseFloat(dimB.replace(',', '.')) > 0;
 
         return (
           <motion.div key="s1" variants={variants} initial="initial" animate="animate" exit="exit"
-            className="flex flex-col items-center w-full"
+            className="flex items-center justify-center gap-8 xl:gap-14 w-full"
           >
-            <h2 className="text-3xl xl:text-5xl font-bold text-slate-800 tracking-tight mb-2">
-              Dimensões do Telhado
-            </h2>
-            <p className="text-slate-500 text-lg xl:text-xl mb-6">
-              <strong>A</strong> = largura (m) &nbsp;·&nbsp; <strong>B</strong> = profundidade (m)
-            </p>
-
-            {/* Seletores A / B */}
-            <div className="flex gap-6 mb-2">
-              {(['A', 'B'] as const).map((dim) => {
-                const val    = dim === 'A' ? dimA : dimB;
-                const active = editingDim === dim;
-                return (
-                  <button
-                    key={dim}
-                    onClick={() => setEditingDim(dim)}
-                    className={`flex flex-col items-center justify-center w-44 xl:w-52 h-28 xl:h-36 rounded-3xl border-2 transition-all shadow-sm
-                      ${active
-                        ? 'border-orange-500 bg-orange-50 shadow-orange-100'
-                        : 'border-slate-200 bg-white hover:border-slate-300'}`}
-                  >
-                    <span className={`text-sm font-bold uppercase tracking-widest mb-1 ${active ? 'text-orange-500' : 'text-slate-400'}`}>
-                      Dimensão {dim}
-                    </span>
-                    <span className={`text-4xl xl:text-5xl font-black tracking-tight ${active ? 'text-orange-600' : 'text-slate-700'}`}>
-                      {val || <span className="text-slate-300">–</span>}
-                    </span>
-                    <span className="text-sm text-slate-400 mt-1">metros</span>
-                  </button>
-                );
-              })}
+            {/* ── Coluna esquerda: SVG ── */}
+            <div className="flex flex-col items-center gap-3 flex-shrink-0">
+              <TelhadoSVG dimA={dimA} dimB={dimB} activeDim={editingDim} />
+              <p className="text-sm xl:text-base text-slate-400 text-center leading-relaxed max-w-xs">
+                Toque em <strong className="text-orange-500">A</strong> ou <strong className="text-orange-500">B</strong> ao lado
+                para digitar cada dimensão
+              </p>
             </div>
 
-            <NumpadMedida value={currentVal} onChange={setCurrentVal} />
+            {/* ── Coluna direita: seletores + numpad + botão ── */}
+            <div className="flex flex-col items-center gap-4 xl:gap-5 w-full max-w-xs xl:max-w-sm">
+              <h2 className="text-2xl xl:text-3xl font-bold text-slate-800 tracking-tight self-start">
+                Dimensões do Telhado
+              </h2>
 
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              onClick={handleNext}
-              disabled={!canAdvance}
-              className="mt-8 bg-orange-600 text-white rounded-full px-12 py-4 xl:py-5 text-xl xl:text-2xl font-bold disabled:opacity-40 disabled:bg-slate-300 disabled:scale-100 shadow-md hover:bg-orange-700 transition-all flex items-center gap-2"
-            >
-              Avançar <Check size={24} />
-            </motion.button>
+              {/* Seletores A / B */}
+              <div className="flex gap-4 w-full">
+                {(['A', 'B'] as const).map((dim) => {
+                  const val    = dim === 'A' ? dimA : dimB;
+                  const active = editingDim === dim;
+                  return (
+                    <button
+                      key={dim}
+                      onClick={() => setEditingDim(dim)}
+                      className={`flex flex-col items-center justify-center flex-1 h-24 xl:h-28 rounded-2xl border-2 transition-all shadow-sm
+                        ${active
+                          ? 'border-orange-500 bg-orange-50 shadow-orange-100'
+                          : 'border-slate-200 bg-white hover:border-slate-300'}`}
+                    >
+                      <span className={`text-xs font-bold uppercase tracking-widest mb-0.5 ${active ? 'text-orange-500' : 'text-slate-400'}`}>
+                        Dim. {dim}
+                      </span>
+                      <span className={`text-3xl xl:text-4xl font-black tracking-tight ${active ? 'text-orange-600' : 'text-slate-700'}`}>
+                        {val || <span className="text-slate-300">–</span>}
+                      </span>
+                      <span className="text-xs text-slate-400 mt-0.5">metros</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Numpad */}
+              <NumpadMedida value={currentVal} onChange={setCurrentVal} />
+
+              {/* Botão avançar */}
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                onClick={handleNext}
+                disabled={!canAdvance}
+                className="w-full mt-1 bg-orange-600 text-white rounded-full py-4 xl:py-5 text-xl xl:text-2xl font-bold disabled:opacity-40 disabled:bg-slate-300 disabled:scale-100 shadow-md hover:bg-orange-700 transition-all flex items-center justify-center gap-2"
+              >
+                Avançar <Check size={22} />
+              </motion.button>
+            </div>
           </motion.div>
         );
       }
@@ -421,20 +544,19 @@ const MadeiramentoFlow: React.FC = () => {
             <h2 className="text-3xl xl:text-5xl font-bold text-slate-800 tracking-tight mb-8">
               Tipo de Telha
             </h2>
-
             <div className="grid grid-cols-3 gap-4 xl:gap-6 w-full max-w-4xl mb-6">
               {TIPOS_TELHA.map((t) => (
                 <motion.button
                   key={t}
                   whileTap={{ scale: 0.97 }}
                   onClick={() => setTipoTelha(t)}
-                  className={`rounded-2xl border-2 px-4 py-6 xl:py-8 transition-all shadow-sm flex flex-col items-center justify-center gap-3 h-auto
+                  className={`rounded-2xl border-2 px-4 py-6 xl:py-8 transition-all shadow-sm flex flex-col items-center justify-center gap-3
                     ${tipoTelha === t
                       ? 'border-orange-500 bg-orange-50 shadow-orange-100'
                       : 'border-slate-200 bg-white hover:border-orange-300'}`}
                 >
-                  <img 
-                    src={TELHA_ICONS[t]} 
+                  <img
+                    src={TELHA_ICONS[t]}
                     alt={t}
                     className="w-20 xl:w-28 h-20 xl:h-28 object-contain"
                   />
@@ -444,7 +566,6 @@ const MadeiramentoFlow: React.FC = () => {
                 </motion.button>
               ))}
             </div>
-
             <div className="w-full max-w-4xl">
               <Toggle
                 label="Possui placa fotovoltaica?"
@@ -452,7 +573,6 @@ const MadeiramentoFlow: React.FC = () => {
                 onChange={() => setTemPlaca((p) => !p)}
               />
             </div>
-
             <motion.button
               whileTap={{ scale: 0.95 }}
               onClick={handleNext}
@@ -476,7 +596,6 @@ const MadeiramentoFlow: React.FC = () => {
             <p className="text-slate-500 text-lg xl:text-xl mb-10">
               Informe a cidade onde o telhado será instalado
             </p>
-
             <div className="w-full max-w-2xl bg-white border border-slate-200 rounded-3xl p-8 shadow-sm">
               <label className="text-sm xl:text-base font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
                 <MapPin size={20} className="text-orange-500" /> Cidade
@@ -495,7 +614,6 @@ const MadeiramentoFlow: React.FC = () => {
                 <Search className="text-slate-400" />
               </button>
             </div>
-
             <motion.button
               whileTap={{ scale: 0.95 }}
               onClick={handleNext}
@@ -508,17 +626,15 @@ const MadeiramentoFlow: React.FC = () => {
 
       // ── Step 4: Resumo ────────────────────────────────────────────────────
       case 4: {
-        // Vão automático exibido apenas para informação
         const vaoAuto = tipoTelha === 'Cerâmico' || tipoTelha === 'Concreto' ? '1,0 m' : '1,5 m';
-
         const linhas = [
-          { label: 'Tipo de Telhado', value: tipoLaje === 'SEM_LAJE' ? 'Sem Laje' : 'Com Laje' },
-          { label: 'Dimensão A (largura)', value: `${dimA} m` },
-          { label: 'Dimensão B (profundidade)', value: `${dimB} m` },
-          { label: 'Tipo de Telha', value: tipoTelha },
-          { label: 'Placa Fotovoltaica', value: temPlaca ? 'Sim (+0,25 kN/m²)' : 'Não' },
-          { label: 'Vão entre apoios', value: `${vaoAuto} (automático)` },
-          { label: 'Local da Obra', value: quoteData.city || 'Não informado' },
+          { label: 'Tipo de Telhado',       value: tipoLaje === 'SEM_LAJE' ? 'Sem Laje' : 'Com Laje' },
+          { label: 'Dimensão A (largura)',   value: `${dimA} m` },
+          { label: 'Dimensão B (profund.)',  value: `${dimB} m` },
+          { label: 'Tipo de Telha',          value: tipoTelha },
+          { label: 'Placa Fotovoltaica',     value: temPlaca ? 'Sim (+0,25 kN/m²)' : 'Não' },
+          { label: 'Vão entre apoios',       value: `${vaoAuto} (automático)` },
+          { label: 'Local da Obra',          value: quoteData.city || 'Não informado' },
         ];
 
         return (
@@ -528,7 +644,6 @@ const MadeiramentoFlow: React.FC = () => {
             <h2 className="text-3xl xl:text-5xl font-bold text-slate-800 tracking-tight mb-8">
               Resumo do Pedido
             </h2>
-
             <div className="w-full max-w-4xl bg-white border border-slate-200 rounded-[2rem] p-8 xl:p-10 shadow-md flex flex-col gap-3 xl:gap-4 mb-8">
               {linhas.map(({ label, value }) => (
                 <div key={label} className="flex justify-between items-center border-b border-slate-100 pb-3 last:border-0 last:pb-0">
@@ -537,13 +652,10 @@ const MadeiramentoFlow: React.FC = () => {
                 </div>
               ))}
             </div>
-
-            {/* Nota informativa */}
             <p className="text-slate-400 text-sm xl:text-base text-center max-w-2xl mb-6 leading-relaxed">
-              Os perfis estruturais, pontaletes e demais quantitativos serão calculados automaticamente
-              pelo sistema com base nas informações acima.
+              Os perfis estruturais, pontaletes e demais quantitativos serão calculados
+              automaticamente pelo sistema com base nas informações acima.
             </p>
-
             <motion.button
               whileTap={{ scale: 0.98 }}
               onClick={() => setShowLeadModal(true)}
@@ -564,7 +676,6 @@ const MadeiramentoFlow: React.FC = () => {
 
   return (
     <div className="h-screen w-screen bg-slate-50 text-slate-800 flex flex-col p-6 xl:p-12 select-none overflow-hidden font-sans">
-
       <header className="flex justify-between items-center mb-8 flex-none w-full">
         <div className="flex flex-col gap-2">
           <h1 className="text-3xl xl:text-4xl font-black tracking-tight text-slate-900 uppercase">
@@ -593,7 +704,6 @@ const MadeiramentoFlow: React.FC = () => {
         >
           <ChevronLeft size={24} /> {step === 0 ? 'Cancelar' : 'Voltar'}
         </motion.button>
-
         {step > 0 && (
           <motion.button
             whileTap={{ scale: 0.95 }}
