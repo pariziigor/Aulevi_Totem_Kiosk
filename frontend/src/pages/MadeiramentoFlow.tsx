@@ -26,6 +26,16 @@ const TIPOS_TELHA = [
   'Shingle',
 ] as const;
 
+// Mapeamento de tipos de telha para suas imagens
+const TELHA_ICONS: Record<typeof TIPOS_TELHA[number], string> = {
+  'Cerâmico': '/assets/telhas/ceramica.png',
+  'Concreto': '/assets/telhas/concreto.png',
+  'Fibrocimento': '/assets/telhas/fibrocimento.png',
+  'Aço galvanizado': '/assets/telhas/acogalvo.png',
+  'Termoacustico': '/assets/telhas/termoacustico.png',
+  'Shingle': '/assets/telhas/shingle.png',
+};
+
 // Helpers
 const formatTitleCase = (text: string) =>
   text.replace(/(?:^|\s)\S/g, (m) => m.toUpperCase());
@@ -418,12 +428,19 @@ const MadeiramentoFlow: React.FC = () => {
                   key={t}
                   whileTap={{ scale: 0.97 }}
                   onClick={() => setTipoTelha(t)}
-                  className={`rounded-2xl border-2 px-4 py-6 xl:py-8 text-lg xl:text-xl font-bold transition-all shadow-sm
+                  className={`rounded-2xl border-2 px-4 py-6 xl:py-8 transition-all shadow-sm flex flex-col items-center justify-center gap-3 h-auto
                     ${tipoTelha === t
-                      ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-orange-100'
-                      : 'border-slate-200 bg-white text-slate-700 hover:border-orange-300'}`}
+                      ? 'border-orange-500 bg-orange-50 shadow-orange-100'
+                      : 'border-slate-200 bg-white hover:border-orange-300'}`}
                 >
-                  {t}
+                  <img 
+                    src={TELHA_ICONS[t]} 
+                    alt={t}
+                    className="w-20 xl:w-28 h-20 xl:h-28 object-contain"
+                  />
+                  <span className={`text-lg xl:text-xl font-bold text-center ${tipoTelha === t ? 'text-orange-700' : 'text-slate-700'}`}>
+                    {t}
+                  </span>
                 </motion.button>
               ))}
             </div>
