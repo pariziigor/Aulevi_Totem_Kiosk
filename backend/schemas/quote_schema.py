@@ -3,7 +3,7 @@ from typing import Optional, Dict, Any
 
 class QuoteRequestSchema(BaseModel):
     # DADOS FIXOS E OBRIGATÓRIOS
-    module: str = Field(default="LSF", description="Módulo de origem: LSF, CHALE, BARRACAO")
+    module: str = Field(default="LSF", description="Módulo de origem: LSF, CHALE, BARRACAO, MADEIRAMENTO")
     lead_name: str = Field(..., min_length=2, description="Nome completo do lead")
     lead_phone: str = Field(..., min_length=10, description="WhatsApp do lead com DDD")
     
@@ -18,6 +18,13 @@ class QuoteRequestSchema(BaseModel):
     has_land: Optional[bool] = Field(default=None, description="Possui terreno? Tipo nativo True ou False")
     own_resources: Optional[bool] = Field(default=None, description="Recurso próprio? Tipo nativo True ou False")
     city: Optional[str] = Field(default=None, description="Local da obra (Cidade/Estado)")
+
+    # ESPECIFICAÇÕES DO MADEIRAMENTO (NOVOS CAMPOS)
+    tipo_laje: Optional[str] = Field(default=None, description="SEM_LAJE ou COM_LAJE")
+    tipo_telha: Optional[str] = Field(default=None, description="Cerâmico, Concreto, Fibrocimento, Aço galvanizado, Termoacustico, Shingle")
+    tem_placa: Optional[bool] = Field(default=None, description="Possui placa fotovoltaica? Obrigatório utilizar tipo nativo True ou False")
+    dim_a: Optional[float] = Field(default=None, gt=0, description="Dimensão A (Largura) em metros")
+    dim_b: Optional[float] = Field(default=None, gt=0, description="Dimensão B (Profundidade) em metros")
 
     product: Optional[Dict[str, Any]] = Field(default=None, description="Dados completos do produto (Chalé/Barracão)")
 
