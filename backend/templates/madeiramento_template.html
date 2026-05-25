@@ -139,7 +139,15 @@
                             <tr class="border-b border-slate-100 {{ 'bg-slate-50/50' if loop.index0 % 2 != 0 else '' }}">
                                 <td class="px-3 py-2 text-slate-400 font-bold">{{ item.codigo }}</td>
                                 <td class="px-3 py-2 text-slate-800 font-bold leading-tight">{{ item.descricao }}</td>
-                                <td class="px-3 py-2 text-center">{{ '%0.1f'|format(item.qtd|float) if item.un == 'm' else '%0.0f'|format(item.qtd|float) }}</td>
+                                <td class="px-3 py-2 text-center">
+                                    {% if item.un == 'm' %}
+                                        {{ '%0.2f'|format(item.qtd|float) }}
+                                    {% elif item.un in ['barras', 'cx'] %}
+                                        {{ '%0.0f'|format(item.qtd|float) }}
+                                    {% else %}
+                                        {{ '%0.0f'|format(item.qtd|float) }}
+                                    {% endif %}
+                                </td>
                                 <td class="px-3 py-2 text-center text-slate-400">{{ item.un }}</td>
                                 <td class="px-3 py-2 text-right">R$ {{ '%0.2f'|format(item.preco_un|float) }}</td>
                                 <td class="px-3 py-2 text-right text-orange-600 font-bold">R$ {{ '%0.2f'|format(item.total|float) }}</td>

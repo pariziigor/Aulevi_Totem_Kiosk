@@ -133,6 +133,20 @@ def _preco_perfil(perfil: str) -> float:
     return PRECOS.get(perfil, 0.0)
 
 
+def _arredondar_parafusos(qtd: int) -> int:
+    """Arredonda quantidade de parafusos para múltiplos de 500 (caixa padrão)."""
+    if qtd == 0:
+        return 0
+    return max(500, math.ceil(qtd / 500) * 500)
+
+
+def _barras_6m(metros: float) -> int:
+    """Calcula quantidade de barras de 6m necessárias (arredonda para cima)."""
+    if metros <= 0:
+        return 0
+    return math.ceil(metros / 6.0)
+
+
 def _calcular_perfil_terca(
     tipo_telha: str, carga_telha: float, esp_terca: float,
     vao_maximo: float, alertas: list
@@ -278,6 +292,8 @@ def _montar_itens_sem_laje(r: dict) -> tuple[list, float]:
     """
     Recebe um dict com todos os campos calculados e retorna
     (lista de ItemOrcamento, total_value).
+    Converte perfis de metros para barras de 6m.
+    Arredonda parafusos para múltiplos de 500.
     """
     itens = []
 
@@ -289,20 +305,24 @@ def _montar_itens_sem_laje(r: dict) -> tuple[list, float]:
             qtd=round(qtd, 2), preco_un=preco, total=total
         ))
 
-    # Vigas
-    add("VIGA", f"Viga principal — {r['perfil_viga']}",
-        "m", r['total_viga_m'], r['perfil_viga'])
+    # Vigas (em barras de 6m)
+    barras_viga = _barras_6m(r['total_viga_m'])
+    add("VIGA", f"Viga principal — {r['perfil_viga']} (barras de 6m)",
+        "barras", barras_viga, r['perfil_viga'])
 
-    # Terças
-    add("TERCA", f"Terça de cobertura — {r['perfil_terca']}",
-        "m", r['total_terca_m'], r['perfil_terca'])
+    # Terças (em barras de 6m)
+    barras_terca = _barras_6m(r['total_terca_m'])
+    add("TERCA", f"Terça de cobertura — {r['perfil_terca']} (barras de 6m)",
+        "barras", barras_terca, r['perfil_terca'])
 
-    # Parafusos 4.8×19
-    add("PAR48", "Parafuso 4.8×19", "un", r['parafusos_48'], "Parafuso 4.8")
+    # Parafusos 4.8×19 (arredondados para múltiplos de 500)
+    par48_arredondado = _arredondar_parafusos(r['parafusos_48'])
+    add("PAR48", "Parafuso 4.8×19 (cx 500)", "cx", par48_arredondado / 500, "Parafuso 4.8")
 
-    # Parafusos 4.2×13 (apenas cerâmica/concreto)
+    # Parafusos 4.2×13 (apenas cerâmica/concreto, arredondados)
     if r['parafusos_42'] > 0:
-        add("PAR42", "Parafuso 4.2×13", "un", r['parafusos_42'], "Parafuso 4.2")
+        par42_arredondado = _arredondar_parafusos(r['parafusos_42'])
+        add("PAR42", "Parafuso 4.2×13 (cx 500)", "cx", par42_arredondado / 500, "Parafuso 4.2")
 
     # Conexões P (Caibro)
     if r['conexoes_p'] > 0:
@@ -321,6 +341,12 @@ def _montar_itens_sem_laje(r: dict) -> tuple[list, float]:
 
 
 def _montar_itens_com_laje(r: dict) -> tuple[list, float]:
+    """
+    Recebe um dict com todos os campos calculados e retorna
+    (lista de ItemOrcamento, total_value).
+    Converte perfis de metros para barras de 6m.
+    Arredonda parafusos para múltiplos de 500.
+    """
     itens = []
 
     def add(codigo, descricao, un, qtd, chave_preco):
@@ -331,28 +357,33 @@ def _montar_itens_com_laje(r: dict) -> tuple[list, float]:
             qtd=round(qtd, 2), preco_un=preco, total=total
         ))
 
-    # Vigas
-    add("VIGA", f"Viga principal — {r['perfil_viga']}",
-        "m", r['total_viga_m'], r['perfil_viga'])
+    # Vigas (em barras de 6m)
+    barras_viga = _barras_6m(r['total_viga_m'])
+    add("VIGA", f"Viga principal — {r['perfil_viga']} (barras de 6m)",
+        "barras", barras_viga, r['perfil_viga'])
 
-    # Terças
-    add("TERCA", f"Terça de cobertura — {r['perfil_terca']}",
-        "m", r['total_terca_m'], r['perfil_terca'])
+    # Terças (em barras de 6m)
+    barras_terca = _barras_6m(r['total_terca_m'])
+    add("TERCA", f"Terça de cobertura — {r['perfil_terca']} (barras de 6m)",
+        "barras", barras_terca, r['perfil_terca'])
 
-    # Pontaletes (mesmo perfil da viga)
-    add("PONT", f"Pontalete — {r['perfil_viga']}",
-        "m", r['total_pontalete_m'], r['perfil_viga'])
+    # Pontaletes (em barras de 6m)
+    barras_pont = _barras_6m(r['total_pontalete_m'])
+    add("PONT", f"Pontalete — {r['perfil_viga']} (barras de 6m)",
+        "barras", barras_pont, r['perfil_viga'])
 
-    # Contraventamento
+    # Contraventamento (em metros)
     add("CONTRAV", "Contraventamento 0,80×1000 ZC100",
         "m", r['total_contraventamento_m'], "Contraventamento")
 
-    # Parafusos 4.8×19
-    add("PAR48", "Parafuso 4.8×19", "un", r['parafusos_48'], "Parafuso 4.8")
+    # Parafusos 4.8×19 (arredondados para múltiplos de 500)
+    par48_arredondado = _arredondar_parafusos(r['parafusos_48'])
+    add("PAR48", "Parafuso 4.8×19 (cx 500)", "cx", par48_arredondado / 500, "Parafuso 4.8")
 
-    # Parafusos 4.2×13
+    # Parafusos 4.2×13 (arredondados)
     if r['parafusos_42'] > 0:
-        add("PAR42", "Parafuso 4.2×13", "un", r['parafusos_42'], "Parafuso 4.2")
+        par42_arredondado = _arredondar_parafusos(r['parafusos_42'])
+        add("PAR42", "Parafuso 4.2×13 (cx 500)", "cx", par42_arredondado / 500, "Parafuso 4.2")
 
     # Conexões P (vigas + terças + pontaletes)
     if r['conexoes_p'] > 0:
@@ -426,10 +457,14 @@ def calcular_sem_laje(
         elif _contem("Viga", perfil):
             conexoes_g += mult
 
+    # Arredondar parafusos para múltiplos de 500
+    parafusos_48_arredondado = _arredondar_parafusos(parafusos_48)
+    parafusos_42_arredondado = _arredondar_parafusos(parafusos_42) if parafusos_42 > 0 else 0
+
     campos = dict(
         perfil_viga=perfil_viga, perfil_terca=perfil_terca,
         total_viga_m=total_viga, total_terca_m=total_terca,
-        parafusos_48=parafusos_48, parafusos_42=parafusos_42,
+        parafusos_48=parafusos_48_arredondado, parafusos_42=parafusos_42_arredondado,
         conexoes_p=conexoes_p, conexoes_m=conexoes_m, conexoes_g=conexoes_g,
     )
     itens, total_value = _montar_itens_sem_laje(campos)
@@ -444,7 +479,7 @@ def calcular_sem_laje(
         perfil_viga=perfil_viga, perfil_terca=perfil_terca,
         qtd_vigas=qtd_vigas, comp_viga_m=comp_viga, total_viga_m=total_viga,
         qtd_tercas=qtd_tercas, comp_terca_m=comp_terca, total_terca_m=total_terca,
-        parafusos_48=parafusos_48, parafusos_42=parafusos_42,
+        parafusos_48=parafusos_48_arredondado, parafusos_42=parafusos_42_arredondado,
         conexoes_p=conexoes_p, conexoes_m=conexoes_m, conexoes_g=conexoes_g,
         itens=itens, total_value=total_value, value_per_m2=value_per_m2,
         alertas=alertas,
@@ -524,12 +559,16 @@ def calcular_com_laje(
         conexoes_p += qtd_tercas * qtd_vigas
     conexoes_p += pontaletes_por_linha * qtd_vigas * 2
 
+    # Arredondar parafusos para múltiplos de 500
+    parafusos_48_arredondado = _arredondar_parafusos(parafusos_48)
+    parafusos_42_arredondado = _arredondar_parafusos(parafusos_42) if parafusos_42 > 0 else 0
+
     campos = dict(
         perfil_viga=perfil_viga, perfil_terca=perfil_terca,
         total_viga_m=total_viga, total_terca_m=total_terca,
         total_pontalete_m=total_pontalete,
         total_contraventamento_m=total_contraventamento,
-        parafusos_48=parafusos_48, parafusos_42=parafusos_42,
+        parafusos_48=parafusos_48_arredondado, parafusos_42=parafusos_42_arredondado,
         conexoes_p=conexoes_p,
         pontaletes_por_linha=pontaletes_por_linha,
         qtd_vigas=qtd_vigas,
@@ -551,7 +590,7 @@ def calcular_com_laje(
         qtd_tercas=qtd_tercas, comp_terca_m=comp_terca, total_terca_m=total_terca,
         total_pontalete_m=total_pontalete,
         total_contraventamento_m=total_contraventamento,
-        parafusos_48=parafusos_48, parafusos_42=parafusos_42,
+        parafusos_48=parafusos_48_arredondado, parafusos_42=parafusos_42_arredondado,
         conexoes_p=conexoes_p,
         itens=itens, total_value=total_value, value_per_m2=value_per_m2,
         alertas=alertas,
