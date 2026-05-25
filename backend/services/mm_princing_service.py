@@ -147,6 +147,13 @@ def _barras_6m(metros: float) -> int:
     return math.ceil(metros / 6.0)
 
 
+def _barras_3m(metros: float) -> int:
+    """Calcula quantidade de barras de 3m necessárias (arredonda para cima)."""
+    if metros <= 0:
+        return 0
+    return math.ceil(metros / 3.0)
+
+
 def _calcular_perfil_terca(
     tipo_telha: str, carga_telha: float, esp_terca: float,
     vao_maximo: float, alertas: list
@@ -297,8 +304,11 @@ def _montar_itens_sem_laje(r: dict) -> tuple[list, float]:
     """
     itens = []
 
-    def add(codigo, descricao, un, qtd, chave_preco):
+    def add(codigo, descricao, un, qtd, chave_preco, eh_caixa_parafuso=False):
         preco = PRECOS.get(chave_preco, 0.0)
+        # Para caixas de parafuso, o preço é unitário × 500
+        if eh_caixa_parafuso:
+            preco = preco * 500
         total = round(qtd * preco, 2)
         itens.append(ItemOrcamento(
             codigo=codigo, descricao=descricao, un=un,
@@ -317,12 +327,12 @@ def _montar_itens_sem_laje(r: dict) -> tuple[list, float]:
 
     # Parafusos 4.8×19 (arredondados para múltiplos de 500)
     par48_arredondado = _arredondar_parafusos(r['parafusos_48'])
-    add("PAR48", "Parafuso 4.8×19 (cx 500)", "cx", par48_arredondado / 500, "Parafuso 4.8")
+    add("PAR48", "Parafuso 4.8×19 (cx 500)", "cx", par48_arredondado / 500, "Parafuso 4.8", eh_caixa_parafuso=True)
 
     # Parafusos 4.2×13 (apenas cerâmica/concreto, arredondados)
     if r['parafusos_42'] > 0:
         par42_arredondado = _arredondar_parafusos(r['parafusos_42'])
-        add("PAR42", "Parafuso 4.2×13 (cx 500)", "cx", par42_arredondado / 500, "Parafuso 4.2")
+        add("PAR42", "Parafuso 4.2×13 (cx 500)", "cx", par42_arredondado / 500, "Parafuso 4.2", eh_caixa_parafuso=True)
 
     # Conexões P (Caibro)
     if r['conexoes_p'] > 0:
@@ -349,8 +359,11 @@ def _montar_itens_com_laje(r: dict) -> tuple[list, float]:
     """
     itens = []
 
-    def add(codigo, descricao, un, qtd, chave_preco):
+    def add(codigo, descricao, un, qtd, chave_preco, eh_caixa_parafuso=False):
         preco = PRECOS.get(chave_preco, 0.0)
+        # Para caixas de parafuso, o preço é unitário × 500
+        if eh_caixa_parafuso:
+            preco = preco * 500
         total = round(qtd * preco, 2)
         itens.append(ItemOrcamento(
             codigo=codigo, descricao=descricao, un=un,
@@ -372,18 +385,19 @@ def _montar_itens_com_laje(r: dict) -> tuple[list, float]:
     add("PONT", f"Pontalete — {r['perfil_viga']} (barras de 6m)",
         "barras", barras_pont, r['perfil_viga'])
 
-    # Contraventamento (em metros)
-    add("CONTRAV", "Contraventamento 0,80×1000 ZC100",
-        "m", r['total_contraventamento_m'], "Contraventamento")
+    # Contraventamento (em barras de 3m)
+    barras_contrav = _barras_3m(r['total_contraventamento_m'])
+    add("CONTRAV", "Contraventamento 0,80×1000 ZC100 (barras de 3m)",
+        "barras", barras_contrav, "Contraventamento")
 
     # Parafusos 4.8×19 (arredondados para múltiplos de 500)
     par48_arredondado = _arredondar_parafusos(r['parafusos_48'])
-    add("PAR48", "Parafuso 4.8×19 (cx 500)", "cx", par48_arredondado / 500, "Parafuso 4.8")
+    add("PAR48", "Parafuso 4.8×19 (cx 500)", "cx", par48_arredondado / 500, "Parafuso 4.8", eh_caixa_parafuso=True)
 
     # Parafusos 4.2×13 (arredondados)
     if r['parafusos_42'] > 0:
         par42_arredondado = _arredondar_parafusos(r['parafusos_42'])
-        add("PAR42", "Parafuso 4.2×13 (cx 500)", "cx", par42_arredondado / 500, "Parafuso 4.2")
+        add("PAR42", "Parafuso 4.2×13 (cx 500)", "cx", par42_arredondado / 500, "Parafuso 4.2", eh_caixa_parafuso=True)
 
     # Conexões P (vigas + terças + pontaletes)
     if r['conexoes_p'] > 0:
