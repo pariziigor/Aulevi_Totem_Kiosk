@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Usando variável de ambiente, o mesmo código vai funcionar 
 // tanto no Totem (localhost) quanto no site dos Vendedores (Nuvem).
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+const BASE_URL = import.meta.env.VITE_API_URL || 'https://pi-aulevi-totem.onrender.com/api/v1';
 
 export const api = axios.create({
   baseURL: BASE_URL,
