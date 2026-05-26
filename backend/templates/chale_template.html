@@ -28,6 +28,10 @@
             box-sizing: border-box;
             overflow: hidden;
         }
+        img {
+        /* Garante que o navegador não tente calcular layout de imagens grandes */
+        content-visibility: auto; 
+    }
         /* Custom scrollbar para esconder no PDF mas manter o design limpo */
         ::-webkit-scrollbar { display: none; }
     </style>

@@ -1,4 +1,6 @@
 import os
+from PIL import Image
+import io
 import base64
 from datetime import datetime
 from jinja2 import Environment, FileSystemLoader
@@ -78,6 +80,7 @@ class PDFService:
         return pdf_bytes
 
     @staticmethod
+    @staticmethod
     def get_chale_image_base64(raw_id: str, image_num: int) -> str:
         try:
             numeros = ''.join(filter(str.isdigit, str(raw_id)))
@@ -89,12 +92,26 @@ class PDFService:
             for ext in ['.png', '.jpg', '.jpeg']:
                 full_path = os.path.join(chales_dir, f"{base_filename}{ext}")
                 if os.path.exists(full_path):
-                    mime_type = "image/png" if ext == ".png" else "image/jpeg"
-                    with open(full_path, "rb") as img_file:
-                        encoded = base64.b64encode(img_file.read()).decode('utf-8')
-                    return f"data:{mime_type};base64,{encoded}"
+                    # OTIMIZAÇÃO: Redimensiona antes de converter para base64
+                    with Image.open(full_path) as img:
+                        # Converte para RGB se for PNG com transparência (para evitar erros em JPEG)
+                        if img.mode in ("RGBA", "P"):
+                            img = img.convert("RGB")
+                        
+                        # Redimensiona mantendo a proporção (largura máx 800px)
+                        max_width = 800
+                        w_percent = (max_width / float(img.size[0]))
+                        if w_percent < 1: # Só redimensiona se for maior que 800px
+                            h_size = int((float(img.size[1]) * float(w_percent)))
+                            img = img.resize((max_width, h_size), Image.Resampling.LANCZOS)
+                        
+                        buffer = io.BytesIO()
+                        img.save(buffer, format="JPEG", quality=75)
+                        encoded = base64.b64encode(buffer.getvalue()).decode('utf-8')
+                        return f"data:image/jpeg;base64,{encoded}"
             return ""
-        except Exception:
+        except Exception as e:
+            print(f"[PDFService] Erro ao otimizar imagem: {e}")
             return ""
 
     @classmethod
