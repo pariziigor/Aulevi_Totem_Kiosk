@@ -5,13 +5,13 @@
 /* Configurações Globais do Kiosk Brutalista */
 @layer base {
   body {
-    @apply bg-white text-black m-0 overflow-hidden font-sans;
-    /* overflow-hidden é crítico para impedir que o usuário "puxe" a tela no Windows */
+    @apply bg-white text-black m-0 font-sans overflow-x-hidden overflow-y-auto;
+    /* overflow-x-hidden: impede o usuário de puxar a tela para as laterais */
+    /* overflow-y-auto: devolve a rolagem vertical natural para celulares e navegadores */
   }
 
   /* Força a ausência de outline padrão do navegador nos botões */
   button:focus {
     outline: none;
   }
-  
 }

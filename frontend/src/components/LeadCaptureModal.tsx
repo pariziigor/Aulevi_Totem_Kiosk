@@ -9,7 +9,7 @@ interface LeadCaptureModalProps {
 
 interface CountryDDI {
   code: string;
-  flagUrl: string; // Trocamos o emoji pela URL da imagem
+  flagUrl: string;
   name: string;
   cca2?: string;
 }
@@ -18,11 +18,10 @@ interface RestCountryResponse {
   name: { common: string; };
   cca2: string;
   idd: { root?: string; suffixes?: string[]; };
-  flags: { svg: string; }; // Nova tipagem para pegar a imagem
+  flags: { svg: string; };
   translations?: { por?: { common: string; }; };
 }
 
-// Fallback agora usa imagens da flagcdn (mesma CDN oficial da API)
 const FALLBACK_COUNTRIES: CountryDDI[] = [
   { code: "+55", flagUrl: "https://flagcdn.com/br.svg", name: "Brasil", cca2: "BR" },
   { code: "+1", flagUrl: "https://flagcdn.com/us.svg", name: "EUA/Canadá", cca2: "US" },
@@ -51,7 +50,6 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
   useEffect(() => {
     const fetchGlobalCountries = async () => {
       try {
-        // Pedimos "flags" ao invés de "flag"
         const response = await fetch("https://restcountries.com/v3.1/all?fields=name,idd,flags,translations,cca2");
         if (!response.ok) throw new Error("Falha ao acessar API de países");
         
@@ -66,7 +64,7 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
             }
             return {
               code: code,
-              flagUrl: c.flags.svg, // Pega a imagem vetorizada perfeita
+              flagUrl: c.flags.svg,
               name: c.translations?.por?.common || c.name.common,
               cca2: c.cca2
             };
@@ -74,7 +72,6 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
           .sort((a, b) => a.name.localeCompare(b.name));
 
         globalList = globalList.filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i);
-
         setCountries(globalList);
 
         const brazil = globalList.find((c) => c.cca2 === "BR");
@@ -90,6 +87,7 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
     fetchGlobalCountries();
   }, []);
 
+  // Função do teclado virtual (Totem)
   const handleKeyPress = (key: string) => {
     if (key === "APAGAR") {
       if (activeInput === "name") setInputName((prev) => prev.slice(0, -1));
@@ -168,56 +166,63 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
   return (
     <motion.div 
       initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }}
-      className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 xl:p-8 select-none"
+      // Ajustado padding para mobile
+      className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-2 md:p-4 xl:p-8 select-none"
     >
-      <div className="bg-slate-50 w-full max-w-6xl h-full max-h-[1080px] rounded-[2rem] shadow-2xl border border-slate-200 flex flex-col overflow-hidden relative">
+      <div className="bg-slate-50 w-full max-w-6xl max-h-[95vh] lg:max-h-[1080px] rounded-3xl lg:rounded-[2rem] shadow-2xl border border-slate-200 flex flex-col overflow-hidden relative">
         
-        <header className="bg-white border-b border-slate-200 px-6 xl:px-10 py-4 xl:py-6 flex-none flex flex-col items-center text-center">
-          <h2 className="text-2xl xl:text-4xl font-bold tracking-tight text-slate-900 uppercase">
+        <header className="bg-white border-b border-slate-200 px-4 md:px-6 xl:px-10 py-4 xl:py-6 flex-none flex flex-col items-center text-center">
+          <h2 className="text-xl md:text-2xl xl:text-4xl font-bold tracking-tight text-slate-900 uppercase">
             Identificação Necessária
           </h2>
-          <p className="text-base xl:text-xl mt-1 xl:mt-2 text-slate-500 font-medium">
+          <p className="text-sm md:text-base xl:text-xl mt-1 xl:mt-2 text-slate-500 font-medium">
             Informe seus dados para gerar o orçamento detalhado.
           </p>
         </header>
 
-        <div className="flex flex-col gap-3 xl:gap-5 w-full max-w-5xl mx-auto flex-none px-6 xl:px-12 mt-4 xl:mt-6">
+        <div className="flex flex-col gap-4 md:gap-5 w-full max-w-5xl mx-auto flex-none px-4 md:px-6 xl:px-12 mt-4 md:mt-6 overflow-y-auto lg:overflow-visible">
           
-          <div onClick={() => { setActiveInput("name"); setShowDdiDropdown(false); }} className="flex flex-col gap-1.5 cursor-pointer group">
-            <label className="text-sm xl:text-lg font-bold uppercase text-slate-500 ml-2 group-hover:text-orange-600 transition-colors">
+          <div className="flex flex-col gap-1.5 group">
+            <label className="text-xs md:text-sm xl:text-lg font-bold uppercase text-slate-500 ml-2 group-hover:text-orange-600 transition-colors">
               Nome Completo
             </label>
-            <div className={`border-2 p-3 xl:p-5 rounded-xl text-xl xl:text-2xl font-bold transition-all min-h-[56px] xl:min-h-[72px] flex items-center shadow-sm ${
+            {/* Trocado DIV por INPUT nativo */}
+            <input
+              type="text"
+              value={inputName}
+              onChange={(e) => setInputName(formatNameTitleCase(e.target.value))}
+              onFocus={() => { setActiveInput("name"); setShowDdiDropdown(false); }}
+              placeholder="Digite seu nome"
+              className={`w-full outline-none border-2 p-3 xl:p-5 rounded-xl text-lg md:text-xl xl:text-2xl font-bold transition-all h-[56px] xl:h-[72px] shadow-sm ${
                 activeInput === "name" ? "border-orange-500 ring-4 ring-orange-50 bg-white text-slate-900" : "border-slate-200 bg-slate-100 text-slate-600 hover:border-orange-300"
-              }`}>
-              {inputName || <span className="text-slate-400 font-medium">TOQUE PARA DIGITAR</span>}
-            </div>
+              }`}
+            />
           </div>
 
           <div className="flex flex-col gap-1.5 group">
-            <label className="text-sm xl:text-lg font-bold uppercase text-slate-500 ml-2 group-hover:text-emerald-600 transition-colors">
+            <label className="text-xs md:text-sm xl:text-lg font-bold uppercase text-slate-500 ml-2 group-hover:text-emerald-600 transition-colors">
               WhatsApp (DDD + Número)
             </label>
             
-            <div className="flex gap-3 w-full relative z-20">
+            <div className="flex gap-2 md:gap-3 w-full relative z-20">
               <div className="relative">
                 <button
                   disabled={isLoadingDDI}
                   onClick={() => setShowDdiDropdown(!showDdiDropdown)}
-                  className={`border-2 px-4 xl:px-6 rounded-xl text-xl xl:text-2xl font-bold transition-all h-[56px] xl:h-[72px] flex items-center justify-center gap-3 shadow-sm ${
+                  className={`border-2 px-2 md:px-4 xl:px-6 rounded-xl text-base md:text-xl xl:text-2xl font-bold transition-all h-[56px] xl:h-[72px] flex items-center justify-center gap-1 md:gap-3 shadow-sm ${
                     showDdiDropdown ? "border-emerald-500 ring-4 ring-emerald-50 bg-white text-slate-900" : "border-slate-200 bg-slate-100 text-slate-700 hover:border-emerald-300"
                   } ${isLoadingDDI ? "opacity-70 cursor-wait" : ""}`}
                 >
-                  <img src={selectedDDI.flagUrl} alt={selectedDDI.name} className="w-8 h-auto object-contain rounded-sm shadow-sm" />
+                  <img src={selectedDDI.flagUrl} alt={selectedDDI.name} className="w-6 h-4 md:w-8 md:h-auto object-cover md:object-contain rounded-sm shadow-sm" />
                   <span>{selectedDDI.code}</span>
-                  <ChevronDown size={20} className="text-slate-400" />
+                  <ChevronDown className="w-4 h-4 md:w-5 md:h-5 text-slate-400" />
                 </button>
 
                 <AnimatePresence>
                   {showDdiDropdown && (
                     <motion.div
                       initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-                      className="absolute top-full left-0 mt-2 w-80 bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden max-h-72 overflow-y-auto custom-scrollbar"
+                      className="absolute top-full left-0 mt-2 w-64 md:w-80 bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden max-h-60 overflow-y-auto custom-scrollbar z-50"
                     >
                       <style>{`.custom-scrollbar::-webkit-scrollbar { width: 8px; } .custom-scrollbar::-webkit-scrollbar-track { background: #f8fafc; } .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }`}</style>
                       
@@ -229,11 +234,11 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
                             setShowDdiDropdown(false);
                             setActiveInput("phone");
                           }}
-                          className="w-full px-5 py-4 border-b border-slate-50 text-left text-lg font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 flex items-center gap-4 transition-colors"
+                          className="w-full px-4 md:px-5 py-3 md:py-4 border-b border-slate-50 text-left text-base md:text-lg font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 flex items-center gap-3 md:gap-4 transition-colors"
                         >
-                          <img src={country.flagUrl} alt={country.name} className="w-8 h-auto object-contain rounded-sm shadow-sm" />
-                          <span className="w-14 text-slate-500">{country.code}</span>
-                          <span className="text-base font-medium truncate flex-1">{country.name}</span>
+                          <img src={country.flagUrl} alt={country.name} className="w-6 md:w-8 h-auto object-contain rounded-sm shadow-sm" />
+                          <span className="w-12 md:w-14 text-slate-500">{country.code}</span>
+                          <span className="text-sm md:text-base font-medium truncate flex-1">{country.name}</span>
                         </button>
                       ))}
                     </motion.div>
@@ -241,29 +246,33 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
                 </AnimatePresence>
               </div>
 
-              <div
-                onClick={() => { setActiveInput("phone"); setShowDdiDropdown(false); }}
-                className={`flex-1 border-2 p-3 xl:p-5 rounded-xl text-xl xl:text-2xl font-bold transition-all h-[56px] xl:h-[72px] flex items-center shadow-sm cursor-pointer ${
+              {/* Trocado DIV por INPUT nativo */}
+              <input
+                type="tel"
+                value={inputPhone}
+                onChange={(e) => setInputPhone(e.target.value.replace(/[^0-9]/g, '').slice(0, 15))}
+                onFocus={() => { setActiveInput("phone"); setShowDdiDropdown(false); }}
+                placeholder="Digite o número"
+                className={`w-full outline-none flex-1 border-2 p-3 xl:p-5 rounded-xl text-lg md:text-xl xl:text-2xl font-bold transition-all h-[56px] xl:h-[72px] shadow-sm ${
                   activeInput === "phone" ? "border-emerald-500 ring-4 ring-emerald-50 bg-white text-slate-900" : "border-slate-200 bg-slate-100 text-slate-600 hover:border-emerald-300"
                 }`}
-              >
-                {inputPhone || <span className="text-slate-400 font-medium">TOQUE PARA DIGITAR O NÚMERO</span>}
-              </div>
+              />
             </div>
           </div>
 
-          <div className="flex items-center gap-3 mt-1 ml-2">
+          <div className="flex items-center gap-2 md:gap-3 mt-1 ml-1 md:ml-2">
             <input
               type="checkbox" id="lgpd" checked={lgpdConsent} onChange={(e) => setLgpdConsent(e.target.checked)}
-              className="w-6 h-6 xl:w-8 xl:h-8 border-2 border-slate-300 rounded-lg accent-orange-600 cursor-pointer transition-all"
+              className="w-5 h-5 md:w-6 md:h-6 xl:w-8 xl:h-8 border-2 border-slate-300 rounded-lg accent-orange-600 cursor-pointer transition-all flex-shrink-0"
             />
-            <label htmlFor="lgpd" className="text-sm xl:text-lg font-medium text-slate-600 cursor-pointer select-none">
+            <label htmlFor="lgpd" className="text-xs md:text-sm xl:text-lg font-medium text-slate-600 cursor-pointer select-none leading-tight">
               Autorizo o armazenamento dos meus dados (LGPD).
             </label>
           </div>
         </div>
 
-        <div onClick={() => setShowDdiDropdown(false)} className="flex-grow flex flex-col justify-center gap-1.5 xl:gap-2.5 overflow-hidden w-full max-w-5xl mx-auto px-4 xl:px-8 mt-2 mb-4 xl:mb-6 z-10">
+        {/* Teclado Virtual: Escondido no celular (hidden), exibido nas telas grandes (lg:flex) */}
+        <div onClick={() => setShowDdiDropdown(false)} className="hidden lg:flex flex-grow flex-col justify-center gap-1.5 xl:gap-2.5 overflow-hidden w-full max-w-5xl mx-auto px-4 xl:px-8 mt-2 mb-4 xl:mb-6 z-10">
           {keyboardLayout.map((row, rowIndex) => (
             <div key={rowIndex} className="flex justify-center gap-1.5 xl:gap-2.5 w-full">
               {row.map((key) => renderKey(key))}
@@ -283,18 +292,19 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
           </div>
         </div>
 
-        <div className="bg-white border-t border-slate-200 px-6 xl:px-10 py-4 xl:py-6 flex justify-between items-center flex-none relative z-20">
-          <motion.button whileTap={{ scale: 0.95 }} onClick={onCancel} className="bg-white text-slate-600 border border-slate-200 rounded-full px-6 xl:px-10 py-3 xl:py-4 text-lg xl:text-xl font-bold uppercase hover:bg-slate-100 transition-colors shadow-sm flex items-center gap-2">
-            <X size={24} /> Cancelar
+        {/* Footer responsivo: empilhado no mobile, lado a lado no desktop */}
+        <div className="bg-white border-t border-slate-200 px-4 md:px-6 xl:px-10 py-4 xl:py-6 flex flex-col-reverse md:flex-row justify-between items-stretch md:items-center gap-3 md:gap-0 flex-none relative z-20 mt-4 lg:mt-0">
+          <motion.button whileTap={{ scale: 0.95 }} onClick={onCancel} className="bg-white text-slate-600 border border-slate-200 rounded-full px-6 xl:px-10 py-3 xl:py-4 text-base md:text-lg xl:text-xl font-bold uppercase hover:bg-slate-100 transition-colors shadow-sm flex items-center justify-center gap-2">
+            <X className="w-5 h-5 md:w-6 md:h-6" /> Cancelar
           </motion.button>
           
           <motion.button
             whileTap={lgpdConsent ? { scale: 0.95 } : {}} onClick={handleSubmit} disabled={lgpdConsent === false}
-            className={`rounded-full px-6 xl:px-10 py-3 xl:py-4 text-lg xl:text-xl font-bold uppercase transition-all flex items-center gap-2 shadow-md ${
+            className={`rounded-full px-6 xl:px-10 py-3 xl:py-4 text-base md:text-lg xl:text-xl font-bold uppercase transition-all flex items-center justify-center gap-2 shadow-md ${
               lgpdConsent === true ? "bg-orange-600 text-white hover:bg-orange-700 shadow-orange-200" : "bg-slate-200 text-slate-400 cursor-not-allowed shadow-none"
             }`}
           >
-            <Check size={24} /> Confirmar e Gerar
+            <Check className="w-5 h-5 md:w-6 md:h-6" /> Confirmar e Gerar
           </motion.button>
         </div>
 
