@@ -3,22 +3,23 @@ from fastapi.middleware.cors import CORSMiddleware
 from routes import quote_routes
 from database.connection import engine, Base
 
-# Inicialização automática das tabelas no SQLite local
+# Inicialização automática das tabelas (agora apontando para o Supabase)
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="Aulevi Kiosk API",
-    description="Motor de cálculo LSF e gestão de leads offline-first",
+    description="Motor de cálculo e automação comercial para geração de propostas",
     version="1.0.0"
 )
 
-# Configuração rigorosa de CORS para o ambiente local do Totem
+# 🔥 CONFIGURAÇÃO DE CORS ATUALIZADA PARA A NUVEM 🔥
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000"],
+    allow_origins=["*"], # Libera acessos do Vercel, Locaweb e localhost
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["Content-Disposition"] # Fundamental para o download do arquivo PDF no frontend
 )
 
 # Integração das rotas isoladas
@@ -27,4 +28,4 @@ app.include_router(quote_routes.router)
 @app.get("/health", tags=["Monitoramento"])
 def health_check():
     """Endpoint vitalício para o Watchdog do Electron."""
-    return {"status": "operacional", "offline_ready": True} # Tipagem booleana estrita
+    return {"status": "operacional", "offline_ready": True} # Tipagem booleana estrita nativa mantida
