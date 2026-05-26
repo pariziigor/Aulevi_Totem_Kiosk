@@ -43,9 +43,13 @@ describe('Serviço: KioskService', () => {
     const result = await KioskService.submitQuote(mockPayload);
 
     expect(mockPost).toHaveBeenCalledTimes(1);
-    expect(mockPost).toHaveBeenCalledWith('/quotes/', mockPayload);
-    expect(result).toEqual(mockSuccessResponse);
-    expect(result.total_value).toBe(245000.50);
+    // 1. Atualizamos para esperar o novo formato de requisição que pede o arquivo (blob)
+    expect(mockPost).toHaveBeenCalledWith('/quotes/', mockPayload, { responseType: 'blob' });
+    
+    // 2. O resultado esperado agora é apenas o status de sucesso
+    expect(result).toEqual({ success: true });
+    
+    // (A linha expect(result.total_value) foi deletada)
   });
 
   it('deve lançar um erro claro caso o servidor retorne falha (Ex: HTTP 400 ou 500)', async () => {
