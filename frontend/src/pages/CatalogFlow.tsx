@@ -86,19 +86,20 @@ const CatalogFlow: React.FC = () => {
         product: selectedProduct,
       };
 
-      const result = await KioskService.submitQuote(payload);
+      // O arquivo já é baixado automaticamente aqui dentro
+      await KioskService.submitQuote(payload);
 
-      console.log(`[Lead Capturado] Pedido: ${result.quote_number}`);
+      console.log(`[Lead Capturado] Especificações enviadas com sucesso para ${name}`);
 
       alert(
-        `ATENDIMENTO REGISTRADO!\n\nOrçamento Nº: ${result.quote_number}\n\nObrigado, ${name}.\nEm breve você receberá o material completo do ${selectedProduct?.title} no WhatsApp.`,
+        `ATENDIMENTO REGISTRADO!\n\nObrigado, ${name}.\nO catálogo em PDF do ${selectedProduct?.title} foi baixado com sucesso!`,
       );
       navigate("/");
     } catch (error) {
       console.error("Falha na comunicação com a API:", error);
       alert("ERRO: Falha ao registrar interesse. Tente novamente.");
     } finally {
-      setIsProcessing(false); // Desliga a tela de carregamento independentemente de sucesso ou erro
+      setIsProcessing(false); // Desliga a tela de carregamento
     }
   };
 

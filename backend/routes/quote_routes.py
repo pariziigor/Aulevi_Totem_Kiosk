@@ -1,16 +1,18 @@
+import io
 import math
 import random
 import string
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from database.connection import get_db
-from schemas.quote_schema import QuoteRequestSchema, QuoteResponseSchema
+from schemas.quote_schema import QuoteRequestSchema
 from services.pricing_service import PricingService
 from services.pdf_service import PDFService
 from models.quote_model import QuoteModel
 
-# 🔥 Import corrigido
+# Import corrigido
 from services.mm_princing_service import calcular_sem_laje, calcular_com_laje, para_dict
 
 router = APIRouter(prefix="/api/v1/quotes", tags=["Orcamentos"])
@@ -28,7 +30,8 @@ def generate_quote_number(module_name: str) -> str:
     
     return f"AUL-{prefix}-{random_str}.{year_str}"
 
-@router.post("/", response_model=QuoteResponseSchema, status_code=status.HTTP_201_CREATED)
+# Nota: response_model foi removido pois a rota agora devolve um ficheiro (Stream) em vez de JSON
+@router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_quote(payload: QuoteRequestSchema, db: Session = Depends(get_db)):
     try:
         payload_dict = payload.model_dump()
@@ -51,7 +54,7 @@ async def create_quote(payload: QuoteRequestSchema, db: Session = Depends(get_db
             tipo_telha = payload_dict.get("tipo_telha", "Cerâmico")
             tem_placa = payload_dict.get("tem_placa", False)
             
-            # 🔥 CHAMA O SERVIÇO (Enviando apenas os 4 parâmetros originais)
+            # CHAMA O SERVIÇO (Enviando apenas os 4 parâmetros originais)
             if tipo_laje == "SEM_LAJE":
                 calc_result = calcular_sem_laje(
                     a=dim_a, b=dim_b, tipo_telha=tipo_telha, tem_placa=tem_placa
@@ -92,7 +95,7 @@ async def create_quote(payload: QuoteRequestSchema, db: Session = Depends(get_db
         product_data = payload_dict.get("product", {})
         selections = payload_dict
 
-        # 3. Persistência no SQLite
+        # 3. Persistência no Banco de Dados (Supabase / Nuvem)
         new_quote = QuoteModel(
             quote_number=quote_number,
             module=module,
@@ -108,12 +111,12 @@ async def create_quote(payload: QuoteRequestSchema, db: Session = Depends(get_db
         db.commit()
         db.refresh(new_quote)
         
-        # 4. GERAÇÃO DO DOCUMENTO PDF CONDICIONAL
+        # 4. GERAÇÃO DO DOCUMENTO PDF CONDICIONAL (EM MEMÓRIA)
         pdf_data = payload.model_dump()
         pdf_data["quote_number"] = quote_number
         
         if module == "LSF":
-            pdf_path = await PDFService.generate_quote_pdf(
+            pdf_bytes = await PDFService.generate_quote_pdf(
                 quote_data=pdf_data,
                 items=calculation_result.get("items", []),
                 total_value=calculation_result.get("total_value", 0.0),
@@ -121,17 +124,30 @@ async def create_quote(payload: QuoteRequestSchema, db: Session = Depends(get_db
             )
 
         elif module in ["CHALE", "BARRACAO"]:
-            pdf_path = await PDFService.generate_chalet_pdf(product_data)
+            pdf_bytes = await PDFService.generate_chalet_pdf(product_data)
             
         elif module == "MADEIRAMENTO":
             pdf_data.update(mm_resultado_dict)
             pdf_data["calculated_area"] = mm_calculated_area
-            pdf_path = await PDFService.generate_madeiramento_pdf(pdf_data)
+            pdf_bytes = await PDFService.generate_madeiramento_pdf(pdf_data)
         
-        print(f"[PDF Generator]: Documento {quote_number} compilado com sucesso em -> {pdf_path}")
+        # 5. CONVERSÃO E ENVIO DO STREAMING PARA O NAVEGADOR
+        pdf_stream = io.BytesIO(pdf_bytes)
+        pdf_stream.seek(0)
         
-        calculation_result["quote_number"] = quote_number
-        return calculation_result
+        clean_name = lead_name.replace(" ", "_")
+        filename = f"{quote_number}_{clean_name}.pdf"
+        
+        print(f"[PDF Generator]: Documento {quote_number} compilado e transmitido com sucesso!")
+        
+        return StreamingResponse(
+            pdf_stream,
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition": f"attachment; filename={filename}",
+                "Access-Control-Expose-Headers": "Content-Disposition"
+            }
+        )
         
     except Exception as e:
         db.rollback()

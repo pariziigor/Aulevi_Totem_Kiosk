@@ -390,15 +390,19 @@ const MadeiramentoFlow: React.FC = () => {
         dim_b: parseFloat(dimB.replace(",", ".")),
         city: quoteData.city || "Não informado",
       };
-      const result = await KioskService.submitQuote(payload);
+      
+      // O arquivo já é baixado automaticamente aqui dentro
+      await KioskService.submitQuote(payload);
+      
       alert(
-        `ORÇAMENTO GERADO COM SUCESSO!\nNº do Pedido: ${result.quote_number}\nValor Total: R$ ${result.total_value.toFixed(2)}`,
+        `ORÇAMENTO GERADO COM SUCESSO!\n\nO PDF com a lista completa de materiais e valores para o Madeiramento foi baixado.`,
       );
       resetSession();
       navigate("/");
     } catch (err) {
       console.error("Falha na API:", err);
       alert("ERRO: Falha ao processar orçamento. Tente novamente.");
+    } finally {
       setIsProcessing(false);
     }
   };

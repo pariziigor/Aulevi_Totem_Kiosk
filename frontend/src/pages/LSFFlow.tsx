@@ -70,7 +70,7 @@ const LSFFlow: React.FC = () => {
     navigate('/');
   };
 
-  const submitQuoteFlow = async (name: string, phone: string) => {
+ const submitQuoteFlow = async (name: string, phone: string) => {
     setIsProcessing(true);
     try {
       const payload = {
@@ -87,15 +87,17 @@ const LSFFlow: React.FC = () => {
         area: parseFloat(quoteData.area)
       };
 
-      const result = await KioskService.submitQuote(payload);
+      // O arquivo já é baixado automaticamente aqui dentro
+      await KioskService.submitQuote(payload);
       
-      alert(`ORÇAMENTO GERADO COM SUCESSO!\nNº do Pedido: ${result.quote_number}\nValor Total: R$ ${result.total_value.toFixed(2)}`);
+      alert(`ORÇAMENTO GERADO COM SUCESSO!\n\nO arquivo PDF com o detalhamento completo do Light Steel Frame foi baixado.`);
       
       resetSession();
       navigate('/');
     } catch (error) {
       console.error("Falha na comunicação com a API:", error);
       alert("ERRO: Falha ao processar orçamento. Tente novamente.");
+    } finally {
       setIsProcessing(false);
     }
   };
