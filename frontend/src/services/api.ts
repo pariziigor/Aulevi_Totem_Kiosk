@@ -6,7 +6,7 @@ const BASE_URL = import.meta.env.VITE_API_URL || 'https://pi-aulevi-totem.onrend
 
 export const api = axios.create({
   baseURL: BASE_URL,
-  timeout: 60000, // 60 segundos (gerar PDF na nuvem pode demorar alguns segundos a mais)
+  timeout: 180000, // 60 segundos (gerar PDF na nuvem pode demorar alguns segundos a mais)
   headers: {
     'Content-Type': 'application/json',
   },
