@@ -12,6 +12,7 @@ from schemas.quote_schema import QuoteRequestSchema
 from services.pricing_service import PricingService
 from services.pdf_service import PDFService
 from models.quote_model import QuoteModel
+from starlette.background import BackgroundTask
 
 # Importações dos novos serviços de nuvem e mensageria
 from services.supabase_service import StorageService
@@ -161,16 +162,16 @@ async def create_quote(payload: QuoteRequestSchema, db: Session = Depends(get_db
         
         print(f"🚨 DEBUG WHATSAPP: Nome='{lead_name}' | Telefone='{lead_phone}'", flush=True)
 
-        # 5. GATILHO DO WHATSAPP (Usando Asyncio puro para não perder a task)
+        # 5. GATILHO DO WHATSAPP (Agendando com segurança)
+        bg_task = None
         if lead_phone and lead_phone != "Não Informado":
-            print(f"🚨 DEBUG: Disparando WhatsApp para {lead_phone} via Asyncio!", flush=True)
-            asyncio.create_task(
-                process_whatsapp_background(
-                    pdf_bytes=pdf_bytes,
-                    phone=lead_phone,
-                    lead_name=lead_name,
-                    module=module
-                )
+            print(f"🚨 DEBUG: Agendando WhatsApp para {lead_phone}...", flush=True)
+            bg_task = BackgroundTask(
+                process_whatsapp_background,
+                pdf_bytes=pdf_bytes,
+                phone=lead_phone,
+                lead_name=lead_name,
+                module=module
             )
 
         # 6. CONVERSÃO E ENVIO DO STREAMING PARA O NAVEGADOR
@@ -180,7 +181,7 @@ async def create_quote(payload: QuoteRequestSchema, db: Session = Depends(get_db
         clean_name = lead_name.replace(" ", "_")
         filename = f"{quote_number}_{clean_name}.pdf"
         
-        print(f"[PDF Generator]: Documento {quote_number} compilado e transmitido com sucesso!", flush=True)
+        print(f"[PDF Generator]: Documento {quote_number} transmitido para o Totem!", flush=True)
         
         return StreamingResponse(
             pdf_stream,
@@ -188,8 +189,12 @@ async def create_quote(payload: QuoteRequestSchema, db: Session = Depends(get_db
             headers={
                 "Content-Disposition": f"attachment; filename={filename}",
                 "Access-Control-Expose-Headers": "Content-Disposition"
-            }
+            },
+            background=bg_task # 🔥 
         )
+        
+    except Exception as e:
+        db.rollback()
         
     except Exception as e:
         db.rollback()
