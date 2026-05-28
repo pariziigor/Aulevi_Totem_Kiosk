@@ -2,8 +2,9 @@ import io
 import math
 import random
 import string
+import asyncio
 from datetime import datetime
-from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from database.connection import get_db
@@ -35,29 +36,31 @@ def generate_quote_number(module_name: str) -> str:
     return f"AUL-{prefix}-{random_str}.{year_str}"
 
 
-# 🚀 FUNÇÃO DE BACKGROUND (Roda escondida sem travar o usuário)
+# FUNÇÃO DE BACKGROUND COM FLUSH (Roda escondida sem travar o usuário)
 async def process_whatsapp_background(pdf_bytes: bytes, phone: str, lead_name: str, module: str):
-    print(f"[Background] Iniciando upload do PDF de {lead_name} para o Supabase...")
-    
-    # 1. Sobe o arquivo para a nuvem
-    pdf_url = StorageService.upload_pdf(pdf_bytes, prefix=module)
-    
-    if pdf_url:
-        print(f"[Background] Upload concluído! URL: {pdf_url}")
-        # 2. Manda a Z-API disparar o WhatsApp
-        await WhatsAppService.send_pdf_quote(
-            phone=phone,
-            pdf_url=pdf_url,
-            lead_name=lead_name,
-            product_name=module
-        )
-    else:
-        print("[Background] ❌ Falha ao obter URL do Supabase, envio de WhatsApp cancelado.")
+    print(f"\n[Background] 🚀 Iniciando fluxo Z-API/Supabase para {lead_name}...", flush=True)
+    try:
+        # 1. Sobe o arquivo para a nuvem
+        pdf_url = StorageService.upload_pdf(pdf_bytes, prefix=module)
+        
+        if pdf_url:
+            print(f"[Background] ✅ Upload concluído! URL: {pdf_url}", flush=True)
+            # 2. Manda a Z-API disparar o WhatsApp
+            await WhatsAppService.send_pdf_quote(
+                phone=phone,
+                pdf_url=pdf_url,
+                lead_name=lead_name,
+                product_name=module
+            )
+        else:
+            print("[Background] ❌ Fluxo interrompido: Falha ao obter URL do Supabase.", flush=True)
+    except Exception as e:
+        print(f"[Background] ❌ Erro fatal na thread de background: {repr(e)}", flush=True)
 
 
 # Nota: response_model foi removido pois a rota agora devolve um ficheiro (Stream) em vez de JSON
 @router.post("/", status_code=status.HTTP_201_CREATED)
-async def create_quote(payload: QuoteRequestSchema, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
+async def create_quote(payload: QuoteRequestSchema, db: Session = Depends(get_db)):
     try:
         payload_dict = payload.model_dump()
         module = payload_dict.pop("module", "LSF").upper()
@@ -156,14 +159,18 @@ async def create_quote(payload: QuoteRequestSchema, background_tasks: Background
             pdf_data["calculated_area"] = mm_calculated_area
             pdf_bytes = await PDFService.generate_madeiramento_pdf(pdf_data)
         
-        # 5. GATILHO DO WHATSAPP (Delega para o BackgroundTask)
+        print(f"🚨 DEBUG WHATSAPP: Nome='{lead_name}' | Telefone='{lead_phone}'", flush=True)
+
+        # 5. GATILHO DO WHATSAPP (Usando Asyncio puro para não perder a task)
         if lead_phone and lead_phone != "Não Informado":
-            background_tasks.add_task(
-                process_whatsapp_background,
-                pdf_bytes=pdf_bytes,
-                phone=lead_phone,
-                lead_name=lead_name,
-                module=module
+            print(f"🚨 DEBUG: Disparando WhatsApp para {lead_phone} via Asyncio!", flush=True)
+            asyncio.create_task(
+                process_whatsapp_background(
+                    pdf_bytes=pdf_bytes,
+                    phone=lead_phone,
+                    lead_name=lead_name,
+                    module=module
+                )
             )
 
         # 6. CONVERSÃO E ENVIO DO STREAMING PARA O NAVEGADOR
@@ -173,7 +180,7 @@ async def create_quote(payload: QuoteRequestSchema, background_tasks: Background
         clean_name = lead_name.replace(" ", "_")
         filename = f"{quote_number}_{clean_name}.pdf"
         
-        print(f"[PDF Generator]: Documento {quote_number} compilado e transmitido com sucesso!")
+        print(f"[PDF Generator]: Documento {quote_number} compilado e transmitido com sucesso!", flush=True)
         
         return StreamingResponse(
             pdf_stream,
@@ -181,13 +188,12 @@ async def create_quote(payload: QuoteRequestSchema, background_tasks: Background
             headers={
                 "Content-Disposition": f"attachment; filename={filename}",
                 "Access-Control-Expose-Headers": "Content-Disposition"
-            },
-            background=background_tasks 
+            }
         )
         
     except Exception as e:
         db.rollback()
-        print(f"Erro detalhado na criação do orçamento: {str(e)}") 
+        print(f"Erro detalhado na criação do orçamento: {str(e)}", flush=True) 
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Falha na esteira de orçamentação: {str(e)}"
