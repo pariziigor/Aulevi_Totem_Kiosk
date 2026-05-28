@@ -1,7 +1,5 @@
 import os
 import uuid
-import io
-import sys
 from supabase import create_client, Client
 
 class StorageService:
@@ -22,9 +20,10 @@ class StorageService:
             
             print(f"[StorageService] 📤 Uploading para o bucket 'orcamentos': {file_name}", flush=True)
             
+            # CORREÇÃO: A biblioteca do Supabase exige os bytes puros
             response = supabase.storage.from_("orcamentos").upload(
                 path=file_name,
-                file=io.BytesIO(pdf_bytes),
+                file=pdf_bytes,
                 file_options={"content-type": "application/pdf"}
             )
             
