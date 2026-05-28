@@ -3,7 +3,7 @@ import math
 import random
 import string
 from datetime import datetime
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from database.connection import get_db
@@ -11,6 +11,10 @@ from schemas.quote_schema import QuoteRequestSchema
 from services.pricing_service import PricingService
 from services.pdf_service import PDFService
 from models.quote_model import QuoteModel
+
+# Importações dos novos serviços de nuvem e mensageria
+from services.supabase_service import StorageService
+from services.whatsapp_service import WhatsAppService
 
 # Import corrigido
 from services.mm_princing_service import calcular_sem_laje, calcular_com_laje, para_dict
@@ -30,9 +34,30 @@ def generate_quote_number(module_name: str) -> str:
     
     return f"AUL-{prefix}-{random_str}.{year_str}"
 
+
+# 🚀 FUNÇÃO DE BACKGROUND (Roda escondida sem travar o usuário)
+async def process_whatsapp_background(pdf_bytes: bytes, phone: str, lead_name: str, module: str):
+    print(f"[Background] Iniciando upload do PDF de {lead_name} para o Supabase...")
+    
+    # 1. Sobe o arquivo para a nuvem
+    pdf_url = StorageService.upload_pdf(pdf_bytes, prefix=module)
+    
+    if pdf_url:
+        print(f"[Background] Upload concluído! URL: {pdf_url}")
+        # 2. Manda a Z-API disparar o WhatsApp
+        await WhatsAppService.send_pdf_quote(
+            phone=phone,
+            pdf_url=pdf_url,
+            lead_name=lead_name,
+            product_name=module
+        )
+    else:
+        print("[Background] ❌ Falha ao obter URL do Supabase, envio de WhatsApp cancelado.")
+
+
 # Nota: response_model foi removido pois a rota agora devolve um ficheiro (Stream) em vez de JSON
 @router.post("/", status_code=status.HTTP_201_CREATED)
-async def create_quote(payload: QuoteRequestSchema, db: Session = Depends(get_db)):
+async def create_quote(payload: QuoteRequestSchema, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     try:
         payload_dict = payload.model_dump()
         module = payload_dict.pop("module", "LSF").upper()
@@ -131,7 +156,17 @@ async def create_quote(payload: QuoteRequestSchema, db: Session = Depends(get_db
             pdf_data["calculated_area"] = mm_calculated_area
             pdf_bytes = await PDFService.generate_madeiramento_pdf(pdf_data)
         
-        # 5. CONVERSÃO E ENVIO DO STREAMING PARA O NAVEGADOR
+        # 5. GATILHO DO WHATSAPP (Delega para o BackgroundTask)
+        if lead_phone and lead_phone != "Não Informado":
+            background_tasks.add_task(
+                process_whatsapp_background,
+                pdf_bytes=pdf_bytes,
+                phone=lead_phone,
+                lead_name=lead_name,
+                module=module
+            )
+
+        # 6. CONVERSÃO E ENVIO DO STREAMING PARA O NAVEGADOR
         pdf_stream = io.BytesIO(pdf_bytes)
         pdf_stream.seek(0)
         
