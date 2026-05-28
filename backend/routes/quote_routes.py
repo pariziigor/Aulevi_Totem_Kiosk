@@ -38,16 +38,17 @@ def generate_quote_number(module_name: str) -> str:
 
 
 # FUNÇÃO DE BACKGROUND COM FLUSH (Roda escondida sem travar o usuário)
-async def process_whatsapp_background(pdf_bytes: bytes, phone: str, lead_name: str, module: str):
+# 🚀 FUNÇÃO DE BACKGROUND SÍNCRONA COM FLUSH
+def process_whatsapp_background(pdf_bytes: bytes, phone: str, lead_name: str, module: str):
     print(f"\n[Background] 🚀 Iniciando fluxo Z-API/Supabase para {lead_name}...", flush=True)
     try:
-        # 1. Sobe o arquivo para a nuvem
+        # 1. Sobe o ficheiro para a nuvem
         pdf_url = StorageService.upload_pdf(pdf_bytes, prefix=module)
         
         if pdf_url:
             print(f"[Background] ✅ Upload concluído! URL: {pdf_url}", flush=True)
-            # 2. Manda a Z-API disparar o WhatsApp
-            await WhatsAppService.send_pdf_quote(
+            # 2. Manda a Z-API disparar o WhatsApp (Agora sem o 'await')
+            WhatsAppService.send_pdf_quote(
                 phone=phone,
                 pdf_url=pdf_url,
                 lead_name=lead_name,
