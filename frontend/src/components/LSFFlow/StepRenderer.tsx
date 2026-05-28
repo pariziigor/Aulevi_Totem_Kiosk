@@ -21,6 +21,7 @@ interface StepRendererProps {
   quoteData: LSFQuoteData;
   onSetQuoteData: (data: Partial<LSFQuoteData>) => void;
   onNext: () => void;
+  onSummaryConfirm: () => void;
   onOpenCityModal: () => void;
   isLoadingCities: boolean;
 }
@@ -36,6 +37,7 @@ export const StepRenderer: React.FC<StepRendererProps> = ({
   quoteData,
   onSetQuoteData,
   onNext,
+  onSummaryConfirm,
   onOpenCityModal,
   isLoadingCities
 }) => {
@@ -182,7 +184,8 @@ export const StepRenderer: React.FC<StepRendererProps> = ({
 
             <motion.button 
               whileTap={{ scale: 0.98 }} 
-              onClick={() => {}} // This callback will be handled in parent
+              type="button"
+              onClick={onSummaryConfirm}
               className="bg-orange-600 text-white rounded-full px-6 md:px-10 py-4 md:py-5 xl:py-6 text-lg md:text-2xl xl:text-3xl font-bold w-full max-w-4xl shadow-lg shadow-orange-200 hover:bg-orange-700 transition-all flex justify-center items-center gap-2 md:gap-3"
             >
               <Check className="w-6 h-6 md:w-8 md:h-8" /> Confirmar e Gerar Orçamento

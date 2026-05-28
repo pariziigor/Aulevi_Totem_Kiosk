@@ -36,6 +36,11 @@ const CatalogFlow: React.FC = () => {
   } = useImageCarousel(selectedProduct);
 
   const submitInterest = async (name: string, phone: string) => {
+    if (!selectedProduct) {
+      alert('ERRO: Nenhum produto selecionado. Volte ao catálogo e escolha um modelo.');
+      return;
+    }
+
     setShowLeadModal(false);
     setIsProcessing(true);
 
@@ -110,6 +115,7 @@ const CatalogFlow: React.FC = () => {
               initial="initial"
               animate="animate"
               exit="exit"
+              className="h-full"
             >
               <ProductCarousel
                 products={products}
@@ -125,6 +131,7 @@ const CatalogFlow: React.FC = () => {
               initial="initial"
               animate="animate"
               exit="exit"
+              className="h-full"
             >
               <ProductDetails
                 product={selectedProduct}

@@ -179,6 +179,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
 
           <motion.button
             whileTap={{ scale: 0.98 }}
+            type="button"
             onClick={onInterestClick}
             className="flex-none bg-orange-600 text-white rounded-full lg:rounded-[2rem] py-5 md:py-6 xl:py-8 text-2xl md:text-3xl xl:text-4xl font-bold uppercase shadow-lg shadow-orange-200 hover:bg-orange-700 transition-all w-full mt-2 lg:mt-0"
           >

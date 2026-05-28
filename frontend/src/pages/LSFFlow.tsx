@@ -73,12 +73,9 @@ const LSFFlow: React.FC = () => {
                 return;
               }
             }
-            if (step === LSF_FLOW_STEPS.SUMMARY) {
-              handleSummaryConfirm();
-              return;
-            }
             handleNext();
           }}
+          onSummaryConfirm={handleSummaryConfirm}
           onOpenCityModal={() => {
             setCitySearch(quoteData.city && quoteData.city !== 'Não informado' ? quoteData.city : "");
             setShowCityModal(true);

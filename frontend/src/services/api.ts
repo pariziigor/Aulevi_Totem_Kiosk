@@ -13,7 +13,7 @@ export const api = axios.create({
 });
 
 export const KioskService = {
-  submitQuote: async (payload: any) => {
+  submitQuote: async (payload: Record<string, unknown>) => {
     try {
       // 1. Avisamos ao Axios que a resposta será um arquivo (Blob) e não um texto/JSON
       const response = await api.post('/quotes/', payload, {
