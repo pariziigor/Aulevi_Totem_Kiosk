@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { NUMPAD_KEYS } from '../constants/lsfFlowConstants';
+import { NUMPAD_KEYS } from '../../constants/lsfFlowConstants';
 
 interface NumpadProps {
   value: string;
@@ -18,7 +18,7 @@ export const Numpad: React.FC<NumpadProps> = ({ value, onChange }) => {
 
   return (
     <div className="grid grid-cols-3 gap-2 md:gap-3 xl:gap-4 w-full max-w-[280px] md:max-w-lg mx-auto mt-6">
-      {NUMPAD_KEYS.map(k => (
+      {NUMPAD_KEYS.map((k: string) => (
         <motion.button 
           key={k} 
           whileTap={{ scale: 0.95 }}

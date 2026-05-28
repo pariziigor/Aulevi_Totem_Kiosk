@@ -3,12 +3,23 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, Check, MapPin, Search } from 'lucide-react';
 import { Numpad } from './Numpad';
 import { Step3Toggle } from './Step3Toggle';
-import { CONSTRUCTION_TYPES, CONSTRUCTION_STANDARDS, LSF_FLOW_STEPS } from '../constants/lsfFlowConstants';
+import { CONSTRUCTION_TYPES, CONSTRUCTION_STANDARDS, LSF_FLOW_STEPS } from '../../constants/lsfFlowConstants';
+
+interface LSFQuoteData {
+  area: string;
+  tipo: string;
+  padrao: string;
+  has_facade: boolean;
+  has_project: boolean;
+  has_land?: boolean;
+  own_resources?: boolean;
+  city?: string;
+}
 
 interface StepRendererProps {
   currentStep: number;
-  quoteData: any;
-  onSetQuoteData: (data: any) => void;
+  quoteData: LSFQuoteData;
+  onSetQuoteData: (data: Partial<LSFQuoteData>) => void;
   onNext: () => void;
   onOpenCityModal: () => void;
   isLoadingCities: boolean;
@@ -57,7 +68,7 @@ export const StepRenderer: React.FC<StepRendererProps> = ({
           <motion.div key="step1" variants={stepVariants} initial="initial" animate="animate" exit="exit" className="flex flex-col items-center w-full">
             <h2 className="text-2xl md:text-3xl xl:text-5xl font-bold text-slate-800 tracking-tight mb-6 md:mb-8 xl:mb-12">Selecione o Tipo</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 xl:gap-12 w-full max-w-5xl px-4 md:px-0">
-              {CONSTRUCTION_TYPES.map(t => (
+              {CONSTRUCTION_TYPES.map((t: { label: string; icon: string }) => (
                 <motion.button key={t.label} 
                   whileTap={{ scale: 0.98 }} 
                   onClick={() => { onSetQuoteData({ tipo: t.label }); onNext(); }}
@@ -78,7 +89,7 @@ export const StepRenderer: React.FC<StepRendererProps> = ({
           <motion.div key="step2" variants={stepVariants} initial="initial" animate="animate" exit="exit" className="flex flex-col items-center w-full">
             <h2 className="text-2xl md:text-3xl xl:text-5xl font-bold text-slate-800 tracking-tight mb-6 md:mb-8 xl:mb-12">Padrão de Acabamento</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 xl:gap-8 w-full max-w-5xl px-4 md:px-0">
-              {CONSTRUCTION_STANDARDS.map(p => (
+              {CONSTRUCTION_STANDARDS.map((p: { label: string; icon: string }) => (
                 <motion.button key={p.label} 
                   whileTap={{ scale: 0.98 }} 
                   onClick={() => { onSetQuoteData({ padrao: p.label }); onNext(); }}

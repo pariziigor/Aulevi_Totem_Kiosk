@@ -1,7 +1,13 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, CheckCircle2, XCircle, ChevronDown } from 'lucide-react';
-import { type Product } from '../../data/products';
+import React from "react";
+import { motion, type PanInfo } from "framer-motion";
+import {
+  ChevronLeft,
+  ChevronRight,
+  CheckCircle2,
+  XCircle,
+  ChevronDown,
+} from "lucide-react";
+import { type Product } from "../../data/products";
 
 interface ProductDetailsProps {
   product: Product;
@@ -9,7 +15,10 @@ interface ProductDetailsProps {
   onNextImage: () => void;
   onPrevImage: () => void;
   onOpenFullscreen: () => void;
-  onDragEnd: (event: MouseEvent | TouchEvent | PointerEvent, info: any) => void;
+  onDragEnd: (
+    event: MouseEvent | TouchEvent | PointerEvent,
+    info: PanInfo,
+  ) => void;
   onInterestClick: () => void;
 }
 
@@ -20,7 +29,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
   onPrevImage,
   onOpenFullscreen,
   onDragEnd,
-  onInterestClick
+  onInterestClick,
 }) => {
   return (
     <div className="flex flex-col w-full h-auto lg:h-full lg:min-h-0 gap-4 md:gap-6 xl:gap-8">
@@ -51,7 +60,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
             dragElastic={0.2}
             onDragEnd={onDragEnd}
             onClick={onOpenFullscreen}
-            whileTap={{ cursor: 'grabbing' }}
+            whileTap={{ cursor: "grabbing" }}
             initial={{ opacity: 0.5, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3 }}
@@ -110,7 +119,8 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 xl:gap-8 h-auto lg:h-full lg:overflow-y-auto lg:pr-4 lg:pb-20 lg:custom-scrollbar">
                 <div className="bg-blue-50/50 border border-blue-100 rounded-3xl p-5 md:p-6 xl:p-8 flex flex-col h-fit">
                   <h4 className="text-orange-800 font-bold text-base md:text-lg xl:text-xl 2xl:text-2xl uppercase tracking-wider mb-4 xl:mb-6 flex items-center gap-2 md:gap-3">
-                    <CheckCircle2 className="w-6 h-6 md:w-7 md:h-7" /> O que acompanha
+                    <CheckCircle2 className="w-6 h-6 md:w-7 md:h-7" /> O que
+                    acompanha
                   </h4>
                   <ul className="flex flex-col gap-2 md:gap-3 xl:gap-4">
                     {product.includedItems.map((item, i) => (
@@ -118,7 +128,9 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
                         key={i}
                         className="flex gap-3 text-sm md:text-base xl:text-lg 2xl:text-xl font-medium text-slate-700 items-start"
                       >
-                        <span className="text-orange-500 font-black mt-1">•</span>
+                        <span className="text-orange-500 font-black mt-1">
+                          •
+                        </span>
                         <span>{item}</span>
                       </li>
                     ))}
@@ -135,7 +147,9 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
                         key={i}
                         className="flex gap-3 text-sm md:text-base xl:text-lg 2xl:text-xl font-medium text-slate-500 items-start"
                       >
-                        <span className="text-slate-300 font-black mt-1">•</span>
+                        <span className="text-slate-300 font-black mt-1">
+                          •
+                        </span>
                         <span>{item}</span>
                       </li>
                     ))}
@@ -150,7 +164,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
                   transition={{
                     repeat: Infinity,
                     duration: 1.5,
-                    ease: 'easeInOut',
+                    ease: "easeInOut",
                   }}
                   className="bg-slate-800 text-white rounded-full px-6 py-2.5 shadow-lg flex items-center gap-2 mb-2 pointer-events-auto"
                 >

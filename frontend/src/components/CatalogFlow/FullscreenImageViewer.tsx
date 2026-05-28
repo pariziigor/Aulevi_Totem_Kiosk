@@ -1,7 +1,7 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
-import { type Product } from '../../data/products';
+import React from "react";
+import { motion, type PanInfo } from "framer-motion";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { type Product } from "../../data/products";
 
 interface FullscreenImageViewerProps {
   product: Product;
@@ -9,7 +9,10 @@ interface FullscreenImageViewerProps {
   onNextImage: () => void;
   onPrevImage: () => void;
   onClose: () => void;
-  onDragEnd: (event: MouseEvent | TouchEvent | PointerEvent, info: any) => void;
+  onDragEnd: (
+    event: MouseEvent | TouchEvent | PointerEvent,
+    info: PanInfo,
+  ) => void;
 }
 
 export const FullscreenImageViewer: React.FC<FullscreenImageViewerProps> = ({
@@ -18,7 +21,7 @@ export const FullscreenImageViewer: React.FC<FullscreenImageViewerProps> = ({
   onNextImage,
   onPrevImage,
   onClose,
-  onDragEnd
+  onDragEnd,
 }) => {
   return (
     <motion.div
