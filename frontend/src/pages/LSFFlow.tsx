@@ -4,7 +4,7 @@ import { ChevronLeft } from 'lucide-react';
 import { useLSFFlow } from '../hooks/useLSFFlow';
 import { useCitySearch } from '../hooks/useCitySearch';
 import { LeadCaptureModal } from '../components/LeadCaptureModal';
-import { CitySearchModal } from '../components/LSFFlow/CitySearchModal';
+import { CitySearchModal } from '../components/LSFFlow/CitySearchModal.tsx';
 import { StepRenderer } from '../components/LSFFlow/StepRenderer';
 import { LSF_FLOW_STEPS } from '../constants/lsfFlowConstants';
 
