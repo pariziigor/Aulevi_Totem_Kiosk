@@ -1,79 +1,39 @@
-import React, { useState, useRef } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { motion, AnimatePresence, type PanInfo } from "framer-motion";
-import {
-  ChevronLeft,
-  ChevronRight,
-  CheckCircle2,
-  XCircle,
-  ChevronDown,
-  X,
-} from "lucide-react";
-import { LeadCaptureModal } from "../components/LeadCaptureModal";
-import { CHALES_DATA, BARRACAO_DATA, type Product } from "../data/products";
-import { KioskService } from "../services/api";
+import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronLeft } from 'lucide-react';
+import { useCatalogFlow } from '../hooks/useCatalogFlow';
+import { useImageCarousel } from '../hooks/useImageCarousel';
+import { LeadCaptureModal } from '../components/LeadCaptureModal';
+import { ProductCarousel } from '../components/CatalogFlow/ProductCarousel';
+import { ProductDetails } from '../components/CatalogFlow/ProductDetails';
+import { FullscreenImageViewer } from '../components/CatalogFlow/FullscreenImageViewer';
+import { KioskService } from '../services/api';
 
 const CatalogFlow: React.FC = () => {
-  const navigate = useNavigate();
-  const { category } = useParams<{ category: string }>();
-  const catalogType = category || "CHALE";
+  const {
+    step,
+    catalogType,
+    products,
+    selectedProduct,
+    showLeadModal,
+    setShowLeadModal,
+    isProcessing,
+    setIsProcessing,
+    handleSelectProduct,
+    handleBackToGallery,
+    handleCancel
+  } = useCatalogFlow();
 
-  const products = catalogType === "BARRACAO" ? BARRACAO_DATA : CHALES_DATA;
-
-  const [step, setStep] = useState<number>(0);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
-  const [showLeadModal, setShowLeadModal] = useState<boolean>(false);
-  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
-  const [isProcessing, setIsProcessing] = useState<boolean>(false);
-
-  const carouselRef = useRef<HTMLDivElement>(null);
-
-  const handleSelectProduct = (product: Product) => {
-    setSelectedProduct(product);
-    setCurrentImageIndex(0);
-    setStep(1);
-    // Rola a tela para o topo ao abrir os detalhes no mobile
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const handleScroll = (direction: "left" | "right") => {
-    if (carouselRef.current) {
-      const scrollAmount = carouselRef.current.clientWidth * 0.5;
-      carouselRef.current.scrollBy({
-        left: direction === "left" ? -scrollAmount : scrollAmount,
-        behavior: "smooth",
-      });
-    }
-  };
-
-  const nextImage = () => {
-    if (selectedProduct) {
-      setCurrentImageIndex(
-        (prev) => (prev + 1) % selectedProduct.images.length,
-      );
-    }
-  };
-
-  const prevImage = () => {
-    if (selectedProduct) {
-      setCurrentImageIndex((prev) =>
-        prev === 0 ? selectedProduct.images.length - 1 : prev - 1,
-      );
-    }
-  };
-
-  const handleDragEnd = (
-    _event: MouseEvent | TouchEvent | PointerEvent,
-    { offset }: PanInfo,
-  ) => {
-    const swipeThreshold = 50;
-    if (offset.x < -swipeThreshold) {
-      nextImage();
-    } else if (offset.x > swipeThreshold) {
-      prevImage();
-    }
-  };
+  const {
+    currentImageIndex,
+    isFullscreen,
+    setIsFullscreen,
+    carouselRef,
+    nextImage,
+    prevImage,
+    handleDragEnd,
+    handleScroll
+  } = useImageCarousel(selectedProduct);
 
   const submitInterest = async (name: string, phone: string) => {
     setShowLeadModal(false);
@@ -94,258 +54,26 @@ const CatalogFlow: React.FC = () => {
       alert(
         `ATENDIMENTO REGISTRADO!\n\nObrigado, ${name}.\nO catálogo em PDF do ${selectedProduct?.title} foi baixado com sucesso!`,
       );
-      navigate("/");
+      handleCancel();
     } catch (error) {
-      console.error("Falha na comunicação com a API:", error);
-      alert("ERRO: Falha ao registrar interesse. Tente novamente.");
+      console.error('Falha na comunicação com a API:', error);
+      alert('ERRO: Falha ao registrar interesse. Tente novamente.');
     } finally {
       setIsProcessing(false);
     }
   };
 
-  const renderStep = () => {
-    const stepVariants = {
-      initial: { opacity: 0, x: 50 },
-      animate: {
-        opacity: 1,
-        x: 0,
-        transition: { duration: 0.4, ease: "easeOut" as const },
-      },
-      exit: { opacity: 0, x: -50, transition: { duration: 0.2 } },
-    };
-
-    if (step === 0) {
-      return (
-        <motion.div
-          key="catalog"
-          variants={stepVariants}
-          initial="initial"
-          animate="animate"
-          exit="exit"
-          className="flex flex-col w-full h-full min-h-0"
-        >
-          <div className="flex-grow relative flex items-center justify-center min-h-0 w-full max-w-[1800px] mx-auto py-4">
-            <button
-              onClick={() => handleScroll("left")}
-              className="absolute left-2 xl:left-8 z-10 bg-white/80 backdrop-blur-md border border-slate-200 text-slate-600 rounded-full p-3 xl:p-4 hover:bg-white hover:shadow-md transition-all hidden md:flex shadow-sm"
-            >
-              <ChevronLeft className="w-8 h-8 xl:w-12 xl:h-12" strokeWidth={1.5} />
-            </button>
-
-            <div
-              ref={carouselRef}
-              // Snap ajustado para o mobile rolar com os dedos
-              className="flex overflow-x-auto snap-x snap-mandatory h-full w-full gap-4 md:gap-6 xl:gap-8 pb-4 md:pb-8 px-4 md:px-32 items-center hide-scrollbar"
-              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-            >
-              {products.map((prod) => (
-                <motion.div
-                  key={prod.id}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => handleSelectProduct(prod)}
-                  // Altura dinâmica: 60vh no mobile para caber os textos
-                  className="snap-center shrink-0 w-[85%] sm:w-[60%] md:w-[45%] lg:w-[30%] xl:w-[25%] 2xl:w-[22%] max-w-[450px] h-[60vh] md:h-[75%] xl:h-[80%] rounded-[1.5rem] md:rounded-[2rem] xl:rounded-[2.5rem] shadow-md border border-slate-200 flex flex-col justify-end p-4 xl:p-6 cursor-pointer hover:shadow-xl hover:border-orange-300 transition-all bg-white relative overflow-hidden group"
-                >
-                  <img
-                    src={prod.images[0]}
-                    alt={prod.title}
-                    className="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-700 ease-out"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent"></div>
-
-                  <div className="relative z-10 bg-white/95 backdrop-blur-sm border border-white/20 rounded-2xl p-3 md:p-4 xl:p-5 text-center shadow-lg transform group-hover:-translate-y-2 transition-transform duration-300">
-                    <h2 className="text-lg md:text-xl xl:text-2xl 2xl:text-3xl font-bold tracking-tight text-slate-800 uppercase leading-none">
-                      {prod.title}
-                    </h2>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-
-            <button
-              onClick={() => handleScroll("right")}
-              className="absolute right-2 xl:right-8 z-10 bg-white/80 backdrop-blur-md border border-slate-200 text-slate-600 rounded-full p-3 xl:p-4 hover:bg-white hover:shadow-md transition-all hidden md:flex shadow-sm"
-            >
-              <ChevronRight className="w-8 h-8 xl:w-12 xl:h-12" strokeWidth={1.5} />
-            </button>
-          </div>
-
-          <div className="text-center mt-2 mb-4 flex-none">
-            <span className="text-xs md:text-base xl:text-xl font-bold uppercase tracking-widest text-slate-400 animate-pulse px-4 block">
-              Arraste para os lados e toque no modelo desejado
-            </span>
-          </div>
-        </motion.div>
-      );
-    }
-
-    if (step === 1 && selectedProduct) {
-      return (
-        <motion.div
-          key="details"
-          variants={stepVariants}
-          initial="initial"
-          animate="animate"
-          exit="exit"
-          // h-auto no mobile, mas volta a ser h-full no Totem (lg)
-          className="flex flex-col w-full h-auto lg:h-full lg:min-h-0 gap-4 md:gap-6 xl:gap-8"
-        >
-          <h2 className="text-3xl md:text-4xl lg:text-6xl 2xl:text-7xl font-bold uppercase tracking-tight text-slate-900 text-center flex-none">
-            {selectedProduct.title}
-          </h2>
-
-          {/* flex-col no mobile (empilha) e flex-row no desktop */}
-          <div className="flex-grow flex flex-col lg:flex-row gap-6 xl:gap-12 2xl:gap-16 lg:min-h-0 w-full">
-            {/* Bloco da Imagem */}
-            <div className="relative flex items-center justify-center bg-slate-900 rounded-[1.5rem] md:rounded-[2rem] xl:rounded-[3rem] overflow-hidden shadow-inner border border-slate-200 w-full h-[40vh] md:h-[50vh] lg:h-auto lg:flex-[1.3]">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  prevImage();
-                }}
-                className="absolute left-2 md:left-6 bg-white/80 backdrop-blur border border-slate-200 rounded-full p-2 md:p-4 hover:bg-white transition-all z-10 shadow-md text-slate-600 pointer-events-auto"
-              >
-                <ChevronLeft className="w-6 h-6 md:w-8 md:h-8 xl:w-12 xl:h-12" />
-              </button>
-
-              <motion.img
-                key={currentImageIndex}
-                src={selectedProduct.images[currentImageIndex]}
-                alt={`${selectedProduct.title} - Imagem ${currentImageIndex + 1}`}
-                className="w-full h-full object-cover cursor-pointer touch-none"
-                drag="x"
-                dragConstraints={{ left: 0, right: 0 }}
-                dragElastic={0.2}
-                onDragEnd={handleDragEnd}
-                onClick={() => setIsFullscreen(true)}
-                whileTap={{ cursor: "grabbing" }}
-                initial={{ opacity: 0.5, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3 }}
-              />
-
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  nextImage();
-                }}
-                className="absolute right-2 md:right-6 bg-white/80 backdrop-blur border border-slate-200 rounded-full p-2 md:p-4 hover:bg-white transition-all z-10 shadow-md text-slate-600 pointer-events-auto"
-              >
-                <ChevronRight className="w-6 h-6 md:w-8 md:h-8 xl:w-12 xl:h-12" />
-              </button>
-
-              <div className="absolute bottom-4 md:bottom-8 bg-slate-900/80 backdrop-blur-md text-white rounded-full px-4 py-2 md:px-8 md:py-3 font-bold tracking-widest text-sm md:text-lg shadow-md pointer-events-none">
-                {currentImageIndex + 1} / {selectedProduct.images.length}
-              </div>
-            </div>
-
-            {/* Bloco de Detalhes e Características */}
-            <div className="flex-1 flex flex-col gap-4 lg:gap-8 w-full h-auto lg:min-h-0">
-              <div className="bg-white border border-slate-200 rounded-[1.5rem] md:rounded-[2rem] xl:rounded-[3rem] p-4 md:p-6 xl:p-10 shadow-sm flex flex-col h-auto lg:h-full lg:min-h-0 relative overflow-hidden">
-                <div className="flex flex-col gap-4 xl:gap-6 flex-1 h-auto lg:min-h-0 border-b border-slate-100 pb-4 xl:pb-6">
-                  {/* Dimensões */}
-                  <div className="flex flex-col md:flex-row justify-between items-center bg-slate-50 rounded-2xl p-4 md:p-5 xl:p-8 border border-slate-100 gap-4 md:gap-0 flex-none text-center md:text-left">
-                    <div className="flex flex-col w-full md:w-auto">
-                      <span className="text-slate-400 text-xs md:text-sm xl:text-lg font-bold uppercase">
-                        Área Total
-                      </span>
-                      <span className="text-xl md:text-2xl xl:text-4xl font-black text-slate-800 mt-1">
-                        {selectedProduct.area}
-                      </span>
-                    </div>
-                    <div className="hidden md:block h-12 xl:h-16 w-px bg-slate-200"></div>
-                    <div className="w-full h-px bg-slate-200 md:hidden"></div>
-                    <div className="flex flex-col w-full md:w-auto md:text-right text-center">
-                      <span className="text-slate-400 text-xs md:text-sm xl:text-lg font-bold uppercase">
-                        Dimensões
-                      </span>
-                      <span className="text-xl md:text-2xl xl:text-4xl font-black text-slate-800 mt-1">
-                        {selectedProduct.dimensions}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="lg:overflow-y-auto lg:custom-scrollbar lg:pr-4 h-auto lg:flex-1 lg:min-h-0">
-                    <p className="text-slate-600 font-medium text-base md:text-lg xl:text-xl 2xl:text-2xl leading-relaxed text-justify md:text-left">
-                      {selectedProduct.description}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Listas Acompanha/Não Acompanha */}
-                <div className="relative h-auto lg:flex-[1.2] lg:min-h-0 lg:overflow-hidden pt-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 xl:gap-8 h-auto lg:h-full lg:overflow-y-auto lg:pr-4 lg:pb-20 lg:custom-scrollbar">
-                    <div className="bg-blue-50/50 border border-blue-100 rounded-3xl p-5 md:p-6 xl:p-8 flex flex-col h-fit">
-                      <h4 className="text-orange-800 font-bold text-base md:text-lg xl:text-xl 2xl:text-2xl uppercase tracking-wider mb-4 xl:mb-6 flex items-center gap-2 md:gap-3">
-                        <CheckCircle2 className="w-6 h-6 md:w-7 md:h-7" /> O que acompanha
-                      </h4>
-                      <ul className="flex flex-col gap-2 md:gap-3 xl:gap-4">
-                        {selectedProduct.includedItems.map((item, i) => (
-                          <li
-                            key={i}
-                            className="flex gap-3 text-sm md:text-base xl:text-lg 2xl:text-xl font-medium text-slate-700 items-start"
-                          >
-                            <span className="text-orange-500 font-black mt-1">•</span>
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    <div className="bg-slate-50 border border-slate-200 rounded-3xl p-5 md:p-6 xl:p-8 flex flex-col h-fit">
-                      <h4 className="text-slate-500 font-bold text-base md:text-lg xl:text-xl 2xl:text-2xl uppercase tracking-wider mb-4 xl:mb-6 flex items-center gap-2 md:gap-3">
-                        <XCircle className="w-6 h-6 md:w-7 md:h-7" /> Não acompanha
-                      </h4>
-                      <ul className="flex flex-col gap-2 md:gap-3 xl:gap-4">
-                        {selectedProduct.excludedItems.map((item, i) => (
-                          <li
-                            key={i}
-                            className="flex gap-3 text-sm md:text-base xl:text-lg 2xl:text-xl font-medium text-slate-500 items-start"
-                          >
-                            <span className="text-slate-300 font-black mt-1">•</span>
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-
-                  {/* Efeito de Gradiente (Só aparece no Desktop/Totem) */}
-                  <div className="hidden lg:flex absolute bottom-0 left-0 right-4 h-24 bg-gradient-to-t from-white via-white/90 to-transparent pointer-events-none items-end justify-center pb-2">
-                    <motion.div
-                      animate={{ y: [0, 8, 0] }}
-                      transition={{
-                        repeat: Infinity,
-                        duration: 1.5,
-                        ease: "easeInOut",
-                      }}
-                      className="bg-slate-800 text-white rounded-full px-6 py-2.5 shadow-lg flex items-center gap-2 mb-2 pointer-events-auto"
-                    >
-                      <span className="text-sm xl:text-base font-bold uppercase tracking-widest">
-                        Role para ver mais
-                      </span>
-                      <ChevronDown size={20} strokeWidth={2.5} />
-                    </motion.div>
-                  </div>
-                </div>
-              </div>
-
-              <motion.button
-                whileTap={{ scale: 0.98 }}
-                onClick={() => setShowLeadModal(true)}
-                className="flex-none bg-orange-600 text-white rounded-full lg:rounded-[2rem] py-5 md:py-6 xl:py-8 text-2xl md:text-3xl xl:text-4xl font-bold uppercase shadow-lg shadow-orange-200 hover:bg-orange-700 transition-all w-full mt-2 lg:mt-0"
-              >
-                Tenho Interesse
-              </motion.button>
-            </div>
-          </div>
-        </motion.div>
-      );
-    }
+  const stepVariants = {
+    initial: { opacity: 0, x: 50 },
+    animate: {
+      opacity: 1,
+      x: 0,
+      transition: { duration: 0.4, ease: 'easeOut' as const },
+    },
+    exit: { opacity: 0, x: -50, transition: { duration: 0.2 } },
   };
 
   return (
-    // min-h-screen para rolar no mobile, lg:h-screen lg:overflow-hidden para travar no Totem
     <div className="min-h-screen lg:h-screen w-full bg-slate-50 text-slate-800 flex flex-col p-4 md:p-6 xl:p-12 select-none overflow-x-hidden lg:overflow-hidden font-sans">
       <style>{`
         .custom-scrollbar::-webkit-scrollbar { width: 8px; }
@@ -354,7 +82,7 @@ const CatalogFlow: React.FC = () => {
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
       `}</style>
 
-      {/* Header Flex-col no mobile, linha no desktop */}
+      {/* Header */}
       <header className="border-b border-slate-200 pb-4 mb-4 md:mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0 flex-none w-full">
         <div className="flex flex-col gap-1 md:gap-2">
           <h1 className="text-2xl md:text-3xl xl:text-4xl font-black tracking-tight text-slate-900 uppercase">
@@ -364,7 +92,7 @@ const CatalogFlow: React.FC = () => {
         </div>
         {step === 0 && (
           <button
-            onClick={() => navigate("/")}
+            onClick={handleCancel}
             className="w-full md:w-auto text-sm md:text-base xl:text-lg font-bold text-slate-500 bg-white border border-slate-200 rounded-full px-5 py-2.5 md:px-6 md:py-3 hover:bg-slate-100 hover:text-slate-800 transition-colors shadow-sm"
           >
             Cancelar Operação
@@ -372,18 +100,52 @@ const CatalogFlow: React.FC = () => {
         )}
       </header>
 
+      {/* Main Content */}
       <div className="flex-grow relative w-full h-auto lg:h-full lg:min-h-0">
-        <AnimatePresence mode="wait">{renderStep()}</AnimatePresence>
+        <AnimatePresence mode="wait">
+          {step === 0 ? (
+            <motion.div
+              key="catalog"
+              variants={stepVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+            >
+              <ProductCarousel
+                products={products}
+                onSelectProduct={handleSelectProduct}
+                onScroll={handleScroll}
+                carouselRef={carouselRef}
+              />
+            </motion.div>
+          ) : step === 1 && selectedProduct ? (
+            <motion.div
+              key="details"
+              variants={stepVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+            >
+              <ProductDetails
+                product={selectedProduct}
+                currentImageIndex={currentImageIndex}
+                onNextImage={nextImage}
+                onPrevImage={prevImage}
+                onOpenFullscreen={() => setIsFullscreen(true)}
+                onDragEnd={handleDragEnd}
+                onInterestClick={() => setShowLeadModal(true)}
+              />
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
       </div>
 
+      {/* Footer */}
       {step === 1 && (
         <footer className="mt-8 flex flex-col-reverse md:flex-row justify-between items-center gap-4 md:gap-0 flex-none w-full relative mb-4 lg:mb-0">
           <motion.button
             whileTap={{ scale: 0.95 }}
-            onClick={() => {
-              setStep(0);
-              window.scrollTo({ top: 0, behavior: "smooth" });
-            }}
+            onClick={handleBackToGallery}
             className="w-full md:w-auto bg-white text-slate-600 border border-slate-200 rounded-full px-6 py-3 md:px-8 md:py-4 xl:px-12 xl:py-5 text-lg md:text-xl xl:text-2xl font-bold shadow-sm hover:bg-slate-100 transition-colors flex justify-center items-center gap-2 md:gap-3"
           >
             <ChevronLeft className="w-6 h-6 md:w-8 md:h-8" /> Voltar ao Catálogo
@@ -391,7 +153,7 @@ const CatalogFlow: React.FC = () => {
 
           <motion.button
             whileTap={{ scale: 0.95 }}
-            onClick={() => navigate("/")}
+            onClick={handleCancel}
             className="w-full md:w-auto bg-white text-slate-500 border border-slate-200 rounded-full px-6 py-3 md:px-8 md:py-4 xl:px-12 xl:py-5 text-lg md:text-xl xl:text-2xl font-bold shadow-sm hover:bg-slate-100 hover:text-slate-800 transition-colors flex justify-center items-center gap-2 md:gap-3"
           >
             Cancelar Operação
@@ -399,6 +161,7 @@ const CatalogFlow: React.FC = () => {
         </footer>
       )}
 
+      {/* Modals */}
       {showLeadModal && (
         <LeadCaptureModal
           onConfirm={submitInterest}
@@ -406,66 +169,20 @@ const CatalogFlow: React.FC = () => {
         />
       )}
 
-      {/* Fullscreen Viewer com botões menores no mobile */}
       <AnimatePresence>
         {isFullscreen && selectedProduct && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-2 md:p-4 xl:p-12"
-          >
-            <button
-              onClick={() => setIsFullscreen(false)}
-              className="absolute top-4 right-4 md:top-8 md:right-8 xl:top-12 xl:right-12 bg-white/10 text-white rounded-full p-2 md:p-4 hover:bg-white/20 transition-all z-50 shadow-lg"
-            >
-              <X className="w-8 h-8 md:w-10 md:h-10" />
-            </button>
-
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                prevImage();
-              }}
-              className="absolute left-2 md:left-8 xl:left-12 bg-white/10 text-white rounded-full p-3 md:p-6 hover:bg-white/20 transition-all z-50 shadow-lg"
-            >
-              <ChevronLeft className="w-8 h-8 md:w-12 md:h-12" />
-            </button>
-
-            <div className="w-full h-full max-w-7xl flex items-center justify-center overflow-hidden">
-              <motion.img
-                key={`fullscreen-${currentImageIndex}`}
-                src={selectedProduct.images[currentImageIndex]}
-                alt={`${selectedProduct.title} - Zoom`}
-                className="max-w-full max-h-full object-contain cursor-grab active:cursor-grabbing touch-none"
-                drag="x"
-                dragConstraints={{ left: 0, right: 0 }}
-                dragElastic={0.2}
-                onDragEnd={handleDragEnd}
-                initial={{ opacity: 0.5, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3 }}
-              />
-            </div>
-
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                nextImage();
-              }}
-              className="absolute right-2 md:right-8 xl:right-12 bg-white/10 text-white rounded-full p-3 md:p-6 hover:bg-white/20 transition-all z-50 shadow-lg"
-            >
-              <ChevronRight className="w-8 h-8 md:w-12 md:h-12" />
-            </button>
-
-            <div className="absolute bottom-4 md:bottom-8 xl:bottom-12 bg-slate-800/80 text-white rounded-full px-6 py-2 md:px-8 md:py-3 font-bold tracking-widest text-sm md:text-lg shadow-md pointer-events-none">
-              {currentImageIndex + 1} / {selectedProduct.images.length}
-            </div>
-          </motion.div>
+          <FullscreenImageViewer
+            product={selectedProduct}
+            currentImageIndex={currentImageIndex}
+            onNextImage={nextImage}
+            onPrevImage={prevImage}
+            onClose={() => setIsFullscreen(false)}
+            onDragEnd={handleDragEnd}
+          />
         )}
       </AnimatePresence>
 
-      {/* Overlay de Carregamento */}
+      {/* Loading Overlay */}
       {isProcessing && (
         <motion.div
           initial={{ opacity: 0 }}
