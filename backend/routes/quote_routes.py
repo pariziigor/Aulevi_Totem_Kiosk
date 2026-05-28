@@ -181,7 +181,8 @@ async def create_quote(payload: QuoteRequestSchema, background_tasks: Background
             headers={
                 "Content-Disposition": f"attachment; filename={filename}",
                 "Access-Control-Expose-Headers": "Content-Disposition"
-            }
+            },
+            background=background_tasks 
         )
         
     except Exception as e:
