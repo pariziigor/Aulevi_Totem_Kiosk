@@ -79,7 +79,7 @@ const CatalogFlow: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen w-full bg-slate-50 text-slate-800 flex flex-col p-4 md:p-6 lg:p-8 select-none overflow-x-hidden font-sans">
+    <div className="min-h-[100dvh] w-full bg-slate-50 text-slate-800 flex flex-col p-4 md:p-6 lg:p-8 select-none overflow-x-hidden font-sans">
       <style>{`
         .custom-scrollbar::-webkit-scrollbar { width: 8px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
@@ -106,7 +106,7 @@ const CatalogFlow: React.FC = () => {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 relative w-full max-w-[1800px] mx-auto">
+      <main className="flex-1 relative w-full max-w-[1800px] mx-auto flex flex-col min-h-0">
         <AnimatePresence mode="wait">
           {step === 0 ? (
             <motion.div

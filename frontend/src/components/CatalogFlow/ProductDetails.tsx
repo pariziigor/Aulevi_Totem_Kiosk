@@ -31,14 +31,14 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
   onInterestClick,
 }) => {
   return (
-    <div className="flex flex-col w-full h-auto gap-4 md:gap-5 lg:gap-5">
+    <div className="flex flex-col w-full flex-1 min-h-[calc(100dvh-240px)] gap-4 md:gap-5 lg:gap-5">
       <h2 className="text-3xl md:text-4xl lg:text-[clamp(2.5rem,4vw,4.4rem)] font-bold uppercase tracking-tight text-slate-900 text-center flex-none">
         {product.title}
       </h2>
 
-      <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 2xl:gap-10 w-full lg:h-[clamp(560px,64vh,700px)]">
+      <div className="flex flex-col md:flex-row gap-5 md:gap-6 lg:gap-8 2xl:gap-10 w-full flex-1 min-h-[560px] md:min-h-[620px] lg:min-h-0">
         {/* Image Section */}
-        <div className="relative flex items-center justify-center bg-slate-900 rounded-[1.5rem] md:rounded-[2rem] lg:rounded-[2rem] overflow-hidden shadow-inner border border-slate-200 w-full h-[40vh] md:h-[50vh] lg:h-full lg:flex-[1.3]">
+        <div className="relative flex items-center justify-center bg-slate-900 rounded-[1.5rem] md:rounded-[2rem] lg:rounded-[2rem] overflow-hidden shadow-inner border border-slate-200 w-full h-[40vh] md:h-auto md:flex-[1.15] lg:flex-[1.35] min-h-[380px] md:min-h-0">
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -81,8 +81,8 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
         </div>
 
         {/* Details Section */}
-        <div className="flex-1 flex flex-col gap-4 lg:gap-5 w-full h-auto lg:h-full">
-          <div className="bg-white border border-slate-200 rounded-[1.5rem] md:rounded-[2rem] lg:rounded-[2rem] p-4 md:p-6 lg:p-6 shadow-sm flex flex-col h-auto lg:flex-1 lg:min-h-0 relative overflow-hidden">
+        <div className="flex-1 flex flex-col gap-4 lg:gap-5 w-full h-auto md:h-full md:min-h-0">
+          <div className="bg-white border border-slate-200 rounded-[1.5rem] md:rounded-[2rem] lg:rounded-[2rem] p-4 md:p-5 lg:p-6 shadow-sm flex flex-col h-auto md:flex-1 md:min-h-0 relative overflow-hidden">
             <div className="flex flex-col gap-4 lg:gap-4 flex-1 min-h-0 border-b border-slate-100 pb-4">
               {/* Dimensions */}
               <div className="flex flex-col md:flex-row justify-between items-center bg-slate-50 rounded-2xl p-4 md:p-5 lg:p-5 border border-slate-100 gap-4 md:gap-0 flex-none text-center md:text-left">
@@ -106,7 +106,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
                 </div>
               </div>
 
-              <div className="lg:overflow-y-auto lg:custom-scrollbar lg:pr-3 h-auto lg:flex-1 lg:min-h-0">
+              <div className="md:overflow-y-auto md:custom-scrollbar md:pr-3 h-auto md:flex-1 md:min-h-0">
                 <p className="text-slate-600 font-medium text-base md:text-lg lg:text-base 2xl:text-lg leading-relaxed text-justify md:text-left">
                   {product.description}
                 </p>
@@ -114,8 +114,8 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
             </div>
 
             {/* Included/Excluded Items */}
-            <div className="relative h-auto lg:flex-[1.2] lg:min-h-0 lg:overflow-hidden pt-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-5 h-auto lg:h-full lg:overflow-y-auto lg:pr-3 lg:pb-4 lg:custom-scrollbar">
+            <div className="relative h-auto md:flex-[1.2] md:min-h-0 md:overflow-hidden pt-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-5 h-auto md:h-full md:overflow-y-auto md:pr-3 md:pb-4 md:custom-scrollbar">
                 <div className="bg-blue-50/50 border border-blue-100 rounded-3xl p-5 md:p-6 lg:p-5 flex flex-col h-fit">
                   <h4 className="text-orange-800 font-bold text-base md:text-lg lg:text-base 2xl:text-lg uppercase tracking-wider mb-4 flex items-center gap-2 md:gap-3">
                     <CheckCircle2 className="w-6 h-6 md:w-7 md:h-7" /> O que
