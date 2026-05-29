@@ -1,45 +1,62 @@
 from contextlib import asynccontextmanager
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
 from routes import quote_routes
 from database.connection import engine, Base
 from services.pdf_service import PDFService
 
-# Inicialização automática das tabelas (Supabase)
+# Inicializacao automatica das tabelas (Supabase)
 Base.metadata.create_all(bind=engine)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Acontece quando o servidor LIGA: Inicia o Chromium
+    # Acontece quando o servidor liga: inicia o Chromium.
     await PDFService.start_browser()
     yield
-    # Acontece quando o servidor DESLIGA: Limpa a memória
+    # Acontece quando o servidor desliga: limpa a memoria.
     await PDFService.stop_browser()
+
 
 app = FastAPI(
     title="Aulevi Kiosk API",
-    description="Motor de cálculo e automação comercial para geração de propostas",
+    description="Motor de calculo e automacao comercial para geracao de propostas",
     version="1.0.0",
-    lifespan=lifespan # Adicionamos o gerenciador de ciclo de vida aqui
+    lifespan=lifespan,
 )
 
-origins = [
-    "http://localhost:5173",       # O seu ambiente de desenvolvimento
-    "https://alv.aulevi.com.br"    # O seu frontend em produção
+default_origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "https://alv.aulevi.com.br",
+    "https://www.alv.aulevi.com.br",
 ]
+
+extra_origins = [
+    origin.strip()
+    for origin in os.getenv("CORS_ALLOWED_ORIGINS", "").split(",")
+    if origin.strip()
+]
+
+origins = [*default_origins, *extra_origins]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,        # Passando a lista exata aqui
+    allow_origins=origins,
+    allow_origin_regex=r"https://.*\.(aulevi\.com\.br|vercel\.app)$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    expose_headers=["Content-Disposition"] 
+    expose_headers=["Content-Disposition"],
 )
 
 app.include_router(quote_routes.router)
 
+
 @app.get("/health", tags=["Monitoramento"])
 def health_check():
-    """Endpoint para validação de uptime."""
+    """Endpoint para validacao de uptime."""
     return {"status": "operacional", "offline_ready": True}
