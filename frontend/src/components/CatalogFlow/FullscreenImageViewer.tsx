@@ -28,7 +28,7 @@ export const FullscreenImageViewer: React.FC<FullscreenImageViewerProps> = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-2 md:p-4 xl:p-12"
+      className="fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-2 md:p-4 lg:p-8"
     >
       <button
         onClick={onClose}

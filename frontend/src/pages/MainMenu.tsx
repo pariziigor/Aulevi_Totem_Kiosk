@@ -64,14 +64,14 @@ const MainMenu: React.FC = () => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       // min-h-screen permite rolar a tela no mobile. Removido overflow-hidden rígido.
-      className="min-h-screen w-full bg-slate-50 text-slate-800 flex flex-col p-4 md:p-6 xl:p-12 select-none"
+      className="min-h-screen w-full bg-slate-50 text-slate-800 flex flex-col p-4 md:p-6 lg:p-8 select-none"
     >
       {/* Cabeçalho */}
-      <header className="flex flex-col items-center justify-center mb-6 md:mb-8 xl:mb-12 flex-none pt-4 md:pt-0">
-        <h1 className="text-3xl md:text-4xl xl:text-6xl font-black tracking-tight text-slate-900 mb-1 md:mb-2 xl:mb-4 uppercase text-center">
+      <header className="flex flex-col items-center justify-center mb-6 md:mb-8 lg:mb-8 flex-none pt-4 md:pt-0">
+        <h1 className="text-3xl md:text-4xl lg:text-[clamp(2.5rem,4vw,4.5rem)] font-black tracking-tight text-slate-900 mb-1 md:mb-2 lg:mb-3 uppercase text-center">
           Aulevi
         </h1>
-        <p className="text-lg md:text-xl xl:text-3xl text-slate-500 font-medium mb-3 md:mb-4 xl:mb-6 text-center px-4">
+        <p className="text-lg md:text-xl lg:text-[clamp(1.25rem,2vw,2rem)] text-slate-500 font-medium mb-3 md:mb-4 lg:mb-4 text-center px-4">
           Engenharia Civil e Estruturas Metálicas
         </p>
         <div className="h-1 md:h-1.5 w-40 md:w-64 bg-gradient-to-r from-orange-600 via-orange-400 to-yellow-400 rounded-full"></div>
@@ -79,7 +79,7 @@ const MainMenu: React.FC = () => {
 
       {/* Grid de Opções Expandido */}
       {/* grid-cols-1 no mobile, grid-cols-2 apenas em telas médias (md) ou maiores */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 xl:gap-10 flex-grow w-full">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 lg:gap-8 flex-grow w-full max-w-[1600px] mx-auto">
         {options.map((opt) => (
           <motion.button
             key={opt.id}
@@ -89,14 +89,14 @@ const MainMenu: React.FC = () => {
             whileHover="hover"
             whileTap="tap"
             variants={cardVariants}
-            className="rounded-[1.5rem] md:rounded-[2rem] xl:rounded-[3rem] shadow-sm border border-slate-200 flex flex-col items-center justify-center p-6 xl:p-10 transition-shadow hover:shadow-xl w-full h-full relative overflow-hidden"
+            className="rounded-[1.5rem] md:rounded-[2rem] lg:rounded-[2rem] shadow-sm border border-slate-200 flex flex-col items-center justify-center p-6 lg:p-8 transition-shadow hover:shadow-xl w-full min-h-[220px] md:min-h-[260px] lg:min-h-[250px] relative overflow-hidden"
           >
             <motion.div
               variants={contentVariants}
-              className="flex flex-col items-center gap-3 md:gap-4 xl:gap-8 w-full"
+              className="flex flex-col items-center gap-3 md:gap-4 lg:gap-5 w-full"
             >
               {/* Contêiner da Imagem Personalizada (Tamanhos ajustados para não vazar a tela no mobile) */}
-              <div className="w-24 h-24 md:w-32 md:h-32 xl:w-48 xl:h-48 flex items-center justify-center drop-shadow-md">
+              <div className="w-24 h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 flex items-center justify-center drop-shadow-md">
                 <img
                   src={opt.image}
                   alt={`Ícone ${opt.label}`}
@@ -110,10 +110,10 @@ const MainMenu: React.FC = () => {
 
               {/* Textos Escalonáveis */}
               <div className="flex flex-col items-center gap-1 xl:gap-2 px-2 text-center">
-                <h2 className="text-xl md:text-2xl xl:text-5xl font-bold text-slate-800 tracking-tight leading-none mt-2 md:mt-0">
+                <h2 className="text-xl md:text-2xl lg:text-[clamp(1.5rem,2.5vw,2.5rem)] font-bold text-slate-800 tracking-tight leading-none mt-2 md:mt-0">
                   {opt.label}
                 </h2>
-                <p className="text-sm md:text-base xl:text-2xl text-slate-500 font-medium mt-1 md:mt-2">
+                <p className="text-sm md:text-base lg:text-lg text-slate-500 font-medium mt-1 md:mt-2">
                   {opt.subtitle}
                 </p>
               </div>
@@ -124,9 +124,9 @@ const MainMenu: React.FC = () => {
 
       {/* Rodapé Dinâmico */}
       {/* flex-col no mobile, flex-row em telas grandes */}
-      <footer className="mt-8 mb-4 md:mb-0 flex flex-col md:flex-row items-center justify-center flex-none w-full relative gap-6 md:gap-0 h-auto md:h-16 xl:h-24">
+      <footer className="mt-6 mb-4 md:mb-0 flex flex-col md:flex-row items-center justify-center flex-none w-full max-w-[1600px] mx-auto relative gap-6 md:gap-0 h-auto md:h-16 lg:h-20">
         {/* Texto de Instrução Pulsante */}
-        <span className="text-slate-400 font-bold text-sm md:text-lg xl:text-2xl tracking-widest uppercase animate-pulse text-center px-4">
+        <span className="text-slate-400 font-bold text-sm md:text-lg lg:text-xl tracking-widest uppercase animate-pulse text-center px-4">
           Toque em uma opção para continuar
         </span>
 
@@ -135,10 +135,10 @@ const MainMenu: React.FC = () => {
           <motion.button
             whileTap={{ scale: 0.95 }}
             onClick={() => navigate("/standby")}
-            className="w-full md:w-auto bg-slate-800 text-white rounded-full px-6 py-3 xl:px-10 xl:py-5 hover:bg-slate-900 transition-colors shadow-md flex items-center justify-center gap-3 xl:gap-4"
+            className="w-full md:w-auto bg-slate-800 text-white rounded-full px-6 py-3 lg:px-8 lg:py-4 hover:bg-slate-900 transition-colors shadow-md flex items-center justify-center gap-3"
           >
-            <LogOut className="w-5 h-5 md:w-6 md:h-6 xl:w-8 xl:h-8" strokeWidth={2} />
-            <span className="text-base md:text-lg xl:text-2xl font-bold uppercase tracking-wide">
+            <LogOut className="w-5 h-5 md:w-6 md:h-6 lg:w-7 lg:h-7" strokeWidth={2} />
+            <span className="text-base md:text-lg lg:text-xl font-bold uppercase tracking-wide">
               Encerrar
             </span>
           </motion.button>

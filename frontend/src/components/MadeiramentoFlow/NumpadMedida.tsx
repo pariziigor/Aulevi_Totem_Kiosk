@@ -38,7 +38,7 @@ export const NumpadMedida: React.FC<NumpadMedidaProps> = ({
             ${
               key === "APAGAR"
                 ? "text-xs md:text-sm font-bold text-rose-500 bg-rose-50 border-rose-100 hover:bg-rose-100"
-                : "text-xl md:text-2xl xl:text-3xl font-bold text-slate-700 bg-white border-slate-200"
+                : "text-xl md:text-2xl lg:text-2xl font-bold text-slate-700 bg-white border-slate-200"
             }
           `}
         >

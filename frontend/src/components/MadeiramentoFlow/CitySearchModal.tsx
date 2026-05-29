@@ -43,9 +43,9 @@ export const CitySearchModal: React.FC<CitySearchModalProps> = ({
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 50 }}
-      className="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex items-center justify-center p-2 md:p-4 xl:p-8 select-none"
+      className="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex items-center justify-center p-2 md:p-4 lg:p-6 select-none"
     >
-      <div className="bg-slate-50 w-full max-w-5xl rounded-2xl md:rounded-[2rem] shadow-2xl flex flex-col overflow-hidden h-[90vh] lg:h-auto lg:max-h-[1000px]">
+      <div className="bg-slate-50 w-full max-w-4xl rounded-2xl md:rounded-[2rem] shadow-2xl flex flex-col overflow-hidden h-[90vh] lg:h-auto lg:max-h-[900px]">
         <header className="bg-white border-b border-slate-200 px-4 md:px-6 py-3 md:py-4 flex justify-between items-center flex-none">
           <h3 className="text-lg md:text-2xl font-bold text-slate-800 uppercase flex items-center gap-2">
             <Search className="text-orange-500 w-5 h-5 md:w-6 md:h-6" /> Buscar Cidade
@@ -56,18 +56,18 @@ export const CitySearchModal: React.FC<CitySearchModalProps> = ({
         </header>
 
         <div className="p-4 md:p-6 bg-white border-b border-slate-100 flex-none">
-          <div className="w-full bg-slate-50 border-2 border-orange-500 ring-2 md:ring-4 ring-orange-50 rounded-xl md:rounded-2xl h-14 md:h-16 xl:h-20 flex items-center px-4 md:px-6 shadow-inner relative">
+          <div className="w-full bg-slate-50 border-2 border-orange-500 ring-2 md:ring-4 ring-orange-50 rounded-xl md:rounded-2xl h-14 md:h-16 lg:h-16 flex items-center px-4 md:px-6 shadow-inner relative">
             <input
               type="text"
               value={searchValue}
               onChange={(event) => onSearchChange(formatTitleCase(event.target.value))}
               placeholder="Digite o nome da cidade..."
-              className="w-full h-full bg-transparent outline-none text-lg md:text-2xl xl:text-3xl font-bold text-slate-800"
+              className="w-full h-full bg-transparent outline-none text-lg md:text-2xl lg:text-2xl font-bold text-slate-800"
             />
           </div>
         </div>
 
-        <div className="flex-1 lg:flex-none h-auto lg:h-48 xl:h-64 overflow-y-auto bg-slate-100 p-3 md:p-4 flex flex-col gap-2 custom-scrollbar">
+        <div className="flex-1 lg:flex-none h-auto lg:h-48 xl:h-56 overflow-y-auto bg-slate-100 p-3 md:p-4 flex flex-col gap-2 custom-scrollbar">
           {isLoading ? (
             <div className="flex items-center justify-center h-full text-base md:text-xl text-slate-400 font-medium">
               Carregando cidades...
@@ -106,7 +106,7 @@ export const CitySearchModal: React.FC<CitySearchModalProps> = ({
                   whileTap={{ scale: 0.95 }}
                   type="button"
                   onClick={() => handleKey(key)}
-                  className={`flex items-center justify-center border border-slate-200 rounded-xl h-14 xl:h-16 text-lg xl:text-xl font-bold uppercase shadow-sm transition-colors hover:border-orange-300
+                  className={`flex items-center justify-center border border-slate-200 rounded-xl h-14 lg:h-14 text-lg lg:text-lg font-bold uppercase shadow-sm transition-colors hover:border-orange-300
                     ${key === "APAGAR" ? "flex-[1.5] bg-slate-200 text-slate-700 hover:bg-slate-300" : "flex-1 bg-white text-slate-700"}`}
                 >
                   {key}
@@ -120,7 +120,7 @@ export const CitySearchModal: React.FC<CitySearchModalProps> = ({
               whileTap={{ scale: 0.95 }}
               type="button"
               onClick={() => onSearchChange(`${searchValue} `)}
-              className="w-full border border-slate-200 rounded-xl h-14 xl:h-16 text-lg xl:text-xl font-bold uppercase shadow-sm bg-white text-slate-700 hover:border-orange-300 transition-colors"
+              className="w-full border border-slate-200 rounded-xl h-14 lg:h-14 text-lg lg:text-lg font-bold uppercase shadow-sm bg-white text-slate-700 hover:border-orange-300 transition-colors"
             >
               ESPAÇO
             </motion.button>

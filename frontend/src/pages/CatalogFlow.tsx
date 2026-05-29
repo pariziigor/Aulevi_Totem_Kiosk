@@ -79,7 +79,7 @@ const CatalogFlow: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen lg:h-screen w-full bg-slate-50 text-slate-800 flex flex-col p-4 md:p-6 xl:p-12 select-none overflow-x-hidden lg:overflow-hidden font-sans">
+    <div className="min-h-screen w-full bg-slate-50 text-slate-800 flex flex-col p-4 md:p-6 lg:p-8 select-none overflow-x-hidden font-sans">
       <style>{`
         .custom-scrollbar::-webkit-scrollbar { width: 8px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
@@ -88,9 +88,9 @@ const CatalogFlow: React.FC = () => {
       `}</style>
 
       {/* Header */}
-      <header className="border-b border-slate-200 pb-4 mb-4 md:mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0 flex-none w-full">
+      <header className="border-b border-slate-200 pb-4 mb-4 md:mb-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0 flex-none w-full max-w-[1800px] mx-auto">
         <div className="flex flex-col gap-1 md:gap-2">
-          <h1 className="text-2xl md:text-3xl xl:text-4xl font-black tracking-tight text-slate-900 uppercase">
+          <h1 className="text-2xl md:text-3xl lg:text-[clamp(1.75rem,2.1vw,2.35rem)] font-black tracking-tight text-slate-900 uppercase">
             Catálogo: {catalogType}
           </h1>
           <div className="h-1 w-16 md:w-24 bg-orange-500 rounded-full"></div>
@@ -98,7 +98,7 @@ const CatalogFlow: React.FC = () => {
         {step === 0 && (
           <button
             onClick={handleCancel}
-            className="w-full md:w-auto text-sm md:text-base xl:text-lg font-bold text-slate-500 bg-white border border-slate-200 rounded-full px-5 py-2.5 md:px-6 md:py-3 hover:bg-slate-100 hover:text-slate-800 transition-colors shadow-sm"
+            className="w-full md:w-auto text-sm md:text-base lg:text-base font-bold text-slate-500 bg-white border border-slate-200 rounded-full px-5 py-2.5 md:px-6 md:py-3 hover:bg-slate-100 hover:text-slate-800 transition-colors shadow-sm"
           >
             Cancelar Operação
           </button>
@@ -106,7 +106,7 @@ const CatalogFlow: React.FC = () => {
       </header>
 
       {/* Main Content */}
-      <div className="flex-grow relative w-full h-auto lg:h-full lg:min-h-0">
+      <main className="flex-1 relative w-full max-w-[1800px] mx-auto">
         <AnimatePresence mode="wait">
           {step === 0 ? (
             <motion.div
@@ -145,15 +145,15 @@ const CatalogFlow: React.FC = () => {
             </motion.div>
           ) : null}
         </AnimatePresence>
-      </div>
+      </main>
 
       {/* Footer */}
       {step === 1 && (
-        <footer className="mt-8 flex flex-col-reverse md:flex-row justify-between items-center gap-4 md:gap-0 flex-none w-full relative mb-4 lg:mb-0">
+        <footer className="mt-6 flex flex-col-reverse md:flex-row justify-between items-center gap-4 md:gap-0 flex-none w-full max-w-[1800px] mx-auto relative mb-4 lg:mb-0">
           <motion.button
             whileTap={{ scale: 0.95 }}
             onClick={handleBackToGallery}
-            className="w-full md:w-auto bg-white text-slate-600 border border-slate-200 rounded-full px-6 py-3 md:px-8 md:py-4 xl:px-12 xl:py-5 text-lg md:text-xl xl:text-2xl font-bold shadow-sm hover:bg-slate-100 transition-colors flex justify-center items-center gap-2 md:gap-3"
+            className="w-full md:w-auto bg-white text-slate-600 border border-slate-200 rounded-full px-6 py-3 md:px-8 md:py-4 lg:px-9 lg:py-3 text-lg md:text-xl lg:text-lg font-bold shadow-sm hover:bg-slate-100 transition-colors flex justify-center items-center gap-2 md:gap-3"
           >
             <ChevronLeft className="w-6 h-6 md:w-8 md:h-8" /> Voltar ao Catálogo
           </motion.button>
@@ -161,7 +161,7 @@ const CatalogFlow: React.FC = () => {
           <motion.button
             whileTap={{ scale: 0.95 }}
             onClick={handleCancel}
-            className="w-full md:w-auto bg-white text-slate-500 border border-slate-200 rounded-full px-6 py-3 md:px-8 md:py-4 xl:px-12 xl:py-5 text-lg md:text-xl xl:text-2xl font-bold shadow-sm hover:bg-slate-100 hover:text-slate-800 transition-colors flex justify-center items-center gap-2 md:gap-3"
+            className="w-full md:w-auto bg-white text-slate-500 border border-slate-200 rounded-full px-6 py-3 md:px-8 md:py-4 lg:px-9 lg:py-3 text-lg md:text-xl lg:text-lg font-bold shadow-sm hover:bg-slate-100 hover:text-slate-800 transition-colors flex justify-center items-center gap-2 md:gap-3"
           >
             Cancelar Operação
           </motion.button>

@@ -23,7 +23,7 @@ export const TelhadoSVG: React.FC<TelhadoSVGProps> = ({
       viewBox="0 0 520 310"
       role="img"
       aria-label="Diagrama isométrico do telhado com dimensões A e B"
-      className="w-full max-w-[280px] md:max-w-sm xl:max-w-md"
+      className="w-full max-w-[280px] md:max-w-sm lg:max-w-sm"
     >
       <defs>
         <marker id="arrOrange" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">

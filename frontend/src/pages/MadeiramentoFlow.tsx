@@ -104,22 +104,22 @@ const MadeiramentoFlow: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen lg:h-screen w-full bg-slate-50 text-slate-800 flex flex-col p-4 md:p-6 xl:p-12 select-none overflow-x-hidden lg:overflow-hidden font-sans">
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8 flex-none w-full gap-4 md:gap-0">
+    <div className="min-h-screen w-full bg-slate-50 text-slate-800 flex flex-col p-4 md:p-6 lg:p-8 select-none overflow-x-hidden font-sans">
+      <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-5 md:mb-6 flex-none w-full max-w-[1800px] mx-auto gap-4 md:gap-0">
         <div className="flex flex-col gap-1 md:gap-2">
-          <h1 className="text-2xl md:text-3xl xl:text-4xl font-black tracking-tight text-slate-900 uppercase">
+          <h1 className="text-2xl md:text-3xl lg:text-[clamp(1.75rem,2.1vw,2.35rem)] font-black tracking-tight text-slate-900 uppercase">
             Madeiramento
           </h1>
           <div className="h-1 w-16 md:w-24 bg-orange-500 rounded-full" />
         </div>
         <div className="bg-white border border-slate-200 px-4 md:px-6 py-1.5 md:py-2 rounded-full shadow-sm">
-          <span className="text-sm md:text-lg xl:text-xl font-bold text-slate-500">
+          <span className="text-sm md:text-lg lg:text-lg font-bold text-slate-500">
             Etapa <span className="text-orange-600">{step + 1}</span> de {MADEIRAMENTO_TOTAL_STEPS}
           </span>
         </div>
       </header>
 
-      <div className="flex-grow flex items-start md:items-center justify-center relative w-full h-auto lg:h-full lg:min-h-0 pb-10 md:pb-0">
+      <main className="flex-1 flex items-start lg:items-center justify-center relative w-full max-w-[1800px] mx-auto pb-6 md:pb-4">
         <StepRenderer
           currentStep={step}
           state={{
@@ -142,14 +142,14 @@ const MadeiramentoFlow: React.FC = () => {
           onConfirmSummary={() => setShowLeadModal(true)}
           isLoadingCities={isLoadingCities}
         />
-      </div>
+      </main>
 
-      <footer className="mt-4 md:mt-8 flex flex-col-reverse md:flex-row justify-between items-center flex-none w-full relative gap-3 md:gap-0">
+      <footer className="mt-4 md:mt-6 flex flex-col-reverse md:flex-row justify-between items-center flex-none w-full max-w-[1800px] mx-auto relative gap-3 md:gap-0">
         <motion.button
           whileTap={{ scale: 0.95 }}
           type="button"
           onClick={handleBack}
-          className="w-full md:w-auto bg-white text-slate-600 border border-slate-200 rounded-full px-6 md:px-8 py-3 xl:px-10 xl:py-4 text-base md:text-lg xl:text-xl font-bold shadow-sm hover:bg-slate-100 transition-colors flex justify-center items-center gap-2"
+          className="w-full md:w-auto bg-white text-slate-600 border border-slate-200 rounded-full px-6 md:px-8 py-3 lg:px-8 lg:py-3 text-base md:text-lg lg:text-lg font-bold shadow-sm hover:bg-slate-100 transition-colors flex justify-center items-center gap-2"
         >
           <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" /> {step === 0 ? "Cancelar" : "Voltar"}
         </motion.button>
@@ -158,7 +158,7 @@ const MadeiramentoFlow: React.FC = () => {
             whileTap={{ scale: 0.95 }}
             type="button"
             onClick={handleCancel}
-            className="w-full md:w-auto bg-white text-slate-500 border border-slate-200 rounded-full px-6 md:px-8 py-3 xl:px-10 xl:py-4 text-base md:text-lg xl:text-xl font-bold shadow-sm hover:bg-slate-100 hover:text-slate-800 transition-colors flex justify-center items-center gap-2"
+            className="w-full md:w-auto bg-white text-slate-500 border border-slate-200 rounded-full px-6 md:px-8 py-3 lg:px-8 lg:py-3 text-base md:text-lg lg:text-lg font-bold shadow-sm hover:bg-slate-100 hover:text-slate-800 transition-colors flex justify-center items-center gap-2"
           >
             Cancelar Operação
           </motion.button>

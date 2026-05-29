@@ -148,7 +148,7 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
         whileTap={isDisabled ? {} : { scale: 0.95, backgroundColor: "#f1f5f9" }}
         onClick={() => !isDisabled && handleKeyPress(key)}
         disabled={isDisabled}
-        className={`${flexClass} flex items-center justify-center border border-slate-200 rounded-lg xl:rounded-xl h-10 xl:h-14 text-sm xl:text-lg font-bold uppercase transition-all shadow-sm
+        className={`${flexClass} flex items-center justify-center border border-slate-200 rounded-lg lg:rounded-xl h-10 lg:h-11 text-sm lg:text-base font-bold uppercase transition-all shadow-sm
           ${
             isDisabled
               ? "bg-slate-100 text-slate-400 opacity-50 cursor-not-allowed shadow-none"
@@ -167,23 +167,23 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
     <motion.div 
       initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }}
       // Ajustado padding para mobile
-      className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-2 md:p-4 xl:p-8 select-none"
+      className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-2 md:p-4 lg:p-6 select-none"
     >
-      <div className="bg-slate-50 w-full max-w-6xl max-h-[95vh] lg:max-h-[1080px] rounded-3xl lg:rounded-[2rem] shadow-2xl border border-slate-200 flex flex-col overflow-hidden relative">
+      <div className="bg-slate-50 w-full max-w-5xl h-[92vh] max-h-[920px] rounded-3xl lg:rounded-[2rem] shadow-2xl border border-slate-200 flex flex-col overflow-hidden relative">
         
-        <header className="bg-white border-b border-slate-200 px-4 md:px-6 xl:px-10 py-4 xl:py-6 flex-none flex flex-col items-center text-center">
-          <h2 className="text-xl md:text-2xl xl:text-4xl font-bold tracking-tight text-slate-900 uppercase">
+        <header className="bg-white border-b border-slate-200 px-4 md:px-6 lg:px-8 py-4 lg:py-4 flex-none flex flex-col items-center text-center">
+          <h2 className="text-xl md:text-2xl lg:text-3xl font-bold tracking-tight text-slate-900 uppercase">
             Identificação Necessária
           </h2>
-          <p className="text-sm md:text-base xl:text-xl mt-1 xl:mt-2 text-slate-500 font-medium">
+          <p className="text-sm md:text-base lg:text-lg mt-1 lg:mt-2 text-slate-500 font-medium">
             Informe seus dados para gerar o orçamento detalhado.
           </p>
         </header>
 
-        <div className="flex flex-col gap-4 md:gap-5 w-full max-w-5xl mx-auto flex-none px-4 md:px-6 xl:px-12 mt-4 md:mt-6 overflow-y-auto lg:overflow-visible">
+        <div className="flex flex-col gap-3 md:gap-4 w-full max-w-5xl mx-auto flex-none px-4 md:px-6 lg:px-8 mt-3 md:mt-4 overflow-y-auto lg:overflow-visible">
           
           <div className="flex flex-col gap-1.5 group">
-            <label className="text-xs md:text-sm xl:text-lg font-bold uppercase text-slate-500 ml-2 group-hover:text-orange-600 transition-colors">
+            <label className="text-xs md:text-sm lg:text-base font-bold uppercase text-slate-500 ml-2 group-hover:text-orange-600 transition-colors">
               Nome Completo
             </label>
             {/* Trocado DIV por INPUT nativo */}
@@ -193,14 +193,14 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
               onChange={(e) => setInputName(formatNameTitleCase(e.target.value))}
               onFocus={() => { setActiveInput("name"); setShowDdiDropdown(false); }}
               placeholder="Digite seu nome"
-              className={`w-full outline-none border-2 p-3 xl:p-5 rounded-xl text-lg md:text-xl xl:text-2xl font-bold transition-all h-[56px] xl:h-[72px] shadow-sm ${
+              className={`w-full outline-none border-2 p-3 lg:p-4 rounded-xl text-lg md:text-xl lg:text-xl font-bold transition-all h-[56px] lg:h-[60px] shadow-sm ${
                 activeInput === "name" ? "border-orange-500 ring-4 ring-orange-50 bg-white text-slate-900" : "border-slate-200 bg-slate-100 text-slate-600 hover:border-orange-300"
               }`}
             />
           </div>
 
           <div className="flex flex-col gap-1.5 group">
-            <label className="text-xs md:text-sm xl:text-lg font-bold uppercase text-slate-500 ml-2 group-hover:text-emerald-600 transition-colors">
+            <label className="text-xs md:text-sm lg:text-base font-bold uppercase text-slate-500 ml-2 group-hover:text-emerald-600 transition-colors">
               WhatsApp (DDD + Número)
             </label>
             
@@ -209,7 +209,7 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
                 <button
                   disabled={isLoadingDDI}
                   onClick={() => setShowDdiDropdown(!showDdiDropdown)}
-                  className={`border-2 px-2 md:px-4 xl:px-6 rounded-xl text-base md:text-xl xl:text-2xl font-bold transition-all h-[56px] xl:h-[72px] flex items-center justify-center gap-1 md:gap-3 shadow-sm ${
+                  className={`border-2 px-2 md:px-4 lg:px-5 rounded-xl text-base md:text-xl lg:text-xl font-bold transition-all h-[56px] lg:h-[60px] flex items-center justify-center gap-1 md:gap-3 shadow-sm ${
                     showDdiDropdown ? "border-emerald-500 ring-4 ring-emerald-50 bg-white text-slate-900" : "border-slate-200 bg-slate-100 text-slate-700 hover:border-emerald-300"
                   } ${isLoadingDDI ? "opacity-70 cursor-wait" : ""}`}
                 >
@@ -253,7 +253,7 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
                 onChange={(e) => setInputPhone(e.target.value.replace(/[^0-9]/g, '').slice(0, 15))}
                 onFocus={() => { setActiveInput("phone"); setShowDdiDropdown(false); }}
                 placeholder="Digite o número"
-                className={`w-full outline-none flex-1 border-2 p-3 xl:p-5 rounded-xl text-lg md:text-xl xl:text-2xl font-bold transition-all h-[56px] xl:h-[72px] shadow-sm ${
+                className={`w-full outline-none flex-1 border-2 p-3 lg:p-4 rounded-xl text-lg md:text-xl lg:text-xl font-bold transition-all h-[56px] lg:h-[60px] shadow-sm ${
                   activeInput === "phone" ? "border-emerald-500 ring-4 ring-emerald-50 bg-white text-slate-900" : "border-slate-200 bg-slate-100 text-slate-600 hover:border-emerald-300"
                 }`}
               />
@@ -265,25 +265,25 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
               type="checkbox" id="lgpd" checked={lgpdConsent} onChange={(e) => setLgpdConsent(e.target.checked)}
               className="w-5 h-5 md:w-6 md:h-6 xl:w-8 xl:h-8 border-2 border-slate-300 rounded-lg accent-orange-600 cursor-pointer transition-all flex-shrink-0"
             />
-            <label htmlFor="lgpd" className="text-xs md:text-sm xl:text-lg font-medium text-slate-600 cursor-pointer select-none leading-tight">
+            <label htmlFor="lgpd" className="text-xs md:text-sm lg:text-base font-medium text-slate-600 cursor-pointer select-none leading-tight">
               Autorizo o armazenamento dos meus dados (LGPD).
             </label>
           </div>
         </div>
 
         {/* Teclado Virtual: Escondido no celular (hidden), exibido nas telas grandes (lg:flex) */}
-        <div onClick={() => setShowDdiDropdown(false)} className="hidden lg:flex flex-grow flex-col justify-center gap-1.5 xl:gap-2.5 overflow-hidden w-full max-w-5xl mx-auto px-4 xl:px-8 mt-2 mb-4 xl:mb-6 z-10">
+        <div onClick={() => setShowDdiDropdown(false)} className="hidden lg:flex flex-grow flex-col justify-center gap-1.5 overflow-hidden w-full max-w-5xl mx-auto px-4 lg:px-8 mt-2 mb-3 z-10">
           {keyboardLayout.map((row, rowIndex) => (
-            <div key={rowIndex} className="flex justify-center gap-1.5 xl:gap-2.5 w-full">
+            <div key={rowIndex} className="flex justify-center gap-1.5 lg:gap-2 w-full">
               {row.map((key) => renderKey(key))}
             </div>
           ))}
-          <div className="flex justify-center gap-1.5 xl:gap-2.5 w-full mt-1">
+          <div className="flex justify-center gap-1.5 lg:gap-2 w-full mt-1">
             <motion.button
               whileTap={activeInput === "phone" ? {} : { scale: 0.98, backgroundColor: "#f1f5f9" }}
               onClick={() => activeInput !== "phone" && handleKeyPress("ESPAÇO")}
               disabled={activeInput === "phone"}
-              className={`w-full flex items-center justify-center border border-slate-200 rounded-xl h-12 xl:h-16 text-lg xl:text-xl font-bold uppercase transition-all shadow-sm
+              className={`w-full flex items-center justify-center border border-slate-200 rounded-xl h-12 lg:h-12 text-lg lg:text-lg font-bold uppercase transition-all shadow-sm
                   ${activeInput === "phone" ? "bg-slate-100 text-slate-400 opacity-50 cursor-not-allowed shadow-none" : "bg-white text-slate-700 hover:border-orange-300 hover:shadow-md"}
                 `}
             >
@@ -293,14 +293,14 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
         </div>
 
         {/* Footer responsivo: empilhado no mobile, lado a lado no desktop */}
-        <div className="bg-white border-t border-slate-200 px-4 md:px-6 xl:px-10 py-4 xl:py-6 flex flex-col-reverse md:flex-row justify-between items-stretch md:items-center gap-3 md:gap-0 flex-none relative z-20 mt-4 lg:mt-0">
-          <motion.button whileTap={{ scale: 0.95 }} onClick={onCancel} className="bg-white text-slate-600 border border-slate-200 rounded-full px-6 xl:px-10 py-3 xl:py-4 text-base md:text-lg xl:text-xl font-bold uppercase hover:bg-slate-100 transition-colors shadow-sm flex items-center justify-center gap-2">
+        <div className="bg-white border-t border-slate-200 px-4 md:px-6 lg:px-8 py-4 lg:py-4 flex flex-col-reverse md:flex-row justify-between items-stretch md:items-center gap-3 md:gap-0 flex-none relative z-20 mt-4 lg:mt-0">
+          <motion.button whileTap={{ scale: 0.95 }} onClick={onCancel} className="bg-white text-slate-600 border border-slate-200 rounded-full px-6 lg:px-8 py-3 lg:py-3 text-base md:text-lg lg:text-lg font-bold uppercase hover:bg-slate-100 transition-colors shadow-sm flex items-center justify-center gap-2">
             <X className="w-5 h-5 md:w-6 md:h-6" /> Cancelar
           </motion.button>
           
           <motion.button
             whileTap={lgpdConsent ? { scale: 0.95 } : {}} onClick={handleSubmit} disabled={lgpdConsent === false}
-            className={`rounded-full px-6 xl:px-10 py-3 xl:py-4 text-base md:text-lg xl:text-xl font-bold uppercase transition-all flex items-center justify-center gap-2 shadow-md ${
+            className={`rounded-full px-6 lg:px-8 py-3 lg:py-3 text-base md:text-lg lg:text-lg font-bold uppercase transition-all flex items-center justify-center gap-2 shadow-md ${
               lgpdConsent === true ? "bg-orange-600 text-white hover:bg-orange-700 shadow-orange-200" : "bg-slate-200 text-slate-400 cursor-not-allowed shadow-none"
             }`}
           >
