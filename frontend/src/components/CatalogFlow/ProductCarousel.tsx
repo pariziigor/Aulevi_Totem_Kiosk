@@ -17,8 +17,8 @@ export const ProductCarousel: React.FC<ProductCarouselProps> = ({
   carouselRef
 }) => {
   return (
-    <div className="flex flex-col w-full min-h-[520px] lg:min-h-[560px]">
-      <div className="flex-1 relative flex items-center justify-center w-full max-w-[1680px] mx-auto py-4">
+    <div className="flex flex-col w-full min-h-[520px] lg:min-h-[calc(100dvh-190px)]">
+      <div className="flex-1 relative flex items-center justify-center w-full max-w-[1760px] mx-auto py-4 lg:py-6">
         <button
           onClick={() => onScroll('left')}
           className="absolute left-2 lg:left-6 z-10 bg-white/80 backdrop-blur-md border border-slate-200 text-slate-600 rounded-full p-3 lg:p-3 hover:bg-white hover:shadow-md transition-all hidden md:flex shadow-sm"
@@ -28,7 +28,7 @@ export const ProductCarousel: React.FC<ProductCarouselProps> = ({
 
         <div
           ref={carouselRef}
-          className="flex overflow-x-auto snap-x snap-mandatory w-full gap-4 md:gap-6 lg:gap-8 pb-4 md:pb-8 px-4 md:px-24 lg:px-28 items-center hide-scrollbar"
+          className="flex overflow-x-auto snap-x snap-mandatory w-full gap-4 md:gap-6 lg:gap-8 pb-4 md:pb-8 px-4 md:px-24 lg:px-24 items-center hide-scrollbar"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {products.map((prod) => (
@@ -36,7 +36,7 @@ export const ProductCarousel: React.FC<ProductCarouselProps> = ({
               key={prod.id}
               whileTap={{ scale: 0.98 }}
               onClick={() => onSelectProduct(prod)}
-              className="snap-center shrink-0 w-[85%] sm:w-[60%] md:w-[45%] lg:w-[30%] xl:w-[23%] 2xl:w-[21%] max-w-[390px] h-[60vh] md:h-[440px] lg:h-[430px] rounded-[1.5rem] md:rounded-[2rem] lg:rounded-[2rem] shadow-md border border-slate-200 flex flex-col justify-end p-4 lg:p-5 cursor-pointer hover:shadow-xl hover:border-orange-300 transition-all bg-white relative overflow-hidden group"
+              className="snap-center shrink-0 w-[85%] sm:w-[60%] md:w-[45%] lg:w-[31%] xl:w-[24%] 2xl:w-[22%] max-w-[430px] h-[60vh] md:h-[440px] lg:h-[clamp(520px,68vh,700px)] rounded-[1.5rem] md:rounded-[2rem] lg:rounded-[2rem] shadow-md border border-slate-200 flex flex-col justify-end p-4 lg:p-5 cursor-pointer hover:shadow-xl hover:border-orange-300 transition-all bg-white relative overflow-hidden group"
             >
               <img
                 src={prod.images[0]}

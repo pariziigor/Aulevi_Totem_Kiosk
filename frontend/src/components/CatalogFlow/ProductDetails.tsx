@@ -31,14 +31,14 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
   onInterestClick,
 }) => {
   return (
-    <div className="flex flex-col w-full h-auto gap-4 md:gap-5 lg:gap-6">
-      <h2 className="text-3xl md:text-4xl lg:text-[clamp(2.5rem,4.5vw,4.75rem)] font-bold uppercase tracking-tight text-slate-900 text-center flex-none">
+    <div className="flex flex-col w-full h-auto gap-4 md:gap-5 lg:gap-5">
+      <h2 className="text-3xl md:text-4xl lg:text-[clamp(2.5rem,4vw,4.4rem)] font-bold uppercase tracking-tight text-slate-900 text-center flex-none">
         {product.title}
       </h2>
 
-      <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 2xl:gap-10 w-full">
+      <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 2xl:gap-10 w-full lg:h-[clamp(560px,64vh,700px)]">
         {/* Image Section */}
-        <div className="relative flex items-center justify-center bg-slate-900 rounded-[1.5rem] md:rounded-[2rem] lg:rounded-[2rem] overflow-hidden shadow-inner border border-slate-200 w-full h-[40vh] md:h-[50vh] lg:h-[520px] lg:flex-[1.25]">
+        <div className="relative flex items-center justify-center bg-slate-900 rounded-[1.5rem] md:rounded-[2rem] lg:rounded-[2rem] overflow-hidden shadow-inner border border-slate-200 w-full h-[40vh] md:h-[50vh] lg:h-full lg:flex-[1.3]">
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -81,8 +81,8 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
         </div>
 
         {/* Details Section */}
-        <div className="flex-1 flex flex-col gap-4 lg:gap-6 w-full h-auto">
-          <div className="bg-white border border-slate-200 rounded-[1.5rem] md:rounded-[2rem] lg:rounded-[2rem] p-4 md:p-6 lg:p-6 shadow-sm flex flex-col h-auto lg:h-[520px] relative overflow-hidden">
+        <div className="flex-1 flex flex-col gap-4 lg:gap-5 w-full h-auto lg:h-full">
+          <div className="bg-white border border-slate-200 rounded-[1.5rem] md:rounded-[2rem] lg:rounded-[2rem] p-4 md:p-6 lg:p-6 shadow-sm flex flex-col h-auto lg:flex-1 lg:min-h-0 relative overflow-hidden">
             <div className="flex flex-col gap-4 lg:gap-4 flex-1 min-h-0 border-b border-slate-100 pb-4">
               {/* Dimensions */}
               <div className="flex flex-col md:flex-row justify-between items-center bg-slate-50 rounded-2xl p-4 md:p-5 lg:p-5 border border-slate-100 gap-4 md:gap-0 flex-none text-center md:text-left">
