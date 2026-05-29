@@ -19,43 +19,66 @@ const SuccessPage = () => {
   }, [counter, navigate]);
 
   return (
-    <main className="min-h-screen w-full overflow-hidden bg-slate-50 flex flex-col items-center justify-center px-6 py-8 text-center select-none">
-      <section className="flex flex-col items-center justify-center gap-8 md:gap-10 w-full max-w-5xl">
-        
-        <div className="space-y-4">
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-slate-800">
-            Orçamento Enviado!
-          </h1>
-          <p className="text-lg md:text-2xl text-slate-600 font-medium">
-            O PDF detalhado foi entregue no WhatsApp informado.
-          </p>
-        </div>
+    // O segredo está aqui: flex-col e justify-between empurram os itens para as pontas
+    <main className="relative min-h-screen w-full overflow-hidden flex flex-col justify-between p-6 select-none">
+      
+      {/* 1. VÍDEO DE FUNDO */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover z-0"
+      >
+        <source src="/assets/sucesso - video.mp4" type="video/mp4" />
+      </video>
 
-        {/* Cronômetro com a cor de destaque oficial do sistema (Laranja Aulevi) */}
-        <div className="text-8xl md:text-[12rem] lg:text-[14rem] font-bold leading-none tabular-nums text-orange-600">
+      {/* 2. OVERLAY SUAVE */}
+      {/* Reduzimos a escuridão geral já que os cartões têm o próprio fundo */}
+      <div className="absolute inset-0 bg-slate-900/10 z-0"></div>
+
+      {/* 3. HEADER (Título e Subtítulo no Topo) */}
+      <header className="relative z-10 w-full max-w-2xl mx-auto mt-8 flex flex-col items-center justify-center gap-2 bg-white/50 backdrop-blur-2xl shadow-xl rounded-3xl p-8 text-center border-2 border-white/60">
+        <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-slate-900 drop-shadow-sm">
+          Orçamento Enviado!
+        </h1>
+        <p className="text-lg md:text-xl text-slate-800 font-semibold px-2 drop-shadow-sm">
+          O PDF detalhado foi entregue no WhatsApp informado.
+        </p>
+      </header>
+
+      {/* 4. ÁREA CENTRAL LIVRE */}
+      {/* O justify-between do main já garante o espaço, mas este flex-grow garante que o vídeo fique 100% livre no meio */}
+      <div className="flex-grow z-10 pointer-events-none"></div>
+
+      {/* 5. FOOTER (Cronômetro e Botões na Base) */}
+      <footer className="relative z-10 w-full max-w-2xl mx-auto mb-8 flex flex-col items-center gap-8 bg-white/50 backdrop-blur-2xl shadow-2xl rounded-[3rem] p-8 border-2 border-white/60">
+        
+        {/* Cronômetro */}
+        <div className="text-7xl md:text-8xl font-bold leading-none tabular-nums text-orange-600 drop-shadow-md">
           {counter}
         </div>
 
-        {/* Botões com bordas arredondadas e feedback tátil (scale-95) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 w-full max-w-3xl mt-4">
+        {/* Botões empilhados para melhor ergonomia no touch */}
+        <div className="flex flex-col gap-4 w-full max-w-sm">
           <button
             type="button"
             onClick={() => navigate("/?origem=totem")}
-            className="bg-orange-600 text-white rounded-full px-8 py-5 md:py-6 text-xl md:text-2xl font-semibold shadow-md hover:bg-orange-700 active:scale-95 transition-all"
+            className="w-full bg-orange-600 text-white rounded-full py-5 text-xl font-semibold shadow-lg hover:bg-orange-700 active:scale-95 transition-all"
           >
-            Ver Outros Modelos
+            Voltar ao menu
           </button>
           
           <button
             type="button"
             onClick={() => navigate("/standby")}
-            className="bg-white text-slate-800 border-2 border-slate-200 rounded-full px-8 py-5 md:py-6 text-xl md:text-2xl font-semibold shadow-sm hover:bg-slate-50 hover:border-slate-300 active:scale-95 transition-all"
+            className="w-full bg-white/60 backdrop-blur-md text-slate-900 border-2 border-white/80 rounded-full py-5 text-xl font-semibold shadow-sm hover:bg-white active:scale-95 transition-all"
           >
             Encerrar Agora
           </button>
         </div>
-
-      </section>
+        
+      </footer>
     </main>
   );
 };
