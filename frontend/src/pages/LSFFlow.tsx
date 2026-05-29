@@ -47,10 +47,10 @@ const LSFFlow: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen w-full bg-slate-50 text-slate-800 flex flex-col p-4 md:p-6 lg:p-8 select-none overflow-x-hidden font-sans">
+    <div className="min-h-screen lg:h-screen lg:min-h-0 w-full lg:w-screen bg-slate-50 text-slate-800 flex flex-col p-4 md:p-6 lg:p-8 select-none overflow-x-hidden overflow-y-auto lg:overflow-hidden font-sans">
       
       {/* Header */}
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-5 md:mb-6 flex-none w-full max-w-[1800px] mx-auto gap-4 md:gap-0">
+      <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-5 md:mb-6 flex-none w-full lg:max-w-none mx-auto gap-4 md:gap-0">
         <div className="flex flex-col gap-1 md:gap-2">
           <h1 className="text-2xl md:text-3xl lg:text-[clamp(1.75rem,2.1vw,2.35rem)] font-black tracking-tight text-slate-900 uppercase">Light Steel Frame</h1>
           <div className="h-1 w-16 md:w-24 bg-orange-500 rounded-full"></div>
@@ -61,7 +61,7 @@ const LSFFlow: React.FC = () => {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 flex items-start lg:items-center justify-center relative w-full max-w-[1800px] mx-auto pb-6 md:pb-4">
+      <main className="flex-1 flex items-start lg:items-stretch justify-center relative w-full lg:max-w-none mx-auto pb-6 md:pb-4 lg:pb-0 min-h-0 lg:overflow-hidden">
         <StepRenderer
           currentStep={step}
           quoteData={quoteData}
@@ -85,7 +85,7 @@ const LSFFlow: React.FC = () => {
       </main>
 
       {/* Footer */}
-      <footer className="mt-4 md:mt-6 flex flex-col-reverse md:flex-row justify-between items-center flex-none w-full max-w-[1800px] mx-auto relative gap-3 md:gap-0">
+      <footer className="mt-4 md:mt-6 flex flex-col-reverse md:flex-row justify-between items-center flex-none w-full lg:max-w-none mx-auto relative gap-3 md:gap-0">
         <motion.button 
           whileTap={{ scale: 0.95 }} 
           onClick={handleBack} 

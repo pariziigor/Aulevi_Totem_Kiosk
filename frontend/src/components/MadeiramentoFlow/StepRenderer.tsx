@@ -61,14 +61,14 @@ export const StepRenderer: React.FC<StepRendererProps> = ({
     switch (currentStep) {
       case MADEIRAMENTO_FLOW_STEPS.TIPO_LAJE:
         return (
-          <motion.div key="s0" variants={stepVariants} initial="initial" animate="animate" exit="exit" className="flex flex-col items-center w-full px-4 md:px-0">
+          <motion.div key="s0" variants={stepVariants} initial="initial" animate="animate" exit="exit" className="flex flex-col items-center justify-center w-full lg:flex-1 lg:min-h-0 px-4 md:px-0">
             <h2 className="text-2xl md:text-3xl lg:text-[clamp(2rem,3vw,3rem)] font-bold text-slate-800 tracking-tight mb-2 md:mb-3 text-center">
               Tipo de Telhado
             </h2>
             <p className="text-slate-500 text-sm md:text-lg lg:text-lg mb-6 md:mb-8 text-center">
               O telhado será apoiado sobre laje existente?
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 lg:gap-8 w-full max-w-4xl">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 lg:gap-8 w-full max-w-6xl">
               {[
                 { val: "SEM_LAJE" as TipoLaje, label: "Sem Laje", sub: "Telhado com estrutura própria", color: "text-orange-400" },
                 { val: "COM_LAJE" as TipoLaje, label: "Com Laje", sub: "Telhado apoiado sobre laje", color: "text-blue-400" },
@@ -81,7 +81,7 @@ export const StepRenderer: React.FC<StepRendererProps> = ({
                     setTipoLaje(option.val);
                     onNext();
                   }}
-                  className="bg-white border border-slate-200 rounded-[1.5rem] md:rounded-[2.5rem] shadow-sm p-6 md:p-10 lg:p-10 flex flex-col items-center justify-center gap-4 md:gap-6 h-auto md:h-72 lg:h-72 transition-all hover:shadow-xl hover:border-orange-400 group text-center"
+                  className="bg-white border border-slate-200 rounded-[1.5rem] md:rounded-[2.5rem] shadow-sm p-6 md:p-10 lg:p-10 flex flex-col items-center justify-center gap-4 md:gap-6 h-auto md:h-72 lg:h-[clamp(300px,45vh,430px)] transition-all hover:shadow-xl hover:border-orange-400 group text-center"
                 >
                   <Layers className={`w-16 h-16 md:w-20 md:h-20 xl:w-[72px] xl:h-[72px] ${option.color}`} />
                   <div>
@@ -100,7 +100,7 @@ export const StepRenderer: React.FC<StepRendererProps> = ({
         const canAdvance = parseFloat(dimA.replace(",", ".")) > 0 && parseFloat(dimB.replace(",", ".")) > 0;
 
         return (
-          <motion.div key="s1" variants={stepVariants} initial="initial" animate="animate" exit="exit" className="flex flex-col lg:flex-row items-center justify-center gap-6 md:gap-8 lg:gap-10 w-full px-4 md:px-0">
+          <motion.div key="s1" variants={stepVariants} initial="initial" animate="animate" exit="exit" className="flex flex-col lg:flex-row items-center justify-center gap-6 md:gap-8 lg:gap-10 w-full lg:flex-1 lg:min-h-0 px-4 md:px-0">
             <div className="flex flex-col items-center gap-2 md:gap-3 flex-shrink-0 w-full lg:w-auto">
               <TelhadoSVG dimA={dimA} dimB={dimB} activeDim={editingDim} />
               <p className="text-xs md:text-sm xl:text-base text-slate-400 text-center leading-relaxed max-w-xs px-4">
@@ -155,18 +155,18 @@ export const StepRenderer: React.FC<StepRendererProps> = ({
 
       case MADEIRAMENTO_FLOW_STEPS.TELHA:
         return (
-          <motion.div key="s2" variants={stepVariants} initial="initial" animate="animate" exit="exit" className="flex flex-col items-center w-full px-4 md:px-0">
+          <motion.div key="s2" variants={stepVariants} initial="initial" animate="animate" exit="exit" className="flex flex-col items-center justify-center w-full lg:flex-1 lg:min-h-0 px-4 md:px-0">
             <h2 className="text-2xl md:text-3xl lg:text-[clamp(2rem,3vw,3rem)] font-bold text-slate-800 tracking-tight mb-4 md:mb-8 text-center">
               Tipo de Telha
             </h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 lg:gap-5 w-full max-w-4xl mb-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 lg:gap-5 w-full lg:max-w-none mb-6 lg:flex-1 lg:min-h-0">
               {TIPOS_TELHA.map((telha) => (
                 <motion.button
                   key={telha}
                   whileTap={{ scale: 0.97 }}
                   type="button"
                   onClick={() => setTipoTelha(telha)}
-                  className={`rounded-xl md:rounded-2xl border-2 px-2 md:px-4 py-4 md:py-6 lg:py-5 transition-all shadow-sm flex flex-col items-center justify-center gap-2 md:gap-3
+                  className={`rounded-xl md:rounded-2xl border-2 px-2 md:px-4 py-4 md:py-6 lg:py-5 transition-all shadow-sm flex flex-col items-center justify-center gap-2 md:gap-3 lg:h-full lg:min-h-0
                     ${tipoTelha === telha ? "border-orange-500 bg-orange-50 shadow-orange-100" : "border-slate-200 bg-white hover:border-orange-300"}`}
                 >
                   <img src={TELHA_ICONS[telha]} alt={telha} className="w-12 h-12 md:w-20 md:h-20 lg:w-20 lg:h-20 object-contain" />
@@ -193,7 +193,7 @@ export const StepRenderer: React.FC<StepRendererProps> = ({
 
       case MADEIRAMENTO_FLOW_STEPS.LOCAL:
         return (
-          <motion.div key="s3" variants={stepVariants} initial="initial" animate="animate" exit="exit" className="flex flex-col items-center w-full px-4 md:px-0">
+          <motion.div key="s3" variants={stepVariants} initial="initial" animate="animate" exit="exit" className="flex flex-col items-center justify-center w-full lg:flex-1 lg:min-h-0 px-4 md:px-0">
             <h2 className="text-2xl md:text-3xl lg:text-[clamp(2rem,3vw,3rem)] font-bold text-slate-800 tracking-tight mb-2 md:mb-3 text-center">
               Local da Obra
             </h2>
@@ -239,7 +239,7 @@ export const StepRenderer: React.FC<StepRendererProps> = ({
         ];
 
         return (
-          <motion.div key="s4" variants={stepVariants} initial="initial" animate="animate" exit="exit" className="flex flex-col items-center w-full px-4 md:px-0">
+          <motion.div key="s4" variants={stepVariants} initial="initial" animate="animate" exit="exit" className="flex flex-col items-center justify-center w-full lg:flex-1 lg:min-h-0 px-4 md:px-0">
             <h2 className="text-2xl md:text-3xl lg:text-[clamp(2rem,3vw,3rem)] font-bold text-slate-800 tracking-tight mb-6 md:mb-7 text-center">
               Resumo do Pedido
             </h2>

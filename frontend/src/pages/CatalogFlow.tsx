@@ -79,7 +79,7 @@ const CatalogFlow: React.FC = () => {
   };
 
   return (
-    <div className="min-h-[100dvh] w-full bg-slate-50 text-slate-800 flex flex-col p-4 md:p-6 lg:p-8 select-none overflow-x-hidden font-sans">
+    <div className="min-h-screen lg:h-screen lg:min-h-0 w-full lg:w-screen bg-slate-50 text-slate-800 flex flex-col p-4 md:p-6 lg:p-8 select-none overflow-x-hidden overflow-y-auto lg:overflow-hidden font-sans">
       <style>{`
         .custom-scrollbar::-webkit-scrollbar { width: 8px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
@@ -88,7 +88,7 @@ const CatalogFlow: React.FC = () => {
       `}</style>
 
       {/* Header */}
-      <header className="border-b border-slate-200 pb-4 mb-4 md:mb-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0 flex-none w-full max-w-[1800px] mx-auto">
+      <header className="border-b border-slate-200 pb-4 mb-4 md:mb-5 lg:mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0 flex-none w-full lg:max-w-none mx-auto">
         <div className="flex flex-col gap-1 md:gap-2">
           <h1 className="text-2xl md:text-3xl lg:text-[clamp(1.75rem,2.1vw,2.35rem)] font-black tracking-tight text-slate-900 uppercase">
             Catálogo: {catalogType}
@@ -106,7 +106,7 @@ const CatalogFlow: React.FC = () => {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 relative w-full max-w-[1800px] mx-auto flex flex-col min-h-0">
+      <main className="flex-1 relative w-full lg:max-w-none mx-auto flex flex-col min-h-0 lg:overflow-hidden">
         <AnimatePresence mode="wait">
           {step === 0 ? (
             <motion.div
@@ -115,7 +115,7 @@ const CatalogFlow: React.FC = () => {
               initial="initial"
               animate="animate"
               exit="exit"
-              className="h-full"
+              className="flex flex-1 min-h-0"
             >
               <ProductCarousel
                 products={products}
@@ -131,7 +131,7 @@ const CatalogFlow: React.FC = () => {
               initial="initial"
               animate="animate"
               exit="exit"
-              className="h-full"
+              className="flex flex-1 min-h-0"
             >
               <ProductDetails
                 product={selectedProduct}
@@ -149,7 +149,7 @@ const CatalogFlow: React.FC = () => {
 
       {/* Footer */}
       {step === 1 && (
-        <footer className="mt-6 flex flex-col-reverse md:flex-row justify-between items-center gap-4 md:gap-0 flex-none w-full max-w-[1800px] mx-auto relative mb-4 lg:mb-0">
+        <footer className="mt-6 lg:mt-6 flex flex-col-reverse md:flex-row justify-between items-center gap-4 md:gap-0 flex-none w-full lg:max-w-none mx-auto relative mb-4 lg:mb-0">
           <motion.button
             whileTap={{ scale: 0.95 }}
             onClick={handleBackToGallery}

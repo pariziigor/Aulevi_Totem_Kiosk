@@ -45,7 +45,7 @@ export const StepRenderer: React.FC<StepRendererProps> = ({
     switch(currentStep) {
       case LSF_FLOW_STEPS.AREA:
         return (
-          <motion.div key="step0" variants={stepVariants} initial="initial" animate="animate" exit="exit" className="flex flex-col items-center w-full">
+          <motion.div key="step0" variants={stepVariants} initial="initial" animate="animate" exit="exit" className="flex flex-col items-center justify-center w-full lg:flex-1 lg:min-h-0">
             <h2 className="text-2xl md:text-3xl lg:text-[clamp(2rem,3vw,3rem)] font-bold text-slate-800 tracking-tight mb-2 md:mb-4">Informe a Área (m²)</h2>
             <p className="text-slate-500 text-sm md:text-lg lg:text-lg mb-5 md:mb-6 text-center px-4">Digite o tamanho estimado do projeto</p>
             
@@ -67,19 +67,19 @@ export const StepRenderer: React.FC<StepRendererProps> = ({
 
       case LSF_FLOW_STEPS.TYPE:
         return (
-          <motion.div key="step1" variants={stepVariants} initial="initial" animate="animate" exit="exit" className="flex flex-col items-center w-full">
+          <motion.div key="step1" variants={stepVariants} initial="initial" animate="animate" exit="exit" className="flex flex-col items-center justify-center w-full lg:flex-1 lg:min-h-0">
             <h2 className="text-2xl md:text-3xl lg:text-[clamp(2rem,3vw,3rem)] font-bold text-slate-800 tracking-tight mb-6 md:mb-7">Selecione o Tipo</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 lg:gap-8 w-full max-w-5xl px-4 md:px-0">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 lg:gap-8 w-full max-w-6xl px-4 md:px-0">
               {CONSTRUCTION_TYPES.map((t: { label: string; icon: string }) => (
                 <motion.button key={t.label} 
                   whileTap={{ scale: 0.98 }} 
                   onClick={() => { onSetQuoteData({ tipo: t.label }); onNext(); }}
-                  className="bg-white border border-slate-200 rounded-[1.5rem] md:rounded-[2.5rem] shadow-sm p-6 md:p-8 lg:p-8 flex flex-col md:flex-row lg:flex-col items-center justify-center gap-4 md:gap-6 lg:gap-5 h-auto md:h-80 lg:h-72 transition-all hover:shadow-xl hover:border-orange-400 hover:text-orange-700 group w-full text-left md:text-center"
+                  className="bg-white border border-slate-200 rounded-[1.5rem] md:rounded-[2.5rem] shadow-sm p-6 md:p-8 lg:p-8 flex flex-col md:flex-row lg:flex-col items-center justify-center gap-4 md:gap-6 lg:gap-5 h-auto md:h-80 lg:h-[clamp(300px,45vh,430px)] transition-all hover:shadow-xl hover:border-orange-400 hover:text-orange-700 group w-full text-center"
                 >
                   <div className="w-24 h-24 md:w-40 md:h-40 lg:w-36 lg:h-36 flex items-center justify-center flex-shrink-0">
                     <img src={t.icon} alt={t.label} className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300" />
                   </div>
-                  <span className="text-lg md:text-2xl lg:text-2xl font-bold text-slate-700 flex-1">{t.label}</span>
+                  <span className="text-lg md:text-2xl lg:text-2xl font-bold text-slate-700 text-center">{t.label}</span>
                 </motion.button>
               ))}
             </div>
@@ -88,19 +88,19 @@ export const StepRenderer: React.FC<StepRendererProps> = ({
 
       case LSF_FLOW_STEPS.STANDARD:
         return (
-          <motion.div key="step2" variants={stepVariants} initial="initial" animate="animate" exit="exit" className="flex flex-col items-center w-full">
+          <motion.div key="step2" variants={stepVariants} initial="initial" animate="animate" exit="exit" className="flex flex-col items-center justify-center w-full lg:flex-1 lg:min-h-0">
             <h2 className="text-2xl md:text-3xl lg:text-[clamp(2rem,3vw,3rem)] font-bold text-slate-800 tracking-tight mb-6 md:mb-7">Padrão de Acabamento</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-5 w-full max-w-7xl px-4 md:px-0">
               {CONSTRUCTION_STANDARDS.map((p: { label: string; icon: string }) => (
                 <motion.button key={p.label} 
                   whileTap={{ scale: 0.98 }} 
                   onClick={() => { onSetQuoteData({ padrao: p.label }); onNext(); }}
-                  className="bg-white border border-slate-200 rounded-[1.5rem] md:rounded-[2.5rem] lg:rounded-[2rem] shadow-sm p-4 md:p-6 lg:p-5 flex flex-row lg:flex-col items-center justify-start lg:justify-center gap-4 md:gap-6 lg:gap-4 h-auto md:h-64 lg:h-64 transition-all hover:shadow-xl hover:border-orange-400 hover:text-orange-700 group w-full text-left md:text-center"
+                  className="bg-white border border-slate-200 rounded-[1.5rem] md:rounded-[2.5rem] lg:rounded-[2rem] shadow-sm p-4 md:p-6 lg:p-5 flex flex-row lg:flex-col items-center justify-center gap-4 md:gap-6 lg:gap-4 h-auto md:h-64 lg:h-[clamp(280px,43vh,400px)] transition-all hover:shadow-xl hover:border-orange-400 hover:text-orange-700 group w-full text-center"
                 >
                   <div className="w-16 h-16 md:w-24 md:h-24 lg:w-24 lg:h-24 flex items-center justify-center flex-shrink-0">
                     <img src={p.icon} alt={p.label} className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300" />
                   </div>
-                  <span className="text-base md:text-2xl lg:text-xl font-bold text-slate-700 flex-1">{p.label}</span>
+                  <span className="text-base md:text-2xl lg:text-xl font-bold text-slate-700 text-center">{p.label}</span>
                 </motion.button>
               ))}
             </div>
@@ -109,11 +109,11 @@ export const StepRenderer: React.FC<StepRendererProps> = ({
 
       case LSF_FLOW_STEPS.QUALIFICATIONS:
         return (
-          <motion.div key="step3" variants={stepVariants} initial="initial" animate="animate" exit="exit" className="flex flex-col items-center w-full relative z-0">
-            <h2 className="text-2xl md:text-3xl lg:text-[clamp(2rem,3vw,3rem)] font-bold text-slate-800 tracking-tight mb-2 text-center">Qualificação do Projeto</h2>
-            <p className="text-slate-500 text-sm md:text-lg lg:text-lg font-medium mb-6 md:mb-7 text-center">Precisamos de alguns detalhes finais</p>
+          <motion.div key="step3" variants={stepVariants} initial="initial" animate="animate" exit="exit" className="flex flex-col items-center justify-center w-full lg:flex-1 lg:min-h-0 relative z-0">
+            <h2 className="text-2xl md:text-3xl lg:text-[clamp(1.9rem,2.7vw,2.75rem)] font-bold text-slate-800 tracking-tight mb-1 text-center">Qualificação do Projeto</h2>
+            <p className="text-slate-500 text-sm md:text-lg lg:text-base font-medium mb-4 md:mb-5 text-center">Precisamos de alguns detalhes finais</p>
 
-            <div className="flex flex-col gap-6 md:gap-8 w-full max-w-4xl px-4 md:px-0">
+            <div className="flex flex-col gap-4 md:gap-5 w-full max-w-6xl px-4 md:px-0">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 xl:gap-6">
                 <Step3Toggle label="Fachada Frontal?" value={!!quoteData.has_facade} onChange={() => onSetQuoteData({ has_facade: !quoteData.has_facade })} />
                 <Step3Toggle label="Projeto Arquitetônico?" value={!!quoteData.has_project} onChange={() => onSetQuoteData({ has_project: !quoteData.has_project })} />
@@ -121,7 +121,7 @@ export const StepRenderer: React.FC<StepRendererProps> = ({
                 <Step3Toggle label="Recurso Próprio?" value={!!quoteData.own_resources} onChange={() => onSetQuoteData({ own_resources: !quoteData.own_resources })} />
               </div>
 
-              <div className="w-full relative bg-white border border-slate-200 rounded-2xl md:rounded-3xl p-4 md:p-6 shadow-sm">
+              <div className="w-full relative bg-white border border-slate-200 rounded-2xl md:rounded-3xl p-4 md:p-5 shadow-sm">
                 <label className="text-xs md:text-sm xl:text-base font-bold text-slate-400 uppercase tracking-widest mb-2 md:mb-3 flex items-center gap-2">
                   <MapPin size={16} className="text-orange-500 md:w-5 md:h-5" /> Local da Obra
                 </label>
@@ -129,7 +129,7 @@ export const StepRenderer: React.FC<StepRendererProps> = ({
                 <button 
                   type="button"
                   onClick={() => onOpenCityModal()}
-                  className="w-full text-left pl-4 md:pl-6 pr-3 md:pr-4 py-3 md:py-4 lg:py-4 bg-slate-50 border-2 border-slate-200 rounded-xl md:rounded-2xl text-sm md:text-xl lg:text-xl font-bold text-slate-800 cursor-pointer hover:border-orange-400 hover:shadow-md transition-all flex items-center justify-between outline-none"
+                  className="w-full text-left pl-4 md:pl-6 pr-3 md:pr-4 py-3 md:py-4 lg:py-3.5 bg-slate-50 border-2 border-slate-200 rounded-xl md:rounded-2xl text-sm md:text-xl lg:text-lg font-bold text-slate-800 cursor-pointer hover:border-orange-400 hover:shadow-md transition-all flex items-center justify-between outline-none"
                 >
                   <span className={`truncate mr-2 ${quoteData.city ? "text-slate-800" : "text-slate-400"}`}>
                     {quoteData.city || (isLoadingCities ? "Carregando IBGE..." : "Toque para buscar cidade...")}
@@ -142,7 +142,7 @@ export const StepRenderer: React.FC<StepRendererProps> = ({
             <motion.button 
               whileTap={{ scale: 0.95 }} 
               onClick={onNext} 
-              className="mt-8 md:mt-10 relative z-10 w-full max-w-[90%] md:max-w-md mx-auto flex items-center justify-center gap-2 md:gap-3 bg-slate-800 text-white rounded-full px-6 md:px-12 py-3 md:py-4 lg:py-4 text-base md:text-xl lg:text-xl font-bold shadow-md hover:bg-slate-900 transition-all outline-none"
+              className="mt-5 md:mt-6 relative z-10 w-full max-w-[90%] md:max-w-md mx-auto flex items-center justify-center gap-2 md:gap-3 bg-slate-800 text-white rounded-full px-6 md:px-12 py-3 md:py-4 lg:py-3.5 text-base md:text-xl lg:text-lg font-bold shadow-md hover:bg-slate-900 transition-all outline-none"
             >
               Ver Resumo Completo <ChevronLeft className="rotate-180 w-5 h-5 md:w-6 md:h-6" />
             </motion.button>
@@ -151,7 +151,7 @@ export const StepRenderer: React.FC<StepRendererProps> = ({
 
       case LSF_FLOW_STEPS.SUMMARY:
         return (
-          <motion.div key="step4" variants={stepVariants} initial="initial" animate="animate" exit="exit" className="flex flex-col items-center w-full px-4 md:px-0">
+          <motion.div key="step4" variants={stepVariants} initial="initial" animate="animate" exit="exit" className="flex flex-col items-center justify-center w-full lg:flex-1 lg:min-h-0 px-4 md:px-0">
             <h2 className="text-2xl md:text-3xl lg:text-[clamp(2rem,3vw,3rem)] font-bold text-slate-800 tracking-tight mb-6 md:mb-7 text-center">Resumo do Pedido</h2>
             
             <div className="w-full max-w-4xl bg-white border border-slate-200 rounded-[1.5rem] md:rounded-[2rem] p-5 md:p-8 lg:p-8 shadow-md text-sm md:text-lg lg:text-lg font-medium text-slate-600 flex flex-col gap-3 md:gap-4 mb-7 md:mb-8">

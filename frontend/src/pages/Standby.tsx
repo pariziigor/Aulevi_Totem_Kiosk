@@ -8,8 +8,7 @@ const StandbyScreen: React.FC = () => {
   return (
     <div 
       onClick={() => navigate('/')} 
-      // h-[100dvh] garante que a tela respeite a barra de endereço dos navegadores mobile
-      className="min-h-[100dvh] w-screen relative overflow-hidden bg-slate-900 cursor-pointer select-none"
+      className="min-h-screen lg:h-screen lg:min-h-0 w-screen relative overflow-x-hidden overflow-y-auto lg:overflow-hidden bg-slate-900 cursor-pointer select-none"
     >
       {/* Vídeo em Background */}
       <video

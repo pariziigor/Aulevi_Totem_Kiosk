@@ -63,8 +63,7 @@ const MainMenu: React.FC = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      // min-h-screen permite rolar a tela no mobile. Removido overflow-hidden rígido.
-      className="min-h-screen w-full bg-slate-50 text-slate-800 flex flex-col p-4 md:p-6 lg:p-8 select-none"
+      className="min-h-screen lg:h-screen lg:min-h-0 w-full lg:w-screen bg-slate-50 text-slate-800 flex flex-col p-4 md:p-6 lg:p-8 select-none overflow-x-hidden overflow-y-auto lg:overflow-hidden"
     >
       {/* Cabeçalho */}
       <header className="flex flex-col items-center justify-center mb-6 md:mb-8 lg:mb-8 flex-none pt-4 md:pt-0">
@@ -79,7 +78,7 @@ const MainMenu: React.FC = () => {
 
       {/* Grid de Opções Expandido */}
       {/* grid-cols-1 no mobile, grid-cols-2 apenas em telas médias (md) ou maiores */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 lg:gap-8 flex-grow w-full max-w-[1600px] mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-rows-2 gap-4 md:gap-6 lg:gap-8 flex-1 min-h-0 w-full lg:max-w-none mx-auto">
         {options.map((opt) => (
           <motion.button
             key={opt.id}
@@ -89,7 +88,7 @@ const MainMenu: React.FC = () => {
             whileHover="hover"
             whileTap="tap"
             variants={cardVariants}
-            className="rounded-[1.5rem] md:rounded-[2rem] lg:rounded-[2rem] shadow-sm border border-slate-200 flex flex-col items-center justify-center p-6 lg:p-8 transition-shadow hover:shadow-xl w-full min-h-[220px] md:min-h-[260px] lg:min-h-[250px] relative overflow-hidden"
+            className="rounded-[1.5rem] md:rounded-[2rem] lg:rounded-[2rem] shadow-sm border border-slate-200 flex flex-col items-center justify-center p-6 lg:p-8 transition-shadow hover:shadow-xl w-full min-h-[220px] md:min-h-[260px] lg:min-h-0 lg:h-full relative overflow-hidden"
           >
             <motion.div
               variants={contentVariants}
@@ -124,7 +123,7 @@ const MainMenu: React.FC = () => {
 
       {/* Rodapé Dinâmico */}
       {/* flex-col no mobile, flex-row em telas grandes */}
-      <footer className="mt-6 mb-4 md:mb-0 flex flex-col md:flex-row items-center justify-center flex-none w-full max-w-[1600px] mx-auto relative gap-6 md:gap-0 h-auto md:h-16 lg:h-20">
+      <footer className="mt-6 mb-4 md:mb-0 flex flex-col md:flex-row items-center justify-center flex-none w-full lg:max-w-none mx-auto relative gap-6 md:gap-0 h-auto">
         {/* Texto de Instrução Pulsante */}
         <span className="text-slate-400 font-bold text-sm md:text-lg lg:text-xl tracking-widest uppercase animate-pulse text-center px-4">
           Toque em uma opção para continuar

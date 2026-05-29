@@ -8,8 +8,8 @@ interface Step3ToggleProps {
 }
 
 export const Step3Toggle: React.FC<Step3ToggleProps> = ({ label, value, onChange }) => (
-  <div className="bg-white border border-slate-200 rounded-2xl md:rounded-3xl p-4 md:p-6 lg:p-5 flex flex-col items-center justify-center gap-3 md:gap-5 lg:gap-4 shadow-sm w-full">
-    <span className="text-sm md:text-lg lg:text-lg font-bold text-slate-700 text-center md:h-12 flex items-center uppercase tracking-tight">
+  <div className="bg-white border border-slate-200 rounded-2xl md:rounded-3xl p-4 md:p-5 lg:p-4 flex flex-col items-center justify-center gap-3 md:gap-4 lg:gap-3 shadow-sm w-full">
+    <span className="text-sm md:text-lg lg:text-base font-bold text-slate-700 text-center md:h-10 lg:h-8 flex items-center uppercase tracking-tight">
       {label}
     </span>
     <div className="flex items-center justify-center gap-3 md:gap-4 lg:gap-4">
