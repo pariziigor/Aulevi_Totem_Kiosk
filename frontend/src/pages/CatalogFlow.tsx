@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useCatalogFlow } from '../hooks/useCatalogFlow';
 import { useImageCarousel } from '../hooks/useImageCarousel';
 import { LeadCaptureModal } from '../components/LeadCaptureModal';
@@ -10,6 +11,7 @@ import { FullscreenImageViewer } from '../components/CatalogFlow/FullscreenImage
 import { KioskService } from '../services/api';
 
 const CatalogFlow: React.FC = () => {
+  const navigate = useNavigate();
   const {
     step,
     catalogType,
@@ -52,9 +54,20 @@ const CatalogFlow: React.FC = () => {
         product: selectedProduct,
       };
 
-      await KioskService.submitQuote(payload);
+      const response = await KioskService.submitQuote(payload);
 
       console.log(`[Lead Capturado] Especificações enviadas com sucesso para ${name}`);
+
+      if (!response.success) {
+        throw new Error(response.message || 'Falha ao registrar interesse.');
+      }
+
+      const isTotem = new URLSearchParams(window.location.search).get('origem') === 'totem';
+
+      if (isTotem) {
+        navigate('/sucesso?origem=totem');
+        return;
+      }
 
       alert(
         `ATENDIMENTO REGISTRADO!\n\nObrigado, ${name}.\nO catálogo em PDF do ${selectedProduct?.title} foi baixado com sucesso!`,

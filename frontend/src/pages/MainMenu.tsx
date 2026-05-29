@@ -5,6 +5,8 @@ import { LogOut } from "lucide-react";
 
 const MainMenu: React.FC = () => {
   const navigate = useNavigate();
+  const isTotem = new URLSearchParams(window.location.search).get("origem") === "totem";
+  const withTotemOrigin = (path: string) => isTotem ? `${path}?origem=totem` : path;
 
   const options = [
     {
@@ -82,7 +84,7 @@ const MainMenu: React.FC = () => {
         {options.map((opt) => (
           <motion.button
             key={opt.id}
-            onClick={() => navigate(opt.path)}
+            onClick={() => navigate(withTotemOrigin(opt.path))}
             custom={opt.hoverColorHex}
             initial="rest"
             whileHover="hover"

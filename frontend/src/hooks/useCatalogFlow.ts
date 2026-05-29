@@ -6,6 +6,9 @@ export const useCatalogFlow = () => {
   const navigate = useNavigate();
   const { category } = useParams<{ category: string }>();
   const catalogType = category || 'CHALE';
+  const mainMenuPath = new URLSearchParams(window.location.search).get('origem') === 'totem'
+    ? '/?origem=totem'
+    : '/';
 
   const products = catalogType === 'BARRACAO' ? BARRACAO_DATA : CHALES_DATA;
 
@@ -26,7 +29,7 @@ export const useCatalogFlow = () => {
   };
 
   const handleCancel = () => {
-    navigate('/');
+    navigate(mainMenuPath);
   };
 
   return {

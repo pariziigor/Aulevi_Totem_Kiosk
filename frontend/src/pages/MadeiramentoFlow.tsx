@@ -17,6 +17,8 @@ import { useKioskStore } from "../store/useKioskStore";
 const MadeiramentoFlow: React.FC = () => {
   const navigate = useNavigate();
   const { quoteData, setQuoteData, resetSession } = useKioskStore();
+  const isTotemRequest = () => new URLSearchParams(window.location.search).get("origem") === "totem";
+  const mainMenuPath = () => isTotemRequest() ? "/?origem=totem" : "/";
 
   const [step, setStep] = useState(0);
   const [showLeadModal, setShowLeadModal] = useState(false);
@@ -49,16 +51,16 @@ const MadeiramentoFlow: React.FC = () => {
       return;
     }
 
-    navigate("/");
+    navigate(mainMenuPath());
   };
 
   const handleCancel = () => {
     resetSession();
-    navigate("/");
+    navigate(mainMenuPath());
   };
 
   const handleOpenCityModal = () => {
-    setCitySearch(quoteData.city && quoteData.city !== "Não informado" ? quoteData.city : "");
+    setCitySearch(quoteData.city && quoteData.city !== "Nao informado" ? quoteData.city : "");
     setShowCityModal(true);
   };
 
@@ -85,16 +87,26 @@ const MadeiramentoFlow: React.FC = () => {
         tem_placa: temPlaca,
         dim_a: parseFloat(dimA.replace(",", ".")),
         dim_b: parseFloat(dimB.replace(",", ".")),
-        city: quoteData.city || "Não informado",
+        city: quoteData.city || "Nao informado",
       };
 
-      await KioskService.submitQuote(payload);
+      const response = await KioskService.submitQuote(payload);
 
-      alert(
-        "ORÇAMENTO GERADO COM SUCESSO!\n\nO PDF com a lista completa de materiais e valores para o Madeiramento foi baixado.",
-      );
+      if (!response.success) {
+        throw new Error(response.message || "Falha ao processar orçamento.");
+      }
+
+      const isTotem = isTotemRequest();
+
       resetSession();
-      navigate("/");
+
+      if (isTotem) {
+        navigate("/sucesso?origem=totem");
+        return;
+      }
+
+      alert("Orçamento gerado com sucesso!");
+      navigate(mainMenuPath());
     } catch (error) {
       console.error("Falha na API:", error);
       alert("ERRO: Falha ao processar orçamento. Tente novamente.");

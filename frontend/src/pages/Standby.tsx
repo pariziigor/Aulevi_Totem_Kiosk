@@ -7,7 +7,7 @@ const StandbyScreen: React.FC = () => {
 
   return (
     <div 
-      onClick={() => navigate('/')} 
+      onClick={() => navigate('/?origem=totem')} 
       className="min-h-screen lg:h-screen lg:min-h-0 w-screen relative overflow-x-hidden overflow-y-auto lg:overflow-hidden bg-slate-900 cursor-pointer select-none"
     >
       {/* Vídeo em Background */}

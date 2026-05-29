@@ -5,6 +5,7 @@ import MainMenu from './pages/MainMenu';
 import LSFFlow from './pages/LSFFlow';
 import CatalogFlow from './pages/CatalogFlow'; // Importação do novo componente
 import MadeiramentoFlow from './pages/MadeiramentoFlow';
+import SuccessPage from './pages/SuccessPage';
 
 const GlobalLayout = ({ children }: { children: React.ReactNode }) => {
   useInactivityTimeout(60);
@@ -20,6 +21,7 @@ function App() {
           <Route path="/" element={<MainMenu />} />
           <Route path="/fluxo/LSF" element={<LSFFlow />} />
           <Route path="/fluxo/MM" element={<MadeiramentoFlow />} /> {/* <-- ADICIONE ESTA LINHA */}
+          <Route path="/sucesso" element={<SuccessPage />} />
           {/* Rota dinâmica que captura CHALE ou BARRACAO e repassa ao CatalogFlow */}
           <Route path="/fluxo/:category" element={<CatalogFlow />} />
         </Routes>
