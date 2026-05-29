@@ -167,10 +167,16 @@ async def create_quote(payload: QuoteRequestSchema, db: Session = Depends(get_db
         if module == "MADEIRAMENTO":
             display_product_name = "Madeiramento Metálico"
         elif module in ["CHALE", "BARRACAO"]:
-            # Tenta extrair o nome do modelo de dentro do dicionário de produto enviado pelo frontend
-            modelo_nome = product_data.get("nome") or product_data.get("name") or product_data.get("modelo") or ""
+            modelo_nome = (
+                product_data.get("nome") or 
+                product_data.get("name") or 
+                product_data.get("modelo") or 
+                product_data.get("titulo") or 
+                product_data.get("title") or 
+                ""
+            )
             prefixo = "Chalé" if module == "CHALE" else "Barracão"
-            # Se achar o nome, junta (Ex: "Chalé Suíço"). Se não, fica só "Chalé"
+            # Junta o prefixo com o nome do modelo. Ex: "Chalé" + "Alpino"
             display_product_name = f"{prefixo} {modelo_nome}".strip() if modelo_nome else prefixo
 
         # 5. GATILHO DO WHATSAPP (Agendando com segurança)
