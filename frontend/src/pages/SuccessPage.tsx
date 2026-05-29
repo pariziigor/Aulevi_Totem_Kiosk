@@ -19,37 +19,42 @@ const SuccessPage = () => {
   }, [counter, navigate]);
 
   return (
-    <main className="h-screen w-screen overflow-hidden bg-zinc-950 text-white flex flex-col items-center justify-center px-6 py-8 text-center select-none">
-      <section className="flex flex-col items-center justify-center gap-8 md:gap-10 w-full max-w-7xl">
+    <main className="min-h-screen w-full overflow-hidden bg-slate-50 flex flex-col items-center justify-center px-6 py-8 text-center select-none">
+      <section className="flex flex-col items-center justify-center gap-8 md:gap-10 w-full max-w-5xl">
+        
         <div className="space-y-4">
-          <h1 className="text-5xl md:text-7xl lg:text-8xl xl:text-9xl font-black uppercase tracking-tight leading-none">
-            ORÇAMENTO ENVIADO
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-slate-800">
+            Orçamento Enviado!
           </h1>
-          <p className="text-lg md:text-2xl lg:text-3xl text-zinc-300 font-bold">
-            O PDF foi entregue no WhatsApp informado.
+          <p className="text-lg md:text-2xl text-slate-600 font-medium">
+            O PDF detalhado foi entregue no WhatsApp informado.
           </p>
         </div>
 
-        <div className="text-9xl md:text-[14rem] lg:text-[18rem] font-black leading-none tabular-nums">
+        {/* Cronômetro com a cor de destaque oficial do sistema (Laranja Aulevi) */}
+        <div className="text-8xl md:text-[12rem] lg:text-[14rem] font-bold leading-none tabular-nums text-orange-600">
           {counter}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 w-full max-w-5xl">
+        {/* Botões com bordas arredondadas e feedback tátil (scale-95) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 w-full max-w-3xl mt-4">
           <button
             type="button"
             onClick={() => navigate("/?origem=totem")}
-            className="bg-white text-black border-4 border-white rounded-2xl px-8 py-6 md:py-8 text-2xl md:text-3xl font-black uppercase tracking-tight active:scale-95 transition-transform"
+            className="bg-orange-600 text-white rounded-full px-8 py-5 md:py-6 text-xl md:text-2xl font-semibold shadow-md hover:bg-orange-700 active:scale-95 transition-all"
           >
             Ver Outros Modelos
           </button>
+          
           <button
             type="button"
             onClick={() => navigate("/standby")}
-            className="bg-transparent text-white border-4 border-white rounded-2xl px-8 py-6 md:py-8 text-2xl md:text-3xl font-black uppercase tracking-tight active:scale-95 transition-transform"
+            className="bg-white text-slate-800 border-2 border-slate-200 rounded-full px-8 py-5 md:py-6 text-xl md:text-2xl font-semibold shadow-sm hover:bg-slate-50 hover:border-slate-300 active:scale-95 transition-all"
           >
             Encerrar Agora
           </button>
         </div>
+
       </section>
     </main>
   );

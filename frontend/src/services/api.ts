@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+// TESTE TESTE TESTE
 // Usando variável de ambiente, o mesmo código vai funcionar 
 // tanto no Totem (localhost) quanto no site dos Vendedores (Nuvem).
 const DEFAULT_API_URL = 'https://pi-aulevi-totem.onrender.com';
