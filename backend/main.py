@@ -23,9 +23,14 @@ app = FastAPI(
     lifespan=lifespan # Adicionamos o gerenciador de ciclo de vida aqui
 )
 
+origins = [
+    "http://localhost:5173",       # O seu ambiente de desenvolvimento
+    "https://alv.aulevi.com.br"    # O seu frontend em produção
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], 
+    allow_origins=origins,        # Passando a lista exata aqui
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
