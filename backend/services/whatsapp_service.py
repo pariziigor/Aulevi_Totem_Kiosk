@@ -27,7 +27,7 @@ class WhatsAppService:
             "phone": clean_phone,
             "document": pdf_url, 
             "fileName": f"Orcamento_Aulevi_{first_name}.pdf",
-            "caption": f"Olá, {first_name}! 🚀\n\nSegue o seu orçamento detalhado para o projeto de *{product_name}* que solicitou no nosso totem.\n\nA equipa de Engenharia da Aulevi está à disposição para tirar qualquer dúvida!"
+            "caption": f"Olá, {first_name}! 👋\n\nObrigado por utilizar o nosso totem. Segue em anexo o orçamento para o seu projeto de *{product_name}* 📄.\n\n⚠️ *Aviso Importante:* Os valores apresentados neste documento são uma *estimativa inicial*. O investimento final pode sofrer alterações após uma análise técnica detalhada da nossa engenharia.\n\nNosso time de especialistas está à disposição para alinhar os detalhes, prazos e tirar qualquer dúvida que você tenha. 🤝\n\nUm abraço,\nEquipe Aulevi 🏗️"
         }
         
         # MONTANDO O CABEÇALHO DE SEGURANÇA
