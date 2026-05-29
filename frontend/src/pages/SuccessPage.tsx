@@ -13,7 +13,7 @@ const SuccessPage = () => {
 
     const timeoutId = window.setTimeout(() => {
       setCounter((currentCounter) => currentCounter - 1);
-    }, 1000);
+    }, 1200);
 
     return () => window.clearTimeout(timeoutId);
   }, [counter, navigate]);
