@@ -36,23 +36,20 @@ def generate_quote_number(module_name: str) -> str:
     
     return f"AUL-{prefix}-{random_str}.{year_str}"
 
-
-# FUNÇÃO DE BACKGROUND COM FLUSH (Roda escondida sem travar o usuário)
-# 🚀 FUNÇÃO DE BACKGROUND SÍNCRONA COM FLUSH
-def process_whatsapp_background(pdf_bytes: bytes, phone: str, lead_name: str, module: str):
+# FUNÇÃO DE BACKGROUND SÍNCRONA COM FLUSH
+def process_whatsapp_background(pdf_bytes: bytes, phone: str, lead_name: str, module: str, quote_number: str, display_name: str):
     print(f"\n[Background] 🚀 Iniciando fluxo Z-API/Supabase para {lead_name}...", flush=True)
     try:
-        # 1. Sobe o ficheiro para a nuvem
         pdf_url = StorageService.upload_pdf(pdf_bytes, prefix=module)
         
         if pdf_url:
             print(f"[Background] ✅ Upload concluído! URL: {pdf_url}", flush=True)
-            # 2. Manda a Z-API disparar o WhatsApp (Agora sem o 'await')
             WhatsAppService.send_pdf_quote(
                 phone=phone,
                 pdf_url=pdf_url,
                 lead_name=lead_name,
-                product_name=module
+                product_name=display_name, # Usa o nome formatado (Chalé X, Madeiramento Metálico)
+                quote_number=quote_number  # Repassa o número do orçamento
             )
         else:
             print("[Background] ❌ Fluxo interrompido: Falha ao obter URL do Supabase.", flush=True)
@@ -163,6 +160,19 @@ async def create_quote(payload: QuoteRequestSchema, db: Session = Depends(get_db
         
         print(f"🚨 DEBUG WHATSAPP: Nome='{lead_name}' | Telefone='{lead_phone}'", flush=True)
 
+        print(f"🚨 DEBUG WHATSAPP: Nome='{lead_name}' | Telefone='{lead_phone}'", flush=True)
+
+        # ALTERAÇÃO 2 e 3: FORMATAÇÃO DO NOME DE EXIBIÇÃO DO PRODUTO PARA O WHATSAPP
+        display_product_name = module
+        if module == "MADEIRAMENTO":
+            display_product_name = "Madeiramento Metálico"
+        elif module in ["CHALE", "BARRACAO"]:
+            # Tenta extrair o nome do modelo de dentro do dicionário de produto enviado pelo frontend
+            modelo_nome = product_data.get("nome") or product_data.get("name") or product_data.get("modelo") or ""
+            prefixo = "Chalé" if module == "CHALE" else "Barracão"
+            # Se achar o nome, junta (Ex: "Chalé Suíço"). Se não, fica só "Chalé"
+            display_product_name = f"{prefixo} {modelo_nome}".strip() if modelo_nome else prefixo
+
         # 5. GATILHO DO WHATSAPP (Agendando com segurança)
         bg_task = None
         if lead_phone and lead_phone != "Não Informado":
@@ -172,7 +182,9 @@ async def create_quote(payload: QuoteRequestSchema, db: Session = Depends(get_db
                 pdf_bytes=pdf_bytes,
                 phone=lead_phone,
                 lead_name=lead_name,
-                module=module
+                module=module,
+                quote_number=quote_number,             # Passando o número
+                display_name=display_product_name      # Passando o nome tratado
             )
 
         # 6. CONVERSÃO E ENVIO DO STREAMING PARA O NAVEGADOR
@@ -191,7 +203,7 @@ async def create_quote(payload: QuoteRequestSchema, db: Session = Depends(get_db
                 "Content-Disposition": f"attachment; filename={filename}",
                 "Access-Control-Expose-Headers": "Content-Disposition"
             },
-            background=bg_task # 🔥 
+            background=bg_task 
         )
         
     except Exception as e:
