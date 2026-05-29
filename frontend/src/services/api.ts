@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Usando variável de ambiente, o mesmo código vai funcionar 
 // tanto no Totem (localhost) quanto no site dos Vendedores (Nuvem).
-const BASE_URL = import.meta.env.VITE_API_URL || 'https://pi-aulevi-totem.onrender.com/api/v1';
+const BASE_URL = import.meta.env.VITE_API_URL || 'https://api-aulevi-totem.onrender.com/api/v1';
 
 export const api = axios.create({
   baseURL: BASE_URL,
@@ -15,12 +15,25 @@ export const api = axios.create({
 export const KioskService = {
   submitQuote: async (payload: Record<string, unknown>) => {
     try {
-      // 1. Avisamos ao Axios que a resposta será um arquivo (Blob) e não um texto/JSON
+      // 1. Verifica a origem na URL (retorna estritamente um booleano nativo)
+      const isTotem = new URLSearchParams(window.location.search).get("origem") === "totem";
+      
+      // Injeta a flag no payload antes de enviar para o backend
+      payload.is_totem = isTotem;
+
+      // Se for totem, espera JSON. Se não, espera o arquivo (blob)
       const response = await api.post('/quotes/', payload, {
-        responseType: 'blob' 
+        responseType: isTotem ? 'json' : 'blob' 
       });
 
-      // 2. Tentamos extrair o nome exato do arquivo que o FastAPI gerou no backend
+      // Fluxo do Totem (Quiosque Público)
+      if (isTotem) {
+        console.log("Acesso via Totem detectado. Download bloqueado, WhatsApp disparado.");
+        // Não fazemos o download, apenas informamos o sucesso
+        return { success: true, message: response.data?.message || "Orçamento enviado!" };
+      }
+
+      // Fluxo de Acesso Pessoal (Celular/Desktop)
       let filename = 'Orcamento_Aulevi.pdf';
       const disposition = response.headers['content-disposition'];
       if (disposition && disposition.includes('filename=')) {
@@ -30,21 +43,16 @@ export const KioskService = {
         }
       }
 
-      // 3. Criamos uma URL temporária na memória do navegador com os bytes do PDF
       const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
-      
-      // 4. Criamos uma âncora <a> invisível, clicamos nela para forçar o download e a apagamos
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', filename);
       document.body.appendChild(link);
       link.click();
       
-      // 5. Limpeza de memória do navegador para não deixar o Totem lento com o tempo
       link.remove();
       window.URL.revokeObjectURL(url);
 
-      // Como o backend não devolve mais os dados em JSON, retornamos um status de sucesso
       return { success: true };
 
     } catch (error) {

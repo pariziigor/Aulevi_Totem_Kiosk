@@ -5,14 +5,14 @@ import string
 import asyncio
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, JSONResponse
 from sqlalchemy.orm import Session
 from database.connection import get_db
 from schemas.quote_schema import QuoteRequestSchema
 from services.pricing_service import PricingService
 from services.pdf_service import PDFService
 from models.quote_model import QuoteModel
-from starlette.background import BackgroundTask
+from starlette.background import BackgroundTask 
 
 # Importações dos novos serviços de nuvem e mensageria
 from services.supabase_service import StorageService
@@ -160,8 +160,6 @@ async def create_quote(payload: QuoteRequestSchema, db: Session = Depends(get_db
         
         print(f"🚨 DEBUG WHATSAPP: Nome='{lead_name}' | Telefone='{lead_phone}'", flush=True)
 
-        print(f"🚨 DEBUG WHATSAPP: Nome='{lead_name}' | Telefone='{lead_phone}'", flush=True)
-
         # ALTERAÇÃO 2 e 3: FORMATAÇÃO DO NOME DE EXIBIÇÃO DO PRODUTO PARA O WHATSAPP
         display_product_name = module
         if module == "MADEIRAMENTO":
@@ -193,28 +191,35 @@ async def create_quote(payload: QuoteRequestSchema, db: Session = Depends(get_db
                 display_name=display_product_name      # Passando o nome tratado
             )
 
-        # 6. CONVERSÃO E ENVIO DO STREAMING PARA O NAVEGADOR
-        pdf_stream = io.BytesIO(pdf_bytes)
-        pdf_stream.seek(0)
+        # 6. RESPOSTA CONDICIONAL (Totem vs Web/Mobile)
+        # CORREÇÃO: Utilizando payload_dict no lugar da variável inexistente "data"
+        is_totem = payload_dict.get("is_totem", False) 
         
-        clean_name = lead_name.replace(" ", "_")
-        filename = f"{quote_number}_{clean_name}.pdf"
-        
-        print(f"[PDF Generator]: Documento {quote_number} transmitido para o Totem!", flush=True)
-        
-        return StreamingResponse(
-            pdf_stream,
-            media_type="application/pdf",
-            headers={
-                "Content-Disposition": f"attachment; filename={filename}",
-                "Access-Control-Expose-Headers": "Content-Disposition"
-            },
-            background=bg_task 
-        )
-        
-    except Exception as e:
-        db.rollback()
-        
+        if is_totem:
+            print("[PDF Generator]: Operando em ambiente quiosque. Download bloqueado, apenas WhatsApp disparado.", flush=True)
+            return JSONResponse(
+                content={"status": "success", "message": "Orçamento processado e enviado via WhatsApp!"},
+                background=bg_task  
+            )
+        else:
+            print(f"[PDF Generator]: Acesso pessoal detectado. Transmitindo documento {quote_number} para o navegador!", flush=True)
+            pdf_stream = io.BytesIO(pdf_bytes)
+            pdf_stream.seek(0)
+            
+            clean_name = lead_name.replace(" ", "_")
+            filename = f"{quote_number}_{clean_name}.pdf"
+            
+            return StreamingResponse(
+                pdf_stream,
+                media_type="application/pdf",
+                headers={
+                    "Content-Disposition": f"attachment; filename={filename}",
+                    "Access-Control-Expose-Headers": "Content-Disposition"
+                },
+                background=bg_task
+            )
+            
+    # CORREÇÃO: Mesclado os dois blocos except que estavam duplicados no final do arquivo
     except Exception as e:
         db.rollback()
         print(f"Erro detalhado na criação do orçamento: {str(e)}", flush=True) 
