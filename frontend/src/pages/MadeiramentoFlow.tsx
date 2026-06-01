@@ -131,7 +131,7 @@ const MadeiramentoFlow: React.FC = () => {
         </div>
       </header>
 
-      <main className="flex-1 flex items-start lg:items-stretch justify-center relative w-full lg:max-w-none mx-auto pb-6 md:pb-4 lg:pb-0 min-h-0 lg:overflow-hidden">
+      <main className="flex-1 flex items-center lg:items-stretch justify-center relative w-full lg:max-w-none mx-auto pb-6 md:pb-4 lg:pb-0 min-h-0 lg:overflow-hidden">
         <StepRenderer
           currentStep={step}
           state={{
