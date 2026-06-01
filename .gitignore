@@ -8,34 +8,75 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+lerna-debug.log*.*
 
 # =========================
 # PYTHON / BACKEND
 # =========================
+# Virtual environments
 backend/venv/
+backend/env/
+backend/.venv/
+backend/.env/
+backend/ENV/
+backend/env.bak/
+backend/venv.bak/
+
+# Python cache
 backend/__pycache__/
+backend/**/__pycache__/
 backend/**/*.pyc
 backend/**/*.pyo
 backend/**/*.pyd
-backend/.env
+backend/**/*.so
+backend/**/*.egg-info/
+backend/*.egg-info/
+
+# Testing
 backend/.pytest_cache/
-backend/.mypy_cache/
 backend/.coverage
 backend/htmlcov/
+backend/.mypy_cache/
+backend/.dmypy.json
+backend/dmypy.json
+backend/coverage.xml
+
+# Databases
 backend/*.sqlite3
-*.db
+backend/*.db
+backend/*.sqlite
+
+# Gerados
 backend/generated_quotes/
+backend/generated_pdfs/
+
+# Environment
+backend/.env
+backend/.env.local
+backend/.env.*.local
 
 # =========================
 # NODE / FRONTEND / ELECTRON
 # =========================
+# Dependencies
 frontend/node_modules/
 electron-wrapper/node_modules/
+node_modules/
 
+# Build outputs
 frontend/dist/
 frontend/dist-ssr/
+frontend/.nuxt
+frontend/build/
 electron-wrapper/dist/
 electron-wrapper/build/
+electron-wrapper/out/
+electron-wrapper/release/
+
+# Package manager locks (optional to commit)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
 
 # =========================
 # ENV FILES
@@ -51,31 +92,67 @@ electron-wrapper/build/
 # VITE
 # =========================
 frontend/.vite/
+*.vite/
 
 # =========================
 # ELECTRON
 # =========================
 electron-wrapper/out/
 electron-wrapper/release/
+electron-wrapper/dist/
+electron-wrapper/build/
 
 # =========================
 # IDE / EDITOR
 # =========================
+# VSCode
 .vscode/*
 !.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/launch.json
 
+# JetBrains IDEs
 .idea/
+*.iml
+*.iws
+*.ipr
+*.sublime-project
+*.sublime-workspace
+
+# Visual Studio
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+*.sln.iml
+
+# Vim
+.vim
+*.swp
+*.swo
+*~
+.netrwhist
+
+# Emacs
+*~
+.\#*
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
 
 # =========================
 # OS FILES
 # =========================
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+desktop.ini
 
 # =========================
 # TEMP FILES
@@ -83,4 +160,41 @@ Thumbs.db
 tmp/
 temp/
 *.tmp
-*.md
+*.temp
+*.bak
+*.backup
+
+# =========================
+# MACOS
+# =========================
+.AppleDouble
+.LSOverride
+
+# =========================
+# WINDOWS
+# =========================
+Thumbs.db
+*.stackdump
+
+# =========================
+# BUILD / DIST
+# =========================
+dist/
+build/
+out/
+*.exe
+*.app
+*.dmg
+
+# =========================
+# DOCUMENTATION
+# =========================
+# Ignore local documentation builds (keep source .md files)
+docs/_build/
+site/
+
+# =========================
+# VSCODE GENERATED
+# =========================
+.vscode-test
+.vscode-profile
