@@ -60,3 +60,8 @@ app.include_router(quote_routes.router)
 def health_check():
     """Endpoint para validacao de uptime."""
     return {"status": "operacional", "offline_ready": True}
+
+@app.get("/", tags=["Monitoramento"])
+def home():
+    """Rota raiz genérica para responder aos pings do cron-job com status 200 OK."""
+    return {"status": "online", "message": "Aulevi Kiosk API está operacional"}
